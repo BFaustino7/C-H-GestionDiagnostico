@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Remito #{{ orden.id }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 40px; }
+        .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px; }
+        .info-box { border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; border-radius: 5px; }
+        .titulo { font-weight: bold; color: #555; display: block; margin-bottom: 5px; }
+        .legal { font-size: 0.8em; color: #777; margin-top: 50px; text-align: justify; }
+        .firma { margin-top: 80px; display: flex; justify-content: space-between; }
+        .linea-firma { border-top: 1px solid black; width: 40%; text-align: center; padding-top: 10px; }
+        
+        /* Ocultar botón al imprimir */
+        @media print { .no-print { display: none; } }
+    </style>
+</head>
+<body>
+
+    <button onclick="window.print()" class="no-print" style="padding: 10px 20px; cursor: pointer; font-size: 16px;">🖨️ IMPRIMIR DOCUMENTO</button>
+
+    <div class="header">
+        <h1>SR REFRIGERACIÓN</h1>
+        <p>Servicio Técnico Especializado - Villa Constitución</p>
+        <h3>ORDEN DE SERVICIO / REMITO DE ENTREGA #{{ orden.id }}</h3>
+    </div>
+
+    <div class="info-box">
+        <span class="titulo">DATOS DEL CLIENTE:</span>
+        <p>
+            <strong>Nombre:</strong> {{ orden.equipo.cliente.nombre }}<br>
+            <strong>Teléfono:</strong> {{ orden.equipo.cliente.telefono }}<br>
+            <strong>Dirección:</strong> {{ orden.equipo.cliente.direccion }}
+        </p>
+    </div>
+
+    <div class="info-box">
+        <span class="titulo">EQUIPO:</span>
+        <p>{{ orden.equipo.get_tipo_display }} - {{ orden.equipo.marca }} {{ orden.equipo.modelo }}</p>
+        <p><strong>Ubicación:</strong> {{ orden.equipo.ubicacion }}</p>
+    </div>
+
+    <div class="info-box">
+        <span class="titulo">TRABAJO REALIZADO:</span>
+        <p>{{ orden.diagnostico_tecnico|linebreaksbr }}</p>
+        <hr>
+        <span class="titulo">REPUESTOS UTILIZADOS:</span>
+        <ul>
+            {% for item in orden.detalleinsumo_set.all %}
+                <li>{{ item.producto.nombre }} (x{{ item.cantidad }})</li>
+            {% empty %}
+                <li>Sin repuestos adicionales.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div style="text-align: right; font-size: 1.2em; margin-top: 20px;">
+        <strong>TOTAL MANO DE OBRA: ${{ orden.costo_mano_obra }}</strong>
+        </div>
+
+    <div class="legal">
+        <strong>GARANTÍA:</strong> El presente trabajo cuenta con una garantía de 90 días sobre la mano de obra realizada. 
+        La garantía no cubre fallas eléctricas externas, mal uso del equipo o intervención de terceros. 
+        Los repuestos electrónicos no tienen cambio ni devolución.
+    </div>
+
+    <div class="firma">
+        <div class="linea-firma">Firma Conformidad Cliente</div>
+        <div class="linea-firma">Firma Responsable Técnico</div>
+    </div>
+
+</body>
+</html>

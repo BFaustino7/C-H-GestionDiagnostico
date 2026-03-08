@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Orden No Encontrada</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Estilo Minimalista Industrial */
+        body { background-color: #f0f0f0; display: flex; align-items: center; justify-content: center; height: 100vh; }
+        .error-card { 
+            border: 2px solid #000; 
+            background: #fff; 
+            padding: 40px; 
+            max-width: 500px; 
+            width: 100%;
+        }
+        .btn-sharp { border-radius: 0; border: 2px solid #000; font-weight: bold; text-transform: uppercase; }
+        .btn-sharp:hover { background-color: #000; color: #fff; }
+    </style>
+</head>
+<body>
+    <div class="error-card">
+        <h1 class="display-1 fw-bold text-muted mb-0">404</h1>
+        <h3 class="fw-bold mb-4">ORDEN INEXISTENTE</h3>
+        <p class="mb-4">
+            No se encontró ninguna orden de reparación con el ID <strong>#{{ id_buscado }}</strong> en la base de datos.
+            Es posible que haya sido eliminada o el número sea incorrecto.
+        </p>
+        <div class="d-grid">
+            <a href="{% url 'tablero' %}" class="btn btn-sharp">Volver al Tablero</a>
+        </div>
+    </div>
+</body>
+</html>
