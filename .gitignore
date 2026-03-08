@@ -16,3 +16,9 @@ __pycache__/
 
 # Archivos de VS Code
 .vscode/
+
+# Ignorar todo el contenido de media (fotos, pdfs, etc)
+media/*
+
+# PERO hacer una excepción con el archivo fantasma para mantener la carpeta viva
+!media/.gitkeep
