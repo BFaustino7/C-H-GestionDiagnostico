@@ -1,7 +1,68 @@
 from django.shortcuts import render, get_object_or_404
-from .models import OrdenReparacion
+from .models import OrdenReparacion, FichaTecnica, Cliente, Equipo, Producto
 import random
 from datetime import datetime, timedelta
+#-----------------------------------------------------#
+from django.shortcuts import render, redirect
+from django.db import transaction
+from .forms import ClienteForm, EquipoForm, OrdenIngresoForm
+#-----------------------------------------------------#
+from django.db.models import Q # Para búsquedas complejas
+
+
+def ingreso_equipo(request):
+    if request.method == 'POST':
+        cliente_form = ClienteForm(request.POST)
+        equipo_form = EquipoForm(request.POST)
+        orden_form = OrdenIngresoForm(request.POST)
+
+        # Validar que todos los formularios tengan datos correctos
+        if cliente_form.is_valid() and equipo_form.is_valid() and orden_form.is_valid():
+            try:
+                # Iniciar transacción atómica
+                with transaction.atomic():
+                    
+                    # 1. Guardar el Cliente
+                    cliente = cliente_form.save()
+
+                    # 2. Guardar el Equipo y asociarlo al Cliente
+                    equipo = equipo_form.save(commit=False)
+                    equipo.cliente = cliente
+                    equipo.save()
+
+                    # 3. Generar la Ficha Técnica en blanco asociada al Equipo
+                    FichaTecnica.objects.create(
+                        equipo=equipo,
+                        gas_tipo='',
+                        gas_cantidad=0,
+                        datos_electricos=''
+                    )
+
+                    # 4. Crear la Orden de Reparación asociada al Equipo
+                    orden = orden_form.save(commit=False)
+                    orden.equipo = equipo
+                    # Nota: El estado por defecto ya es 'PENDIENTE' y pago 'DEBE' en tu modelo
+                    orden.save()
+
+                # Redirigir al usuario tras un ingreso exitoso (ajustar 'tablero' según tu urls.py)
+                return redirect('tablero') 
+            
+            except Exception as e:
+                # Agregar mensajes de error de Django (messages.error)
+                pass
+    else:
+        # Cargar formularios vacíos si la petición es GET
+        cliente_form = ClienteForm()
+        equipo_form = EquipoForm()
+        orden_form = OrdenIngresoForm()
+
+    context = {
+        'cliente_form': cliente_form,
+        'equipo_form': equipo_form,
+        'orden_form': orden_form
+    }
+    
+    return render(request, 'gestion/ingreso_equipo.html', context)
 
 def tablero_principal(request):
     # 1. CONSULTAS BD
@@ -93,13 +154,54 @@ def imprimir_remito(request, orden_id):
     return render(request, 'gestion/remito_imprimible.html', {'orden': orden})
 
 def detalle_orden(request, orden_id):
+    # 1. Intentamos obtener la orden (Tu lógica de control)
     try:
         orden = OrdenReparacion.objects.get(pk=orden_id)
     except OrdenReparacion.DoesNotExist:
-        return render(request, 'gestion/orden_no_encontrada.html', {
-            'id_buscado': orden_id
-        })
+        return render(request, 'gestion/orden_no_encontrada.html', {'id_buscado': orden_id})
     
-    return render(request, 'gestion/detalle_orden.html', {
-        'orden': orden,
+    # 2. Lógica para procesar el formulario (Lo nuevo)
+    if request.method == 'POST':
+        orden.diagnostico_tecnico = request.POST.get('diagnostico')
+        orden.costo_mano_obra = request.POST.get('mano_obra')
+        orden.estado = request.POST.get('estado')
+        orden.save()
+        # Redirigimos para "limpiar" el envío del formulario y ver los cambios
+        return redirect('detalle_orden', orden_id=orden.id)
+
+    # 3. Renderizado normal (GET)
+    return render(request, 'gestion/detalle_orden.html', {'orden': orden})
+
+
+def lista_clientes(request):
+    busqueda = request.GET.get('buscar')
+    if busqueda:
+        # Busca por nombre o teléfono
+        clientes = Cliente.objects.filter(
+            Q(nombre__icontains=busqueda) | Q(telefono__icontains=busqueda)
+        )
+    else:
+        clientes = Cliente.objects.all().order_by('nombre')
+    
+    return render(request, 'gestion/lista_clientes.html', {'clientes': clientes})
+
+def lista_equipos(request):
+    # Traemos los equipos con su cliente relacionado para no saturar la DB (select_related)
+    equipos = Equipo.objects.select_related('cliente').all()
+    
+    return render(request, 'gestion/lista_equipos.html', {'equipos': equipos})
+
+def calendario_taller(request):
+    # Mostramos órdenes pendientes y en reparación para organizar la semana
+    proximos_trabajos = OrdenReparacion.objects.filter(
+        estado__in=['PENDIENTE', 'DIAGNOSTICO', 'REPARACION']
+    ).order_by('fecha_ingreso')
+    
+    return render(request, 'gestion/calendario.html', {
+        'ordenes': proximos_trabajos,
+        'hoy': datetime.now()
     })
+
+def configuracion_sistema(request):
+    productos = Producto.objects.all()
+    return render(request, 'gestion/configuracion.html', {'productos': productos})

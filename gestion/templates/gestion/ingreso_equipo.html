@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Nuevo Ingreso</title>
+</head>
+<body>
+    <h2>Ingreso de Equipo al Taller</h2>
+    
+    <form method="POST" action="">
+        {% csrf_token %}
+        
+        <h3>Datos del Cliente</h3>
+        {{ cliente_form.as_p }}
+        
+        <h3>Datos del Equipo</h3>
+        {{ equipo_form.as_p }}
+        
+        <h3>Orden de Reparación</h3>
+        {{ orden_form.as_p }}
+        
+        <button type="submit">Guardar Ingreso</button>
+    </form>
+</body>
+</html>

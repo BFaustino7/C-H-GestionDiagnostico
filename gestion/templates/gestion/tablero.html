@@ -100,12 +100,11 @@
     <div id="sidebar-wrapper">
         <div class="sidebar-heading">C&H Refrigeración</div>
         <div class="list-group list-group-flush">
-            <a href="#" class="list-group-item list-group-item-action active">📊 Dashboard</a>
-            <a href="#" class="list-group-item list-group-item-action">❄️ Servicios</a>
-            <a href="#" class="list-group-item list-group-item-action">👥 Clientes</a>
-            <a href="#" class="list-group-item list-group-item-action">🔧 Equipos / Fichas</a>
-            <a href="#" class="list-group-item list-group-item-action">📅 Calendario</a>
-            <a href="#" class="list-group-item list-group-item-action mt-5 border-top border-secondary">⚙️ Configuración</a>
+            <a href="{% url 'tablero' %}" class="list-group-item list-group-item-action active">📊 Dashboard</a>
+            <a href="{% url 'clientes' %}" class="list-group-item list-group-item-action">👥 Clientes</a>
+            <a href="{% url 'equipos' %}" class="list-group-item list-group-item-action">🔧 Equipos / Fichas</a>
+            <a href="{% url 'calendario' %}" class="list-group-item list-group-item-action">📅 Calendario</a>
+            <a href="{% url 'configuracion' %}" class="list-group-item list-group-item-action mt-5 border-top border-secondary">⚙️ Configuración</a>
         </div>
     </div>
     <div id="page-content-wrapper">

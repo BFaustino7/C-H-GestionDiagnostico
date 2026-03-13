@@ -70,7 +70,15 @@ class OrdenReparacion(models.Model):
         ('TERMINADO', 'Terminado (Listo p/ entregar)'),
         ('ENTREGADO', 'Entregado al Cliente'),
     ]
-
+    # --- NUEVO: Opciones de Pago ---
+    ESTADOS_PAGO = [
+        ('DEBE', 'Impago'),
+        ('SENA', 'Seña / Anticipo'),
+        ('PAGADO', 'Pagado Totalmente'),
+    ]
+    estado_pago = models.CharField(max_length=20, choices=ESTADOS_PAGO, default='DEBE') 
+    en_banco_pruebas = models.BooleanField(default=False, help_text="Activa el panel SCADA para este equipo") 
+    #---------------------------------------------------------------------------------------------------------#
     equipo = models.ForeignKey(Equipo, on_delete=models.PROTECT)
     tecnico = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     fecha_ingreso = models.DateTimeField(auto_now_add=True)
@@ -79,7 +87,12 @@ class OrdenReparacion(models.Model):
     falla_declarada = models.TextField(help_text="Qué dijo el cliente que pasa")
     diagnostico_tecnico = models.TextField(blank=True)
     
+    #Plata
     costo_mano_obra = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    sena_monto = models.DecimalField(max_digits=10, decimal_places=2, default=0, help_text="Monto dejado a cuenta")
+    """
+    sena_monto:El cliente deja plata a cuenta para comprar insumo o repuesto.
+    """
     
     # Relación M-to-M con Productos usando la tabla intermedia
     insumos = models.ManyToManyField(Producto, through='DetalleInsumo')

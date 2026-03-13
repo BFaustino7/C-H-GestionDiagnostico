@@ -4,11 +4,13 @@ from . import views
 urlpatterns = [
     # Ruta de la pantalla principal (Tablero)
     path('', views.tablero_principal, name='tablero'),
-
     # --- NUEVA RUTA DE DETALLE ---
     path('orden/<int:orden_id>/', views.detalle_orden, name='detalle_orden'),
-    # -----------------------------
-
     # Ruta para imprimir el remito
     path('remito/<int:orden_id>/', views.imprimir_remito, name='imprimir_remito'),
+    path('equipos/', views.lista_equipos, name='equipos'),
+    path('clientes/', views.lista_clientes, name='clientes'),
+    path('calendario/', views.calendario_taller, name='calendario'),
+    path('configuracion/', views.configuracion_sistema, name='configuracion'),
+    path('ingresar/', views.ingreso_equipo, name= 'ingreso_equipo')
 ]

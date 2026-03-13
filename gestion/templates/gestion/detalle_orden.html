@@ -63,8 +63,8 @@
                     <div class="card-header bg-white text-dark border-bottom border-dark">Especificaciones</div>
                     <div class="card-body p-0">
                         <table class="table table-striped m-0">
-                            <tr><td class="ps-3">Gas Ref.</td><td class="fw-bold">{{ orden.equipo.fichatecnica.tipo_gas }}</td></tr>
-                            <tr><td class="ps-3">Carga</td><td class="fw-bold">{{ orden.equipo.fichatecnica.carga_gas_gr }} gr</td></tr>
+                            <tr><td class="ps-3">Gas Ref.</td><td class="fw-bold">{{ orden.equipo.fichatecnica.gas_tipo }}</td></tr>
+                            <tr><td class="ps-3">Carga</td><td class="fw-bold">{{ orden.equipo.fichatecnica.gas_cantidad }} gr</td></tr>
                             <tr><td class="ps-3">Tensión</td><td class="fw-bold">{{ orden.equipo.fichatecnica.tension }} V</td></tr>
                             <tr><td class="ps-3">Corriente</td><td class="fw-bold">{{ orden.equipo.fichatecnica.corriente_nominal }} A</td></tr>
                         </table>
@@ -99,7 +99,7 @@
                     <div class="card-body">
                         <div class="mb-4">
                             <label class="fw-bold small text-muted text-uppercase d-block mb-1">Motivo de Ingreso</label>
-                            <div class="p-3 bg-light border border-secondary">{{ orden.problema_reportado }}</div>
+                            <div class="p-3 bg-light border border-secondary">{{ orden.falla_declarada}}</div>
                         </div>
                         
                         <div>
