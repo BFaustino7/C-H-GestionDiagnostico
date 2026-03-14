@@ -1,159 +1,695 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Orden #{{ orden.id }}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <style>
-        body { background-color: #f4f4f4; font-family: 'Segoe UI', sans-serif; }
-        
-        /* ESTÉTICA INDUSTRIAL / MINIMALISTA */
-        .card { border: 1px solid #000; border-radius: 0 !important; box-shadow: none !important; margin-bottom: 20px; }
-        .card-header { background-color: #000; color: #fff; border-radius: 0 !important; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; padding: 10px 15px; }
-        .btn-square { border-radius: 0; font-weight: 600; text-transform: uppercase; border: 1px solid #000; }
-        
-        /* Colores de estado sólidos */
-        .status-badge { 
-            background-color: #000; color: #fff; padding: 5px 10px; font-weight: bold; text-transform: uppercase; font-size: 0.9rem; border: 1px solid #000;
+{% extends 'gestion/base.html' %}
+
+{% block title %}Orden #{{ orden.id }} - C&H Refrigeración{% endblock %}
+
+{% block page_title %}FICHA TÉCNICA - ORDEN DE REPARACIÓN{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ========================================
+       DETALLE ORDEN - FICHA TÉCNICA INDUSTRIAL
+       ======================================== */
+    
+    /* Cabecera Industrial */
+    .order-header {
+        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        border: 3px solid #000000;
+        padding: 25px 30px;
+        margin-bottom: 25px;
+        box-shadow: 5px 5px 0px rgba(0,0,0,0.3);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    
+    .order-id-block {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+    
+    .order-number {
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: #ffffff;
+        letter-spacing: 2px;
+    }
+    
+    .order-number span {
+        color: #ffcc00;
+    }
+    
+    .order-date {
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 0.85rem;
+        color: #888888;
+        padding: 8px 15px;
+        background-color: #0d0d0d;
+        border: 1px solid #333333;
+    }
+    
+    /* Badge de Estado Grande */
+    .status-badge-large {
+        padding: 12px 30px;
+        font-size: 1rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        font-family: 'Courier New', Courier, monospace;
+        border: 3px solid;
+        box-shadow: 3px 3px 0px rgba(0,0,0,0.5);
+    }
+    
+    .status-pendiente {
+        background-color: #dc3545;
+        color: #ffffff;
+        border-color: #a71d2a;
+    }
+    
+    .status-diagnostico {
+        background-color: #ffc107;
+        color: #000000;
+        border-color: #d39e00;
+    }
+    
+    .status-reparacion {
+        background-color: #0d6efd;
+        color: #ffffff;
+        border-color: #0a58ca;
+    }
+    
+    .status-completado {
+        background-color: #198754;
+        color: #ffffff;
+        border-color: #146c43;
+    }
+    
+    .status-entregado {
+        background-color: #6c757d;
+        color: #ffffff;
+        border-color: #565e64;
+    }
+    
+    /* Panel de Información - Grid 2 columnas */
+    .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 25px;
+        margin-bottom: 25px;
+    }
+    
+    @media (max-width: 992px) {
+        .info-grid {
+            grid-template-columns: 1fr;
         }
-        
-        .table-custom th { background-color: #e9ecef; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; }
-        .img-bordered { border: 1px solid #000; padding: 2px; }
-    </style>
-</head>
-<body>
+    }
+    
+    .info-panel {
+        background-color: #ffffff;
+        border: 2px solid #1a1a1a;
+        box-shadow: 4px 4px 0px rgba(0,0,0,0.15);
+    }
+    
+    .info-panel-header {
+        background-color: #1a1a1a;
+        color: #ffffff;
+        padding: 12px 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        border-bottom: 3px solid #ffcc00;
+    }
+    
+    .info-panel-header i {
+        font-size: 1.3rem;
+        color: #ffcc00;
+    }
+    
+    .info-panel-header h3 {
+        margin: 0;
+        font-size: 0.95rem;
+        font-weight: 600;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+    }
+    
+    .info-panel-body {
+        padding: 20px;
+    }
+    
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px dashed #cccccc;
+    }
+    
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    
+    .info-label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #666666;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .info-value {
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        text-align: right;
+    }
+    
+    .info-value.highlight {
+        color: #0d6efd;
+    }
+    
+    /* Sección de Diagnóstico - Estilo Terminal */
+    .terminal-section {
+        background-color: #ffffff;
+        border: 2px solid #1a1a1a;
+        margin-bottom: 25px;
+        box-shadow: 4px 4px 0px rgba(0,0,0,0.15);
+    }
+    
+    .terminal-header {
+        background-color: #1a1a1a;
+        color: #ffffff;
+        padding: 12px 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        border-bottom: 3px solid #00ff00;
+    }
+    
+    .terminal-header i {
+        font-size: 1.3rem;
+        color: #00ff00;
+    }
+    
+    .terminal-header h3 {
+        margin: 0;
+        font-size: 0.95rem;
+        font-weight: 600;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+    }
+    
+    .terminal-dots {
+        margin-left: auto;
+        display: flex;
+        gap: 6px;
+    }
+    
+    .terminal-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+    }
+    
+    .terminal-dot.red { background-color: #ff5f56; }
+    .terminal-dot.yellow { background-color: #ffbd2e; }
+    .terminal-dot.green { background-color: #27c93f; }
+    
+    .terminal-body {
+        background-color: #0d0d0d;
+        padding: 20px;
+        min-height: 120px;
+    }
+    
+    .terminal-content {
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 0.95rem;
+        color: #00ff00;
+        line-height: 1.8;
+        white-space: pre-wrap;
+    }
+    
+    .terminal-prompt {
+        color: #ffcc00;
+    }
+    
+    /* Formulario de Edición */
+    .edit-form-section {
+        background-color: #ffffff;
+        border: 2px solid #1a1a1a;
+        margin-bottom: 25px;
+        box-shadow: 4px 4px 0px rgba(0,0,0,0.15);
+    }
+    
+    .edit-form-header {
+        background-color: #2a2a2a;
+        color: #ffffff;
+        padding: 12px 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        border-bottom: 3px solid #0dcaf0;
+    }
+    
+    .edit-form-header i {
+        font-size: 1.3rem;
+        color: #0dcaf0;
+    }
+    
+    .edit-form-header h3 {
+        margin: 0;
+        font-size: 0.95rem;
+        font-weight: 600;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+    }
+    
+    .edit-form-body {
+        padding: 25px;
+    }
+    
+    .form-group-industrial {
+        margin-bottom: 20px;
+    }
+    
+    .form-group-industrial label {
+        display: block;
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        margin-bottom: 8px;
+        padding-left: 2px;
+    }
+    
+    .form-group-industrial label i {
+        margin-right: 8px;
+        color: #666666;
+    }
+    
+    .input-industrial {
+        width: 100%;
+        padding: 14px 18px;
+        font-size: 1rem;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        border: 2px solid #999999;
+        border-radius: 0;
+        background-color: #fafafa;
+        transition: all 0.2s ease;
+    }
+    
+    .input-industrial:focus {
+        outline: none;
+        border-color: #1a1a1a;
+        background-color: #ffffff;
+        box-shadow: 3px 3px 0px rgba(0,0,0,0.1);
+    }
+    
+    .input-industrial.input-numeric {
+        font-family: 'Courier New', Courier, monospace;
+        font-weight: 700;
+        font-size: 1.2rem;
+        letter-spacing: 1px;
+    }
+    
+    textarea.input-industrial {
+        min-height: 120px;
+        resize: vertical;
+        line-height: 1.6;
+    }
+    
+    /* Costo Total - Destacado */
+    .cost-input-wrapper {
+        display: flex;
+        align-items: center;
+        background-color: #1a1a1a;
+        border: 2px solid #000000;
+        padding: 5px;
+    }
+    
+    .cost-prefix {
+        background-color: #ffcc00;
+        color: #000000;
+        padding: 12px 20px;
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 1.2rem;
+        font-weight: 700;
+    }
+    
+    .cost-input-wrapper .input-industrial {
+        border: none;
+        background-color: #ffffff;
+        flex-grow: 1;
+    }
+    
+    /* Botones de Acción */
+    .actions-section {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        padding: 20px 0;
+    }
+    
+    .btn-action {
+        padding: 16px 35px;
+        font-size: 0.95rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        border: 3px solid;
+        border-radius: 0;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+    }
+    
+    .btn-action i {
+        font-size: 1.2rem;
+    }
+    
+    .btn-actualizar {
+        background-color: #1a1a1a;
+        color: #ffffff;
+        border-color: #000000;
+    }
+    
+    .btn-actualizar:hover {
+        background-color: #333333;
+        color: #ffffff;
+        transform: translate(-3px, -3px);
+        box-shadow: 6px 6px 0px rgba(0,0,0,0.3);
+    }
+    
+    .btn-remito {
+        background-color: #198754;
+        color: #ffffff;
+        border-color: #146c43;
+    }
+    
+    .btn-remito:hover {
+        background-color: #20c997;
+        color: #ffffff;
+        transform: translate(-3px, -3px);
+        box-shadow: 6px 6px 0px rgba(0,0,0,0.3);
+    }
+    
+    .btn-volver {
+        background-color: transparent;
+        color: #666666;
+        border-color: #999999;
+    }
+    
+    .btn-volver:hover {
+        background-color: #f0f0f0;
+        color: #1a1a1a;
+        border-color: #1a1a1a;
+    }
+    
+    /* Indicador de Modificación */
+    .last-modified {
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 0.75rem;
+        color: #888888;
+        padding: 10px 15px;
+        background-color: #f5f5f5;
+        border-left: 3px solid #cccccc;
+        margin-top: 15px;
+    }
+    
+    /* Historial compacto */
+    .history-badge {
+        display: inline-block;
+        padding: 4px 10px;
+        font-size: 0.7rem;
+        font-family: 'Courier New', Courier, monospace;
+        background-color: #e9ecef;
+        color: #495057;
+        margin-right: 8px;
+        margin-bottom: 5px;
+    }
+</style>
+{% endblock %}
 
-    <div class="bg-white border-bottom border-dark py-3 mb-4">
-        <div class="container d-flex justify-content-between align-items-center">
-            <div>
-                <a href="{% url 'tablero' %}" class="text-decoration-none text-dark fw-bold">
-                    <i class="bi bi-arrow-left"></i> VOLVER
-                </a>
-            </div>
-            <div class="h4 m-0 fw-bold">ORDEN #{{ orden.id }}</div>
-            <div class="status-badge">{{ orden.get_estado_display }}</div>
+{% block content %}
+<!-- Cabecera Industrial con ID y Estado -->
+<div class="order-header">
+    <div class="order-id-block">
+        <div class="order-number">
+            ORDEN <span>#{{ orden.id|stringformat:"05d" }}</span>
+        </div>
+        <div class="order-date">
+            <i class="bi bi-calendar3 me-2"></i>
+            INGRESO: {{ orden.fecha_ingreso|date:"d/m/Y H:i" }}
         </div>
     </div>
+    
+    <!-- Badge de Estado Grande -->
+    {% if orden.estado == 'PENDIENTE' %}
+        <div class="status-badge-large status-pendiente">
+            <i class="bi bi-exclamation-triangle me-2"></i>PENDIENTE
+        </div>
+    {% elif orden.estado == 'DIAGNOSTICO' %}
+        <div class="status-badge-large status-diagnostico">
+            <i class="bi bi-search me-2"></i>EN DIAGNÓSTICO
+        </div>
+    {% elif orden.estado == 'REPARACION' %}
+        <div class="status-badge-large status-reparacion">
+            <i class="bi bi-tools me-2"></i>EN REPARACIÓN
+        </div>
+    {% elif orden.estado == 'COMPLETADO' %}
+        <div class="status-badge-large status-completado">
+            <i class="bi bi-check-circle me-2"></i>COMPLETADO
+        </div>
+    {% elif orden.estado == 'ENTREGADO' %}
+        <div class="status-badge-large status-entregado">
+            <i class="bi bi-box-seam me-2"></i>ENTREGADO
+        </div>
+    {% else %}
+        <div class="status-badge-large status-pendiente">
+            {{ orden.estado }}
+        </div>
+    {% endif %}
+</div>
 
-    <div class="container">
-        <div class="row">
+<!-- Panel de Información: Cliente y Equipo -->
+<div class="info-grid">
+    <!-- Columna Izquierda: Datos del Cliente -->
+    <div class="info-panel">
+        <div class="info-panel-header">
+            <i class="bi bi-person-badge"></i>
+            <h3>Datos del Cliente</h3>
+        </div>
+        <div class="info-panel-body">
+            <div class="info-row">
+                <span class="info-label">Nombre</span>
+                <span class="info-value">{{ orden.cliente.nombre }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Teléfono</span>
+                <span class="info-value highlight">{{ orden.cliente.telefono }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Email</span>
+                <span class="info-value">{{ orden.cliente.email|default:"—" }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Dirección</span>
+                <span class="info-value">{{ orden.cliente.direccion|default:"—" }}</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Columna Derecha: Datos del Equipo -->
+    <div class="info-panel">
+        <div class="info-panel-header">
+            <i class="bi bi-cpu"></i>
+            <h3>Datos del Equipo</h3>
+        </div>
+        <div class="info-panel-body">
+            <div class="info-row">
+                <span class="info-label">Marca</span>
+                <span class="info-value">{{ orden.equipo.marca }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Modelo</span>
+                <span class="info-value">{{ orden.equipo.modelo }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Tipo de Gas</span>
+                <span class="info-value highlight">{{ orden.equipo.tipo_gas|default:"R-410A" }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Número de Serie</span>
+                <span class="info-value">{{ orden.equipo.numero_serie|default:"N/A" }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Capacidad</span>
+                <span class="info-value">{{ orden.equipo.capacidad|default:"—" }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sección de Diagnóstico - Estilo Terminal -->
+<div class="terminal-section">
+    <div class="terminal-header">
+        <i class="bi bi-terminal"></i>
+        <h3>Problema Reportado por el Cliente</h3>
+        <div class="terminal-dots">
+            <div class="terminal-dot red"></div>
+            <div class="terminal-dot yellow"></div>
+            <div class="terminal-dot green"></div>
+        </div>
+    </div>
+    <div class="terminal-body">
+        <div class="terminal-content"><span class="terminal-prompt">root@ch-taller:~$</span> cat /reporte/problema.log
+
+{{ orden.problema_reportado|default:"Sin descripción del problema." }}</div>
+    </div>
+</div>
+
+<!-- Formulario de Edición Técnica -->
+<form method="post" action="{% url 'detalle_orden' orden.id %}">
+    {% csrf_token %}
+    
+    <div class="edit-form-section">
+        <div class="edit-form-header">
+            <i class="bi bi-pencil-square"></i>
+            <h3>Formulario de Edición Técnica</h3>
+        </div>
+        <div class="edit-form-body">
+            <!-- Diagnóstico Técnico -->
+            <div class="form-group-industrial">
+                <label for="diagnostico_tecnico">
+                    <i class="bi bi-clipboard-pulse"></i>
+                    Diagnóstico Técnico
+                </label>
+                <textarea 
+                    name="diagnostico_tecnico" 
+                    id="diagnostico_tecnico" 
+                    class="input-industrial"
+                    placeholder="Describa el diagnóstico técnico detallado del equipo..."
+                >{{ orden.diagnostico_tecnico }}</textarea>
+            </div>
             
-            <div class="col-md-4">
-                
-                <div class="card">
-                    <div class="card-header">Equipo / Cliente</div>
-                    <div class="card-body">
-                        <h2 class="h4 fw-bold mb-1">{{ orden.equipo.tipo }} {{ orden.equipo.marca }}</h2>
-                        <p class="text-muted mb-3">{{ orden.equipo.modelo }}</p>
-                        
-                        <table class="table table-sm table-borderless m-0">
-                            <tr><td class="text-muted w-25">Cliente:</td><td class="fw-bold">{{ orden.equipo.cliente.nombre }}</td></tr>
-                            <tr><td class="text-muted">Tel:</td><td>{{ orden.equipo.cliente.telefono }}</td></tr>
-                            <tr><td class="text-muted">Ubic:</td><td>{{ orden.equipo.ubicacion }}</td></tr>
-                        </table>
-                    </div>
-                    <div class="card-footer bg-light border-top border-dark text-center p-1">
-                        <a href="/admin/gestion/equipo/{{ orden.equipo.id }}/change/" class="text-dark small text-decoration-none fw-bold">EDITAR DATOS</a>
-                    </div>
-                </div>
-
-                {% if orden.equipo.fichatecnica %}
-                <div class="card">
-                    <div class="card-header bg-white text-dark border-bottom border-dark">Especificaciones</div>
-                    <div class="card-body p-0">
-                        <table class="table table-striped m-0">
-                            <tr><td class="ps-3">Gas Ref.</td><td class="fw-bold">{{ orden.equipo.fichatecnica.gas_tipo }}</td></tr>
-                            <tr><td class="ps-3">Carga</td><td class="fw-bold">{{ orden.equipo.fichatecnica.gas_cantidad }} gr</td></tr>
-                            <tr><td class="ps-3">Tensión</td><td class="fw-bold">{{ orden.equipo.fichatecnica.tension }} V</td></tr>
-                            <tr><td class="ps-3">Corriente</td><td class="fw-bold">{{ orden.equipo.fichatecnica.corriente_nominal }} A</td></tr>
-                        </table>
-                    </div>
-                </div>
-                {% endif %}
-
-                <div class="card">
-                    <div class="card-header bg-white text-dark border-bottom border-dark">Evidencia</div>
-                    <div class="card-body">
-                        <div class="row g-2">
-                            {% for foto in orden.equipo.fotos.all %}
-                            <div class="col-4">
-                                <a href="{{ foto.imagen.url }}" target="_blank">
-                                    <img src="{{ foto.imagen.url }}" class="img-fluid img-bordered w-100" style="aspect-ratio: 1/1; object-fit: cover;">
-                                </a>
-                            </div>
-                            {% empty %}
-                            <p class="text-muted small m-0">Sin imágenes adjuntas.</p>
-                            {% endfor %}
-                        </div>
-                        <a href="/admin/gestion/equipo/{{ orden.equipo.id }}/change/" class="btn btn-square btn-sm w-100 mt-3">+ SUBIR FOTOS</a>
-                    </div>
-                </div>
-
+            <!-- Reparación Realizada -->
+            <div class="form-group-industrial">
+                <label for="reparacion_realizada">
+                    <i class="bi bi-wrench-adjustable"></i>
+                    Reparación Realizada
+                </label>
+                <textarea 
+                    name="reparacion_realizada" 
+                    id="reparacion_realizada" 
+                    class="input-industrial"
+                    placeholder="Detalle los trabajos de reparación ejecutados..."
+                >{{ orden.reparacion_realizada }}</textarea>
             </div>
-
-            <div class="col-md-8">
-                
-                <div class="card">
-                    <div class="card-header">Bitácora Técnica</div>
-                    <div class="card-body">
-                        <div class="mb-4">
-                            <label class="fw-bold small text-muted text-uppercase d-block mb-1">Motivo de Ingreso</label>
-                            <div class="p-3 bg-light border border-secondary">{{ orden.falla_declarada}}</div>
-                        </div>
-                        
-                        <div>
-                            <label class="fw-bold small text-muted text-uppercase d-block mb-1">Diagnóstico & Solución</label>
-                            {% if orden.diagnostico_tecnico %}
-                                <div class="p-3 border border-dark" style="min-height: 100px;">{{ orden.diagnostico_tecnico|linebreaks }}</div>
-                            {% else %}
-                                <div class="p-3 border border-secondary text-muted fst-italic">Pendiente de carga...</div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="mt-3 text-end">
-                             <a href="/admin/gestion/ordenreparacion/{{ orden.id }}/change/" class="btn btn-square btn-dark btn-sm">ACTUALIZAR DIAGNÓSTICO</a>
-                        </div>
-                    </div>
+            
+            <!-- Costo Total -->
+            <div class="form-group-industrial">
+                <label for="costo_total">
+                    <i class="bi bi-currency-dollar"></i>
+                    Costo Total
+                </label>
+                <div class="cost-input-wrapper">
+                    <span class="cost-prefix">$</span>
+                    <input 
+                        type="number" 
+                        name="costo_total" 
+                        id="costo_total" 
+                        class="input-industrial input-numeric"
+                        step="0.01"
+                        min="0"
+                        placeholder="0.00"
+                        value="{{ orden.costo_total|default:'' }}"
+                    >
                 </div>
-
-                <div class="row">
-                    <div class="col-md-8">
-                        <div class="card h-100">
-                            <div class="card-header bg-white text-dark border-bottom border-dark">Repuestos / Insumos</div>
-                            <ul class="list-group list-group-flush rounded-0">
-                                {% for item in orden.detalleinsumo_set.all %}
-                                <li class="list-group-item d-flex justify-content-between align-items-center border-bottom">
-                                    <span>{{ item.producto.nombre }} <span class="text-muted small">(x{{ item.cantidad }})</span></span>
-                                    <span class="fw-bold">${{ item.precio_unitario_hist }}</span>
-                                </li>
-                                {% empty %}
-                                <li class="list-group-item text-muted small fst-italic">No se utilizaron repuestos.</li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    </div>
-                    
-                    <div class="col-md-4">
-                        <div class="card bg-light h-100 text-center d-flex flex-column justify-content-center">
-                            <div class="card-body">
-                                <small class="text-muted text-uppercase">Mano de Obra</small>
-                                <div class="display-6 fw-bold my-2">${{ orden.costo_mano_obra }}</div>
-                                
-                                {% if orden.estado == 'TERMINADO' %}
-                                <hr>
-                                <a href="{% url 'imprimir_remito' orden.id %}" target="_blank" class="btn btn-square btn-success w-100">
-                                    <i class="bi bi-printer"></i> REMITO
-                                </a>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
             </div>
+            
+            <!-- Selector de Estado -->
+            <div class="form-group-industrial">
+                <label for="estado">
+                    <i class="bi bi-flag"></i>
+                    Actualizar Estado
+                </label>
+                <select name="estado" id="estado" class="input-industrial">
+                    <option value="PENDIENTE" {% if orden.estado == 'PENDIENTE' %}selected{% endif %}>PENDIENTE</option>
+                    <option value="DIAGNOSTICO" {% if orden.estado == 'DIAGNOSTICO' %}selected{% endif %}>EN DIAGNÓSTICO</option>
+                    <option value="REPARACION" {% if orden.estado == 'REPARACION' %}selected{% endif %}>EN REPARACIÓN</option>
+                    <option value="COMPLETADO" {% if orden.estado == 'COMPLETADO' %}selected{% endif %}>COMPLETADO</option>
+                    <option value="ENTREGADO" {% if orden.estado == 'ENTREGADO' %}selected{% endif %}>ENTREGADO</option>
+                </select>
+            </div>
+            
+            {% if orden.fecha_modificacion %}
+            <div class="last-modified">
+                <i class="bi bi-clock-history me-2"></i>
+                ÚLTIMA MODIFICACIÓN: {{ orden.fecha_modificacion|date:"d/m/Y H:i:s" }}
+            </div>
+            {% endif %}
         </div>
     </div>
+    
+    <!-- Botones de Acción -->
+    <div class="actions-section">
+        <button type="submit" class="btn-action btn-actualizar">
+            <i class="bi bi-save"></i>
+            ACTUALIZAR FICHA
+        </button>
+        
+        <a href="{% url 'imprimir_remito' orden.id %}" class="btn-action btn-remito">
+            <i class="bi bi-file-earmark-text"></i>
+            GENERAR REMITO
+        </a>
+        
+        <a href="{% url 'tablero' %}" class="btn-action btn-volver">
+            <i class="bi bi-arrow-left"></i>
+            VOLVER
+        </a>
+    </div>
+</form>
+{% endblock %}
 
-</body>
-</html>
+{% block extra_js %}
+<script>
+    // Formateo automático del costo
+    const costoInput = document.getElementById('costo_total');
+    
+    costoInput.addEventListener('blur', function() {
+        if (this.value) {
+            this.value = parseFloat(this.value).toFixed(2);
+        }
+    });
+    
+    // Confirmación antes de salir si hay cambios
+    let formChanged = false;
+    const form = document.querySelector('form');
+    const inputs = form.querySelectorAll('input, textarea, select');
+    
+    inputs.forEach(input => {
+        input.addEventListener('change', () => {
+            formChanged = true;
+        });
+    });
+    
+    window.addEventListener('beforeunload', (e) => {
+        if (formChanged) {
+            e.preventDefault();
+            e.returnValue = '';
+        }
+    });
+    
+    form.addEventListener('submit', () => {
+        formChanged = false;
+    });
+</script>
+{% endblock %}

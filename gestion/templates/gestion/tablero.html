@@ -1,337 +1,378 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SR Taller - SCADA</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% extends 'gestion/base.html' %}
 
-    <style>
-        /* ESTILO INDUSTRIAL GENERAL */
-        body { background-color: #f4f4f4; font-family: 'Segoe UI', sans-serif; overflow-x: hidden; }
-        
-        /* LAYOUT PRINCIPAL */
-        #wrapper { display: flex; width: 100%; }
-        
-        /* SIDEBAR INDUSTRIAL */
-        #sidebar-wrapper {
-            min-height: 100vh;
-            width: 260px;
-            background: #1a1a1a; /* Gris muy oscuro */
-            border-right: 4px solid #000;
-            flex-shrink: 0;
-        }
-        
-        .sidebar-heading {
-            padding: 1.5rem;
-            font-size: 1.2rem;
-            font-weight: 800;
-            color: #fff;
-            text-transform: uppercase;
-            border-bottom: 2px solid #333;
-            letter-spacing: 1px;
-            background-color: #000;
-        }
+{% block title %}Tablero - Sistema de Gestión de Taller{% endblock %}
 
-        .list-group-item-action {
-            padding: 15px 20px;
-            font-size: 1rem;
-            font-weight: 600;
-            color: #bbb;
-            background-color: transparent;
-            border: none;
-            border-bottom: 1px solid #2c2c2c;
-            border-radius: 0; /* Bordes cuadrados */
-            transition: all 0.2s ease-in-out;
-        }
+{% block page_title %}TABLERO DIAGNÓSTICO{% endblock %}
 
-        .list-group-item-action:hover {
-            background-color: #333;
-            color: #fff;
-            padding-left: 25px; /* Efecto de deslizamiento */
-            border-left: 5px solid #00ff00; /* Acento verde industrial */
-        }
+{% block content %}
+<div class="container-fluid px-4 py-4">
 
-        .list-group-item-action.active {
-            background-color: #222;
-            color: #fff;
-            border-left: 5px solid #0dcaf0; /* Acento Cyan */
-        }
+  <!-- SECCIÓN 1: DIAGNÓSTICO ACTIVO -->
+  <section class="mb-5">
+    <h2 class="fw-bold mb-4"
+      style="color: #1a1a1a; font-family: 'Segoe UI', sans-serif; border-bottom: 2px solid #000; padding-bottom: 12px;">
+      📊 DIAGNÓSTICO ACTIVO (Bucle IoT)
+    </h2>
 
-        /* CONTENIDO DERECHA */
-        #page-content-wrapper {
-            width: 100%;
-            padding-bottom: 100px;
-        }
+    {% for item in banco_pruebas %}
+    <div class="row mb-5 align-items-stretch">
+      <!-- GRÁFICA IZQUIERDA: CICLO (Unidad Interior/Frío) -->
+      <div class="col-lg-6 mb-3 mb-lg-0">
+        <div class="card border-dark shadow-lg"
+          style="border: 1px solid #000; box-shadow: 5px 5px 0px rgba(0,0,0,0.1); border-radius: 0;">
+          <div class="card-header bg-dark text-white fw-bold" style="border: 1px solid #000;">
+            🧊 CICLO - Unidad Interior/Frío #{{ item.id }}
+          </div>
+          <div class="card-body" style="background: #f4f4f4; padding: 20px;">
+            <!-- Valores PLC en tiempo real -->
+            <div class="row mb-4 text-center">
+              <div class="col-md-4">
+                <div class="plc-display"
+                  style="background: #222; border: 1px solid #666; padding: 12px; border-radius: 0;">
+                  <small class="d-block" style="color: #999; font-size: 11px; letter-spacing: 1px;">BAJA PRESIÓN</small>
+                  <div
+                    style="color: #00ff00; font-family: 'Courier New', monospace; font-size: 18px; font-weight: bold; margin-top: 6px;">
+                    {{ item.baja_presion|safe }}
+                  </div>
+                  <small style="color: #00ff00; font-size: 10px;">PSI</small>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="plc-display"
+                  style="background: #222; border: 1px solid #666; padding: 12px; border-radius: 0;">
+                  <small class="d-block" style="color: #999; font-size: 11px; letter-spacing: 1px;">TEMPERATURA</small>
+                  <div
+                    style="color: #0dcaf0; font-family: 'Courier New', monospace; font-size: 18px; font-weight: bold; margin-top: 6px;">
+                    {{ item.temperatura|safe }}
+                  </div>
+                  <small style="color: #0dcaf0; font-size: 10px;">°C</small>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="plc-display"
+                  style="background: #222; border: 1px solid #666; padding: 12px; border-radius: 0;">
+                  <small class="d-block" style="color: #999; font-size: 11px; letter-spacing: 1px;">SUPERHEAT
+                    (SH)</small>
+                  <div
+                    style="color: #d63384; font-family: 'Courier New', monospace; font-size: 18px; font-weight: bold; margin-top: 6px;">
+                    {{ item.superheat|safe }}
+                  </div>
+                  <small style="color: #d63384; font-size: 10px;">K</small>
+                </div>
+              </div>
+            </div>
 
-        /* TUS ESTILOS PREVIOS (INTACTOS) */
-        .section-header { border-left: 5px solid #000; padding-left: 15px; margin: 40px 0 20px 0; text-transform: uppercase; font-weight: 800; color: #333; letter-spacing: 1px; }
-        .card-industrial { background: #fff; border: 1px solid #000; padding: 0; box-shadow: 5px 5px 0px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        .table-scada thead { background-color: #000; color: #fff; text-transform: uppercase; }
-        .table-scada th, .table-scada td { padding: 15px; border-bottom: 1px solid #ccc; vertical-align: middle; }
-        
-        /* Displays IoT */
-        .iot-display { 
-            background-color: #222; color: #fff; font-family: 'Courier New', monospace; 
-            padding: 5px 10px; border: 2px solid #555; text-align: right; font-size: 1.3rem; 
-            font-weight: bold; position: relative; overflow: hidden;
-        }
-        .iot-label { font-size: 0.6rem; color: #aaa; text-transform: uppercase; position: absolute; top: 2px; left: 4px; }
-        
-        /* Colores de Valores */
-        .val-presion { color: #00ff00; } 
-        .val-temp { color: #0dcaf0; }    
-        .val-sh { color: #d63384; }      
-        .val-watts { color: #ffc107; }   
-        .val-alta { color: #dc3545; }    
-
-        .btn-hard { border-radius: 0; border: 2px solid #000; font-weight: bold; text-transform: uppercase; transition: transform 0.1s; }
-        .btn-hard:hover { transform: translate(-2px, -2px); box-shadow: 3px 3px 0 #000; }
-        .badge-sq { border-radius: 0; border: 1px solid #000; font-weight: normal; }
-        .fab-button { position: fixed; bottom: 30px; right: 30px; z-index: 1000; width: 60px; height: 60px; background-color: #4b0082; color: white; border: 2px solid #000; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; }
-    </style>
-</head>
-<body>
-
-<div class="d-flex" id="wrapper">
-
-    <div id="sidebar-wrapper">
-        <div class="sidebar-heading">C&H Refrigeración</div>
-        <div class="list-group list-group-flush">
-            <a href="{% url 'tablero' %}" class="list-group-item list-group-item-action active">📊 Dashboard</a>
-            <a href="{% url 'clientes' %}" class="list-group-item list-group-item-action">👥 Clientes</a>
-            <a href="{% url 'equipos' %}" class="list-group-item list-group-item-action">🔧 Equipos / Fichas</a>
-            <a href="{% url 'calendario' %}" class="list-group-item list-group-item-action">📅 Calendario</a>
-            <a href="{% url 'configuracion' %}" class="list-group-item list-group-item-action mt-5 border-top border-secondary">⚙️ Configuración</a>
+            <!-- Gráfica Chart.js -->
+            <div style="position: relative; height: 300px; margin-top: 20px;">
+              <canvas id="chart-left-{{ item.id }}"></canvas>
+            </div>
+          </div>
         </div>
-    </div>
-    <div id="page-content-wrapper">
+      </div>
 
-        <nav class="navbar navbar-dark bg-dark px-4 py-3 shadow border-bottom border-black">
-            <div class="container-fluid">
-                <span class="navbar-brand fw-bold text-uppercase"><i class="bi bi-gear-fill me-2"></i> SR Gestión</span>
-                <div>
-                    <a href="/admin/gestion/ordenreparacion/add/" class="btn btn-primary btn-sm btn-hard border-0"><i class="bi bi-plus-lg"></i> Ingreso</a>
-                    <a href="/admin" class="btn btn-outline-light btn-sm ms-2 btn-hard">Admin</a>
+      <!-- GRÁFICA DERECHA: RENDIMIENTO (Unidad Exterior/Trabajo) -->
+      <div class="col-lg-6">
+        <div class="card border-dark shadow-lg"
+          style="border: 1px solid #000; box-shadow: 5px 5px 0px rgba(0,0,0,0.1); border-radius: 0;">
+          <div class="card-header bg-dark text-white fw-bold" style="border: 1px solid #000;">
+            ⚙️ RENDIMIENTO - Unidad Exterior/Trabajo #{{ item.id }}
+          </div>
+          <div class="card-body" style="background: #f4f4f4; padding: 20px;">
+            <!-- Valores PLC en tiempo real -->
+            <div class="row mb-4 text-center">
+              <div class="col-md-6">
+                <div class="plc-display"
+                  style="background: #222; border: 1px solid #666; padding: 12px; border-radius: 0;">
+                  <small class="d-block" style="color: #999; font-size: 11px; letter-spacing: 1px;">ALTA PRESIÓN</small>
+                  <div
+                    style="color: #dc3545; font-family: 'Courier New', monospace; font-size: 18px; font-weight: bold; margin-top: 6px;">
+                    {{ item.alta_presion|safe }}
+                  </div>
+                  <small style="color: #dc3545; font-size: 10px;">PSI</small>
                 </div>
-            </div>
-        </nav>
-
-        <div class="container mt-4">
-
-            {% if banco_pruebas %}
-            <h5 class="section-header">Diagnóstico Activo</h5>
-            
-            {% for item in banco_pruebas %}
-            
-            <div class="d-flex justify-content-between align-items-center mb-2 bg-dark text-white p-2 border border-black">
-                <h5 class="m-0 fw-bold ps-2">{{ item.equipo_marca }}</h5>
-                <span class="badge bg-success badge-sq me-2">SISTEMA ONLINE</span>
-            </div>
-
-            <div class="row mb-4">
-                
-                <div class="col-lg-6">
-                    <div class="card-industrial p-3 h-100">
-                        <h6 class="fw-bold text-muted border-bottom pb-2 mb-3"><i class="bi bi-snow2"></i> CICLO (R410A)</h6>
-                        
-                        <div class="row g-2 mb-3">
-                            <div class="col-4">
-                                <div class="iot-display">
-                                    <span class="iot-label">BAJA (PSI)</span>
-                                    <span class="val-presion">{{ item.presion_baja_val }}</span>
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="iot-display">
-                                    <span class="iot-label">TEMP (°C)</span>
-                                    <span class="val-temp">{{ item.temp_val }}</span>
-                                </div>
-                            </div>
-                            <div class="col-4">
-                                <div class="iot-display" style="border-color: #d63384;">
-                                    <span class="iot-label" style="color: #d63384;">SH (K)</span>
-                                    <span class="val-sh">{{ item.sh_val }}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div style="height: 200px;">
-                            <canvas id="chart-left-{{ item.id }}"></canvas>
-                        </div>
-                    </div>
+              </div>
+              <div class="col-md-6">
+                <div class="plc-display"
+                  style="background: #222; border: 1px solid #666; padding: 12px; border-radius: 0;">
+                  <small class="d-block" style="color: #999; font-size: 11px; letter-spacing: 1px;">POTENCIA</small>
+                  <div
+                    style="color: #ffc107; font-family: 'Courier New', monospace; font-size: 18px; font-weight: bold; margin-top: 6px;">
+                    {{ item.potencia|safe }}
+                  </div>
+                  <small style="color: #ffc107; font-size: 10px;">W</small>
                 </div>
-
-                <div class="col-lg-6">
-                    <div class="card-industrial p-3 h-100">
-                        <h6 class="fw-bold text-muted border-bottom pb-2 mb-3"><i class="bi bi-lightning-fill"></i> RENDIMIENTO</h6>
-                        
-                        <div class="row g-2 mb-3">
-                            <div class="col-6">
-                                <div class="iot-display">
-                                    <span class="iot-label">ALTA (PSI)</span>
-                                    <span class="val-alta">{{ item.presion_alta_val }}</span>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="iot-display">
-                                    <span class="iot-label">POTENCIA (W)</span>
-                                    <span class="val-watts">{{ item.watts_val }}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div style="height: 200px;">
-                            <canvas id="chart-right-{{ item.id }}"></canvas>
-                        </div>
-                    </div>
-                </div>
-
+              </div>
             </div>
 
-            <script>
-                // IZQ: Baja vs Temp vs Superheat
-                new Chart(document.getElementById('chart-left-{{ item.id }}'), {
-                    type: 'line',
-                    data: {
-                        labels: {{ item.labels|safe }},
-                        datasets: [{
-                            label: 'Baja (PSI)',
-                            data: {{ item.data_baja|safe }},
-                            borderColor: '#00ff00', backgroundColor: 'rgba(0, 255, 0, 0.05)',
-                            borderWidth: 2, tension: 0.3, fill: true, yAxisID: 'y'
-                        }, {
-                            label: 'Temp (°C)',
-                            data: {{ item.data_temp|safe }},
-                            borderColor: '#0dcaf0', borderWidth: 2, borderDash: [3, 3],
-                            tension: 0.3, yAxisID: 'y1'
-                        }, {
-                            label: 'SH (K)',
-                            data: {{ item.data_sh|safe }},
-                            borderColor: '#d63384', borderWidth: 2, pointRadius: 0,
-                            tension: 0.4, yAxisID: 'y1'
-                        }]
-                    },
-                    options: {
-                        responsive: true, maintainAspectRatio: false,
-                        interaction: { mode: 'index', intersect: false },
-                        plugins: { legend: { labels: { color: '#333', boxWidth: 10, font: {size: 10} } } },
-                        scales: {
-                            x: { display: false },
-                            y: { type: 'linear', position: 'left' },
-                            y1: { type: 'linear', position: 'right', grid: { display: false } }
-                        }
-                    }
-                });
-
-                // DER: Potencia vs Alta
-                new Chart(document.getElementById('chart-right-{{ item.id }}'), {
-                    type: 'line',
-                    data: {
-                        labels: {{ item.labels|safe }},
-                        datasets: [{
-                            label: 'Potencia (W)',
-                            data: {{ item.data_watts|safe }},
-                            borderColor: '#ffc107', backgroundColor: 'rgba(255, 193, 7, 0.1)',
-                            borderWidth: 2, tension: 0.2, fill: true, yAxisID: 'y'
-                        }, {
-                            label: 'Alta (PSI)',
-                            data: {{ item.data_alta|safe }},
-                            borderColor: '#dc3545', borderWidth: 2, pointRadius: 0,
-                            tension: 0.3, yAxisID: 'y1'
-                        }]
-                    },
-                    options: {
-                        responsive: true, maintainAspectRatio: false,
-                        interaction: { mode: 'index', intersect: false },
-                        plugins: { legend: { labels: { color: '#333', boxWidth: 10, font: {size: 10} } } },
-                        scales: {
-                            x: { display: false },
-                            y: { type: 'linear', position: 'left', title: {display:true, text:'Watts'} },
-                            y1: { type: 'linear', position: 'right', grid: { display: false }, title: {display:true, text:'PSI'} }
-                        }
-                    }
-                });
-            </script>
-            {% endfor %}
-            {% endif %}
-
-
-            <h5 class="section-header text-primary">🛠️ En Proceso ({{ taller.count }})</h5>
-            <div class="card-industrial">
-                <div class="table-responsive">
-                    <table class="table table-scada table-hover mb-0">
-                        <thead><tr><th>ID</th><th>Equipo</th><th>Ingreso</th><th>Estado</th><th class="text-end">Control</th></tr></thead>
-                        <tbody>
-                            {% for orden in taller %}
-                            <tr>
-                                <td class="fw-bold">#{{ orden.id }}</td>
-                                <td><div class="fw-bold">{{ orden.equipo.cliente.nombre }}</div><small class="text-muted">{{ orden.equipo.marca }}</small></td>
-                                <td>{{ orden.fecha_ingreso|date:"d/m H:i" }}</td>
-                                <td><span class="badge badge-sq 
-                                    {% if orden.estado == 'PENDIENTE' %}bg-danger
-                                    {% elif orden.estado == 'DIAGNOSTICO' %}bg-warning text-dark
-                                    {% elif orden.estado == 'REPARACION' %}bg-primary
-                                    {% else %}bg-secondary{% endif %}">{{ orden.get_estado_display }}</span></td>
-                                <td class="text-end"><a href="{% url 'detalle_orden' orden.id %}" class="btn btn-sm btn-outline-dark btn-hard">Ficha</a></td>
-                            </tr>
-                            {% empty %}
-                            <tr><td colspan="5" class="text-center py-4 text-muted">Sin equipos.</td></tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+            <!-- Gráfica Chart.js -->
+            <div style="position: relative; height: 300px; margin-top: 20px;">
+              <canvas id="chart-right-{{ item.id }}"></canvas>
             </div>
-
-            
-            <div class="row">
-                <div class="col-md-8">
-                    <h5 class="section-header text-success">✅ Para Entregar ({{ entregas.count }})</h5>
-                    <div class="card-industrial">
-                        <table class="table table-scada table-hover mb-0">
-                            <thead><tr><th>Cliente</th><th>Equipo</th><th>Total</th><th class="text-end">Acción</th></tr></thead>
-                            <tbody>
-                                {% for orden in entregas %}
-                                <tr>
-                                    <td>{{ orden.equipo.cliente.nombre }}</td>
-                                    <td>{{ orden.equipo.marca }}</td>
-                                    <td class="fw-bold text-success fs-5">${{ orden.costo_mano_obra }}</td>
-                                    <td class="text-end">
-                                        <a href="{% url 'imprimir_remito' orden.id %}" target="_blank" class="btn btn-sm btn-dark btn-hard me-1"><i class="bi bi-printer"></i></a>
-                                        <a href="/admin/gestion/ordenreparacion/{{ orden.id }}/change/" class="btn btn-sm btn-success btn-hard">Fin</a>
-                                    </td>
-                                </tr>
-                                {% empty %}
-                                <tr><td colspan="4" class="text-center py-4 text-muted">Nada listo para entregar.</td></tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="col-md-4">
-                    <h5 class="section-header text-muted">Historial</h5>
-                    <div class="card-industrial">
-                        <ul class="list-group list-group-flush">
-                            {% for orden in historial %}
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <small>{{ orden.equipo.cliente.nombre }}</small>
-                                <span class="badge bg-secondary badge-sq" style="font-size: 0.7rem;">ENTREGADO</span>
-                            </li>
-                            {% empty %}
-                            <li class="list-group-item text-center p-4 text-muted">Vacío</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
+          </div>
         </div>
+      </div>
     </div>
+    {% endfor %}
+  </section>
+
+  <!-- SECCIÓN 2: TABLAS DE GESTIÓN -->
+  <section class="mb-5">
+    <h2 class="fw-bold mb-4"
+      style="color: #1a1a1a; font-family: 'Segoe UI', sans-serif; border-bottom: 2px solid #000; padding-bottom: 12px;">
+      📋 GESTIÓN DE ÓRDENES
+    </h2>
+
+    <div class="row">
+      <!-- TABLA: EN PROCESO -->
+      <div class="col-lg-6 mb-4">
+        <div class="card border-dark shadow-lg"
+          style="border: 1px solid #000; box-shadow: 5px 5px 0px rgba(0,0,0,0.1); border-radius: 0;">
+          <div class="card-header bg-dark text-white fw-bold" style="border: 1px solid #000;">
+            ⏳ EN PROCESO
+          </div>
+          <div class="table-responsive">
+            <table class="table table-dark table-bordered table-hover mb-0" style="border: 1px solid #000;">
+              <thead style="background: #000;">
+                <tr>
+                  <th style="border: 1px solid #333;">ID</th>
+                  <th style="border: 1px solid #333;">Cliente</th>
+                  <th style="border: 1px solid #333;">Estado</th>
+                  <th style="border: 1px solid #333;">Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for orden in ordenes_en_proceso %}
+                <tr>
+                  <td style="border: 1px solid #333; font-family: 'Courier New', monospace;">#{{ orden.id }}</td>
+                  <td style="border: 1px solid #333;">{{ orden.cliente }}</td>
+                  <td style="border: 1px solid #333;">
+                    {% if orden.estado == 'PENDIENTE' %}
+                    <span class="badge"
+                      style="background: #dc3545; border-radius: 0; padding: 6px 10px; font-size: 11px; font-weight: bold;">PENDIENTE</span>
+                    {% elif orden.estado == 'DIAGNÓSTICO' %}
+                    <span class="badge"
+                      style="background: #ffc107; color: #000; border-radius: 0; padding: 6px 10px; font-size: 11px; font-weight: bold;">DIAGNÓSTICO</span>
+                    {% elif orden.estado == 'REPARACIÓN' %}
+                    <span class="badge"
+                      style="background: #0d6efd; border-radius: 0; padding: 6px 10px; font-size: 11px; font-weight: bold;">REPARACIÓN</span>
+                    {% endif %}
+                  </td>
+                  <td style="border: 1px solid #333;">
+                    <a href="{% url 'detalle_orden' orden.id %}" class="btn btn-sm btn-outline-light"
+                      style="border: 1px solid #666; border-radius: 0; padding: 4px 8px; font-size: 11px;">
+                      📄 Ficha
+                    </a>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="4" class="text-center text-muted py-3">Sin órdenes en proceso</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TABLA: PARA ENTREGAR -->
+      <div class="col-lg-6 mb-4">
+        <div class="card border-dark shadow-lg"
+          style="border: 1px solid #000; box-shadow: 5px 5px 0px rgba(0,0,0,0.1); border-radius: 0;">
+          <div class="card-header bg-dark text-white fw-bold" style="border: 1px solid #000;">
+            ✅ PARA ENTREGAR
+          </div>
+          <div class="table-responsive">
+            <table class="table table-dark table-bordered table-hover mb-0" style="border: 1px solid #000;">
+              <thead style="background: #000;">
+                <tr>
+                  <th style="border: 1px solid #333;">Cliente</th>
+                  <th style="border: 1px solid #333;">Equipo</th>
+                  <th style="border: 1px solid #333;">Costo</th>
+                  <th style="border: 1px solid #333;">Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for entrega in ordenes_para_entregar %}
+                <tr>
+                  <td style="border: 1px solid #333;">{{ entrega.cliente }}</td>
+                  <td style="border: 1px solid #333;">{{ entrega.equipo }}</td>
+                  <td style="border: 1px solid #333; font-family: 'Courier New', monospace; color: #ffc107;">${{
+                    entrega.costo }}</td>
+                  <td style="border: 1px solid #333;">
+                    <a href="{% url 'detalle_orden' entrega.id %}" class="btn btn-sm btn-success"
+                      style="border-radius: 0; padding: 4px 8px; font-size: 11px; background: #28a745; border: 1px solid #28a745;">
+                      👁️ VER FICHA
+                    </a>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="4" class="text-center text-muted py-3">Sin órdenes para entregar</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
-<div class="fab-button" onclick="alert('Conectando...')"><i class="bi bi-robot"></i></div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+  </section>
+
+</div>
+
+<!-- BOTÓN FLOTANTE (FAB) CON ICONO DE ROBOT -->
+<button class="btn btn-dark fab-button" id="fab-button" style="
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 2px solid #000;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 1000;
+  transition: transform 0.3s ease;
+">
+  🤖
+</button>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Gráficas Chart.js para cada equipo
+  {% for item in banco_pruebas %}
+  // GRÁFICA IZQUIERDA: CICLO
+  const ctxLeft{{ item.id }} = document.getElementById('chart-left-{{ item.id }}').getContext('2d');
+  const chartLeft{{ item.id }} = new Chart(ctxLeft{{ item.id }}, {
+    type: 'line',
+    data: {
+      labels: {{ item.labels | safe }},
+    datasets: [
+    {
+      label: 'Baja Presión (PSI)',
+      data: {{ item.baja_presion_data | safe }},
+    borderColor: '#00ff00',
+    backgroundColor: 'rgba(0, 255, 0, 0.1)',
+    borderWidth: 2,
+    tension: 0.4,
+    fill: true
+          },
+    {
+      label: 'Temperatura (°C)',
+      data: {{ item.temperatura_data | safe }},
+    borderColor: '#0dcaf0',
+    backgroundColor: 'rgba(13, 202, 240, 0.1)',
+    borderWidth: 2,
+    tension: 0.4,
+    fill: false
+          },
+    {
+      label: 'Superheat (K)',
+      data: {{ item.superheat_data | safe }},
+    borderColor: '#d63384',
+    backgroundColor: 'rgba(214, 51, 132, 0.1)',
+    borderWidth: 2,
+    tension: 0.4,
+    fill: false
+          }
+  ]
+      },
+    options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        labels: {
+          color: '#1a1a1a',
+          font: { family: "'Segoe UI', sans-serif", size: 11 }
+        }
+      }
+    },
+    scales: {
+      x: {
+        grid: { color: '#ddd' },
+        ticks: { color: '#666', font: { family: "'Segoe UI', sans-serif" } }
+      },
+      y: {
+        grid: { color: '#ddd' },
+        ticks: { color: '#666', font: { family: "'Segoe UI', sans-serif" } }
+      }
+    }
+  }
+    });
+
+  // GRÁFICA DERECHA: RENDIMIENTO
+  const ctxRight{{ item.id }} = document.getElementById('chart-right-{{ item.id }}').getContext('2d');
+  const chartRight{{ item.id }} = new Chart(ctxRight{{ item.id }}, {
+    type: 'line',
+    data: {
+      labels: {{ item.labels | safe }},
+    datasets: [
+    {
+      label: 'Alta Presión (PSI)',
+      data: {{ item.alta_presion_data | safe }},
+    borderColor: '#dc3545',
+    backgroundColor: 'rgba(220, 53, 69, 0.1)',
+    borderWidth: 2,
+    tension: 0.4,
+    fill: true
+          },
+    {
+      label: 'Potencia (W)',
+      data: {{ item.potencia_data | safe }},
+    borderColor: '#ffc107',
+    backgroundColor: 'rgba(255, 193, 7, 0.1)',
+    borderWidth: 2,
+    tension: 0.4,
+    fill: false
+          }
+  ]
+      },
+    options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        labels: {
+          color: '#1a1a1a',
+          font: { family: "'Segoe UI', sans-serif", size: 11 }
+        }
+      }
+    },
+    scales: {
+      x: {
+        grid: { color: '#ddd' },
+        ticks: { color: '#666', font: { family: "'Segoe UI', sans-serif" } }
+      },
+      y: {
+        grid: { color: '#ddd' },
+        ticks: { color: '#666', font: { family: "'Segoe UI', sans-serif" } }
+      }
+    }
+  }
+    });
+  {% endfor %}
+
+  // Efecto hover en botón FAB
+  const fabButton = document.getElementById('fab-button');
+  fabButton.addEventListener('mouseover', function () {
+    this.style.transform = 'scale(1.1)';
+  });
+  fabButton.addEventListener('mouseout', function () {
+    this.style.transform = 'scale(1)';
+  });
+
+  // Ejemplo de acción al clickear FAB
+  fabButton.addEventListener('click', function () {
+    console.log('FAB Clicked - Robot asistente activado');
+    alert('🤖 Asistente de diagnóstico listo para ayudarte');
+  });
+</script>
+{% endblock %}

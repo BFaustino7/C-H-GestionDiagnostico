@@ -1,0 +1,690 @@
+{% extends 'gestion/base.html' %}
+
+{% block title %}Equipos - C&H Refrigeración{% endblock %}
+{% block page_title %}REGISTRO DE EQUIPOS{% endblock %}
+{% block nav_equipos %}active{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ========================================
+       EQUIPOS - SCADA GRID INTERFACE
+       ======================================== */
+    
+    /* Filter Bar */
+    .filter-bar {
+        background-color: #ffffff;
+        border: 2px solid #1a1a1a;
+        padding: 20px 25px;
+        margin-bottom: 25px;
+        box-shadow: 4px 4px 0px rgba(0,0,0,0.15);
+    }
+    
+    .filter-bar-title {
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: #666666;
+        margin-bottom: 15px;
+        font-family: 'Courier New', Courier, monospace;
+    }
+    
+    .filter-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .btn-filter {
+        background-color: #f4f4f4;
+        color: #1a1a1a;
+        border: 2px solid #1a1a1a;
+        border-radius: 0;
+        padding: 12px 20px;
+        font-weight: 600;
+        font-size: 0.8rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .btn-filter:hover {
+        background-color: #1a1a1a;
+        color: #ffffff;
+        transform: translate(-2px, -2px);
+        box-shadow: 4px 4px 0px #666666;
+    }
+    
+    .btn-filter.active {
+        background-color: #1a1a1a;
+        color: #ffcc00;
+        box-shadow: inset 0 0 0 2px #ffcc00;
+    }
+    
+    .btn-filter i {
+        font-size: 1.1rem;
+    }
+    
+    .filter-count {
+        background-color: #ffcc00;
+        color: #1a1a1a;
+        padding: 2px 8px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        font-family: 'Courier New', Courier, monospace;
+    }
+    
+    .btn-filter.active .filter-count {
+        background-color: #ffffff;
+    }
+    
+    /* Stats Bar */
+    .stats-bar {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+    
+    .stat-box {
+        background-color: #1a1a1a;
+        color: #ffffff;
+        padding: 15px 25px;
+        border: 2px solid #000000;
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .stat-box i {
+        font-size: 1.8rem;
+        color: #ffcc00;
+    }
+    
+    .stat-info {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .stat-value {
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #00ff00;
+    }
+    
+    .stat-label {
+        font-size: 0.7rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: #888888;
+    }
+    
+    /* Equipment Grid */
+    .equipment-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 20px;
+    }
+    
+    /* Equipment Card */
+    .equipment-card {
+        background-color: #ffffff;
+        border: 1px solid #1a1a1a;
+        box-shadow: 5px 5px 0px rgba(0,0,0,0.1);
+        transition: all 0.2s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .equipment-card:hover {
+        transform: translate(-3px, -3px);
+        box-shadow: 8px 8px 0px rgba(0,0,0,0.15);
+    }
+    
+    .equipment-card-header {
+        background-color: #1a1a1a;
+        color: #ffffff;
+        padding: 12px 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 3px solid #ffcc00;
+    }
+    
+    .equipment-type {
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        font-family: 'Courier New', Courier, monospace;
+    }
+    
+    .equipment-id {
+        background-color: #333333;
+        padding: 4px 10px;
+        font-size: 0.7rem;
+        font-family: 'Courier New', Courier, monospace;
+        color: #00ff00;
+    }
+    
+    .equipment-card-body {
+        padding: 20px;
+    }
+    
+    .equipment-main-info {
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+        border-bottom: 1px dashed #cccccc;
+    }
+    
+    .equipment-brand {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 3px;
+    }
+    
+    .equipment-model {
+        font-size: 0.9rem;
+        color: #666666;
+        font-family: 'Courier New', Courier, monospace;
+    }
+    
+    .equipment-details {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 15px;
+    }
+    
+    .detail-item {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .detail-label {
+        font-size: 0.65rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: #888888;
+        margin-bottom: 3px;
+    }
+    
+    .detail-value {
+        font-size: 0.9rem;
+        color: #1a1a1a;
+        font-weight: 500;
+    }
+    
+    .detail-value.client-name {
+        color: #0066cc;
+    }
+    
+    /* Service Status */
+    .service-status {
+        background-color: #f8f8f8;
+        border: 1px solid #dddddd;
+        padding: 12px 15px;
+        margin-bottom: 15px;
+    }
+    
+    .service-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+    
+    .service-label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: #666666;
+    }
+    
+    .service-badge {
+        padding: 3px 10px;
+        font-size: 0.65rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        font-family: 'Courier New', Courier, monospace;
+        border-radius: 0;
+    }
+    
+    .service-badge.ok {
+        background-color: #00aa00;
+        color: #ffffff;
+    }
+    
+    .service-badge.warning {
+        background-color: #ffaa00;
+        color: #1a1a1a;
+    }
+    
+    .service-badge.overdue {
+        background-color: #cc0000;
+        color: #ffffff;
+    }
+    
+    .service-date {
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 0.95rem;
+        color: #1a1a1a;
+    }
+    
+    .service-days {
+        font-size: 0.75rem;
+        color: #888888;
+    }
+    
+    /* Card Actions */
+    .equipment-card-footer {
+        padding: 0 20px 20px 20px;
+    }
+    
+    .btn-historial {
+        display: block;
+        width: 100%;
+        background-color: #1a1a1a;
+        color: #ffffff;
+        border: 2px solid #000000;
+        border-radius: 0;
+        padding: 12px 20px;
+        font-weight: 700;
+        font-size: 0.8rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        text-align: center;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+    
+    .btn-historial:hover {
+        background-color: #333333;
+        color: #ffcc00;
+        transform: translate(-2px, -2px);
+        box-shadow: 4px 4px 0px #000000;
+    }
+    
+    .btn-historial i {
+        margin-right: 8px;
+    }
+    
+    /* Type Icon Badge */
+    .type-icon {
+        position: absolute;
+        top: 55px;
+        right: 15px;
+        width: 50px;
+        height: 50px;
+        background-color: #f4f4f4;
+        border: 2px solid #dddddd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: #666666;
+    }
+    
+    /* Empty State */
+    .empty-state {
+        background-color: #ffffff;
+        border: 2px dashed #cccccc;
+        padding: 60px 40px;
+        text-align: center;
+        grid-column: 1 / -1;
+    }
+    
+    .empty-icon {
+        font-size: 4rem;
+        color: #cccccc;
+        margin-bottom: 20px;
+    }
+    
+    .empty-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+    }
+    
+    .empty-text {
+        color: #888888;
+        font-size: 0.9rem;
+        margin-bottom: 25px;
+    }
+    
+    .empty-warning {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background-color: #ffcc00;
+        color: #1a1a1a;
+        padding: 10px 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-bottom: 20px;
+    }
+    
+    .btn-empty-action {
+        background-color: #1a1a1a;
+        color: #ffffff;
+        border: 2px solid #000000;
+        border-radius: 0;
+        padding: 15px 30px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.2s ease;
+    }
+    
+    .btn-empty-action:hover {
+        background-color: #333333;
+        color: #ffcc00;
+        transform: translate(-3px, -3px);
+        box-shadow: 5px 5px 0px #000000;
+    }
+    
+    /* Pagination */
+    .pagination-wrapper {
+        margin-top: 30px;
+        display: flex;
+        justify-content: center;
+    }
+    
+    .pagination-industrial {
+        display: flex;
+        gap: 5px;
+    }
+    
+    .pagination-industrial .page-btn {
+        background-color: #ffffff;
+        border: 2px solid #1a1a1a;
+        color: #1a1a1a;
+        padding: 10px 15px;
+        font-family: 'Courier New', Courier, monospace;
+        font-weight: 700;
+        font-size: 0.85rem;
+        text-decoration: none;
+        transition: all 0.15s ease;
+    }
+    
+    .pagination-industrial .page-btn:hover {
+        background-color: #1a1a1a;
+        color: #ffffff;
+    }
+    
+    .pagination-industrial .page-btn.active {
+        background-color: #1a1a1a;
+        color: #ffcc00;
+    }
+    
+    .pagination-industrial .page-btn.disabled {
+        background-color: #f4f4f4;
+        color: #cccccc;
+        cursor: not-allowed;
+        border-color: #cccccc;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .stats-bar {
+            flex-direction: column;
+        }
+        
+        .filter-buttons {
+            flex-direction: column;
+        }
+        
+        .btn-filter {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .equipment-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Filter Bar -->
+<div class="filter-bar">
+    <div class="filter-bar-title">
+        <i class="bi bi-funnel me-2"></i>FILTRAR POR TIPO DE EQUIPO
+    </div>
+    <div class="filter-buttons">
+        <a href="{% url 'lista_equipos' %}" class="btn-filter {% if not tipo_filtro %}active{% endif %}">
+            <i class="bi bi-grid-3x3-gap"></i>
+            TODOS
+            <span class="filter-count">{{ total_equipos|default:"0" }}</span>
+        </a>
+        <a href="{% url 'lista_equipos' %}?tipo=split" class="btn-filter {% if tipo_filtro == 'split' %}active{% endif %}">
+            <i class="bi bi-wind"></i>
+            AIRE SPLIT
+            <span class="filter-count">{{ count_split|default:"0" }}</span>
+        </a>
+        <a href="{% url 'lista_equipos' %}?tipo=heladera" class="btn-filter {% if tipo_filtro == 'heladera' %}active{% endif %}">
+            <i class="bi bi-box-seam"></i>
+            HELADERA
+            <span class="filter-count">{{ count_heladera|default:"0" }}</span>
+        </a>
+        <a href="{% url 'lista_equipos' %}?tipo=camara" class="btn-filter {% if tipo_filtro == 'camara' %}active{% endif %}">
+            <i class="bi bi-snow3"></i>
+            CAMARA
+            <span class="filter-count">{{ count_camara|default:"0" }}</span>
+        </a>
+        <a href="{% url 'lista_equipos' %}?tipo=lavarropas" class="btn-filter {% if tipo_filtro == 'lavarropas' %}active{% endif %}">
+            <i class="bi bi-water"></i>
+            LAVARROPAS
+            <span class="filter-count">{{ count_lavarropas|default:"0" }}</span>
+        </a>
+    </div>
+</div>
+
+<!-- Stats Bar -->
+<div class="stats-bar">
+    <div class="stat-box">
+        <i class="bi bi-gear-wide-connected"></i>
+        <div class="stat-info">
+            <span class="stat-value">{{ total_equipos|default:"0" }}</span>
+            <span class="stat-label">Equipos Registrados</span>
+        </div>
+    </div>
+    <div class="stat-box">
+        <i class="bi bi-check-circle"></i>
+        <div class="stat-info">
+            <span class="stat-value">{{ equipos_ok|default:"0" }}</span>
+            <span class="stat-label">Service al Dia</span>
+        </div>
+    </div>
+    <div class="stat-box">
+        <i class="bi bi-exclamation-triangle"></i>
+        <div class="stat-info">
+            <span class="stat-value">{{ equipos_pendientes|default:"0" }}</span>
+            <span class="stat-label">Requieren Service</span>
+        </div>
+    </div>
+</div>
+
+<!-- Equipment Grid -->
+<div class="equipment-grid">
+    {% if lista_equipos %}
+        {% for equipo in lista_equipos %}
+        <div class="equipment-card">
+            <div class="equipment-card-header">
+                <span class="equipment-type">
+                    {% if equipo.tipo == 'split' %}
+                        <i class="bi bi-wind me-1"></i> AIRE SPLIT
+                    {% elif equipo.tipo == 'heladera' %}
+                        <i class="bi bi-box-seam me-1"></i> HELADERA
+                    {% elif equipo.tipo == 'camara' %}
+                        <i class="bi bi-snow3 me-1"></i> CAMARA FRIGORIFICA
+                    {% elif equipo.tipo == 'lavarropas' %}
+                        <i class="bi bi-water me-1"></i> LAVARROPAS
+                    {% else %}
+                        <i class="bi bi-gear me-1"></i> {{ equipo.tipo|upper }}
+                    {% endif %}
+                </span>
+                <span class="equipment-id">EQ-{{ equipo.id|stringformat:"05d" }}</span>
+            </div>
+            
+            <div class="type-icon">
+                {% if equipo.tipo == 'split' %}
+                    <i class="bi bi-wind"></i>
+                {% elif equipo.tipo == 'heladera' %}
+                    <i class="bi bi-box-seam"></i>
+                {% elif equipo.tipo == 'camara' %}
+                    <i class="bi bi-snow3"></i>
+                {% elif equipo.tipo == 'lavarropas' %}
+                    <i class="bi bi-water"></i>
+                {% else %}
+                    <i class="bi bi-gear"></i>
+                {% endif %}
+            </div>
+            
+            <div class="equipment-card-body">
+                <div class="equipment-main-info">
+                    <div class="equipment-brand">{{ equipo.marca }}</div>
+                    <div class="equipment-model">{{ equipo.modelo }}</div>
+                </div>
+                
+                <div class="equipment-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Cliente</span>
+                        <span class="detail-value client-name">{{ equipo.cliente.nombre }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Tipo de Gas</span>
+                        <span class="detail-value">{{ equipo.tipo_gas|default:"N/A" }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">N de Serie</span>
+                        <span class="detail-value" style="font-family: 'Courier New', monospace;">{{ equipo.numero_serie|default:"---" }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Reparaciones</span>
+                        <span class="detail-value" style="font-family: 'Courier New', monospace; color: #00aa00;">{{ equipo.total_reparaciones|default:"0" }}</span>
+                    </div>
+                </div>
+                
+                <div class="service-status">
+                    <div class="service-header">
+                        <span class="service-label">Ultimo Service</span>
+                        {% if equipo.dias_desde_service <= 90 %}
+                            <span class="service-badge ok">OK</span>
+                        {% elif equipo.dias_desde_service <= 180 %}
+                            <span class="service-badge warning">PROXIMO</span>
+                        {% else %}
+                            <span class="service-badge overdue">VENCIDO</span>
+                        {% endif %}
+                    </div>
+                    <div class="service-date">{{ equipo.ultimo_service|date:"d/m/Y"|default:"Sin registros" }}</div>
+                    {% if equipo.ultimo_service %}
+                    <div class="service-days">Hace {{ equipo.dias_desde_service }} dias</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="equipment-card-footer">
+                <a href="{% url 'historial_equipo' equipo.id %}" class="btn-historial">
+                    <i class="bi bi-clock-history"></i>VER HISTORIAL
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <!-- Empty State -->
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="bi bi-gear"></i>
+            </div>
+            <div class="empty-warning">
+                <i class="bi bi-exclamation-triangle"></i>
+                ATENCION
+            </div>
+            <div class="empty-title">SIN EQUIPOS REGISTRADOS</div>
+            <p class="empty-text">
+                No hay equipos en el sistema{% if tipo_filtro %} del tipo "{{ tipo_filtro|upper }}"{% endif %}.<br>
+                Los equipos se registran automaticamente al crear una orden de ingreso.
+            </p>
+            <a href="{% url 'ingreso_equipo' %}" class="btn-empty-action">
+                <i class="bi bi-plus-lg"></i>
+                CREAR NUEVO INGRESO
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Pagination -->
+{% if lista_equipos.has_other_pages %}
+<div class="pagination-wrapper">
+    <div class="pagination-industrial">
+        {% if lista_equipos.has_previous %}
+            <a href="?page=1{% if tipo_filtro %}&tipo={{ tipo_filtro }}{% endif %}" class="page-btn">
+                <i class="bi bi-chevron-double-left"></i>
+            </a>
+            <a href="?page={{ lista_equipos.previous_page_number }}{% if tipo_filtro %}&tipo={{ tipo_filtro }}{% endif %}" class="page-btn">
+                <i class="bi bi-chevron-left"></i>
+            </a>
+        {% else %}
+            <span class="page-btn disabled"><i class="bi bi-chevron-double-left"></i></span>
+            <span class="page-btn disabled"><i class="bi bi-chevron-left"></i></span>
+        {% endif %}
+        
+        {% for num in lista_equipos.paginator.page_range %}
+            {% if lista_equipos.number == num %}
+                <span class="page-btn active">{{ num }}</span>
+            {% elif num > lista_equipos.number|add:'-3' and num < lista_equipos.number|add:'3' %}
+                <a href="?page={{ num }}{% if tipo_filtro %}&tipo={{ tipo_filtro }}{% endif %}" class="page-btn">{{ num }}</a>
+            {% endif %}
+        {% endfor %}
+        
+        {% if lista_equipos.has_next %}
+            <a href="?page={{ lista_equipos.next_page_number }}{% if tipo_filtro %}&tipo={{ tipo_filtro }}{% endif %}" class="page-btn">
+                <i class="bi bi-chevron-right"></i>
+            </a>
+            <a href="?page={{ lista_equipos.paginator.num_pages }}{% if tipo_filtro %}&tipo={{ tipo_filtro }}{% endif %}" class="page-btn">
+                <i class="bi bi-chevron-double-right"></i>
+            </a>
+        {% else %}
+            <span class="page-btn disabled"><i class="bi bi-chevron-right"></i></span>
+            <span class="page-btn disabled"><i class="bi bi-chevron-double-right"></i></span>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Filter button animation
+    document.querySelectorAll('.btn-filter').forEach(btn => {
+        btn.addEventListener('mouseenter', function() {
+            this.style.transform = 'translate(-2px, -2px)';
+        });
+        btn.addEventListener('mouseleave', function() {
+            if (!this.classList.contains('active')) {
+                this.style.transform = 'translate(0, 0)';
+            }
+        });
+    });
+</script>
+{% endblock %}

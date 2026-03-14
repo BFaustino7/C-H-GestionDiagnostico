@@ -1,0 +1,460 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}C&H Refrigeración - Sistema de Gestión{% endblock %}</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    
+    <style>
+        /* ========================================
+           SCADA/INDUSTRIAL THEME - C&H REFRIGERACIÓN
+           ======================================== */
+        
+        :root {
+            --sidebar-bg: #1a1a1a;
+            --sidebar-border: #000000;
+            --main-bg: #f4f4f4;
+            --accent-green: #00ff00;
+            --accent-red: #ff3333;
+            --accent-yellow: #ffcc00;
+            --text-primary: #ffffff;
+            --text-secondary: #888888;
+            --panel-bg: #2a2a2a;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--main-bg);
+            min-height: 100vh;
+            display: flex;
+        }
+        
+        /* Numeric values use Courier New */
+        .numeric-value,
+        .data-value,
+        input[type="number"],
+        .counter,
+        .metric-value {
+            font-family: 'Courier New', Courier, monospace;
+            letter-spacing: 1px;
+        }
+        
+        /* ========================================
+           SIDEBAR - Panel de Control Industrial
+           ======================================== */
+        
+        #sidebar-wrapper {
+            width: 260px;
+            min-height: 100vh;
+            background-color: var(--sidebar-bg);
+            border-right: 4px solid var(--sidebar-border);
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Logo Block */
+        .sidebar-logo {
+            background-color: #000000;
+            padding: 20px 15px;
+            text-align: center;
+            border-bottom: 2px solid #333333;
+        }
+        
+        .sidebar-logo h1 {
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin: 0;
+            text-transform: uppercase;
+        }
+        
+        .sidebar-logo .logo-subtitle {
+            color: var(--accent-green);
+            font-size: 0.7rem;
+            letter-spacing: 3px;
+            margin-top: 5px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        
+        /* Navigation Links */
+        .sidebar-nav {
+            padding: 20px 0;
+            flex-grow: 1;
+        }
+        
+        .sidebar-nav .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+        }
+        
+        .sidebar-nav .nav-link:hover {
+            background-color: var(--panel-bg);
+            color: var(--text-primary);
+            border-left-color: var(--accent-yellow);
+        }
+        
+        .sidebar-nav .nav-link.active {
+            background-color: var(--panel-bg);
+            color: var(--accent-green);
+            border-left-color: var(--accent-green);
+        }
+        
+        .sidebar-nav .nav-link i {
+            font-size: 1.2rem;
+            margin-right: 12px;
+            width: 24px;
+            text-align: center;
+        }
+        
+        /* Status Indicator */
+        .sidebar-status {
+            padding: 15px 20px;
+            background-color: #0d0d0d;
+            border-top: 1px solid #333333;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-family: 'Courier New', Courier, monospace;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent-green);
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* ========================================
+           MAIN CONTENT AREA
+           ======================================== */
+        
+        #page-content-wrapper {
+            flex-grow: 1;
+            margin-left: 260px;
+            min-height: 100vh;
+            background-color: var(--main-bg);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Top Header Bar */
+        .top-header {
+            background-color: #ffffff;
+            padding: 15px 30px;
+            border-bottom: 2px solid #dddddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .page-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin: 0;
+        }
+        
+        .header-datetime {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.85rem;
+            color: #666666;
+            background-color: #f0f0f0;
+            padding: 8px 15px;
+            border: 1px solid #cccccc;
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding: 25px 30px;
+            flex-grow: 1;
+        }
+        
+        /* ========================================
+           INDUSTRIAL UI COMPONENTS
+           ======================================== */
+        
+        /* Panel Style */
+        .industrial-panel {
+            background-color: #ffffff;
+            border: 2px solid #cccccc;
+            border-radius: 0;
+            box-shadow: 3px 3px 0px #999999;
+            margin-bottom: 20px;
+        }
+        
+        .industrial-panel .panel-header {
+            background-color: #2a2a2a;
+            color: #ffffff;
+            padding: 12px 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border-bottom: 3px solid #000000;
+        }
+        
+        .industrial-panel .panel-body {
+            padding: 20px;
+        }
+        
+        /* Buttons */
+        .btn-industrial {
+            background-color: #2a2a2a;
+            color: #ffffff;
+            border: 2px solid #000000;
+            border-radius: 0;
+            padding: 10px 25px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-industrial:hover {
+            background-color: #444444;
+            color: #ffffff;
+            transform: translate(-2px, -2px);
+            box-shadow: 4px 4px 0px #000000;
+        }
+        
+        .btn-industrial-success {
+            background-color: #1a5c1a;
+            border-color: #0d3d0d;
+        }
+        
+        .btn-industrial-success:hover {
+            background-color: #228b22;
+        }
+        
+        .btn-industrial-danger {
+            background-color: #8b0000;
+            border-color: #5c0000;
+        }
+        
+        .btn-industrial-danger:hover {
+            background-color: #b22222;
+        }
+        
+        /* Form Controls */
+        .form-control-industrial {
+            border: 2px solid #999999;
+            border-radius: 0;
+            padding: 10px 15px;
+            font-size: 0.95rem;
+            background-color: #ffffff;
+        }
+        
+        .form-control-industrial:focus {
+            border-color: #1a1a1a;
+            box-shadow: 3px 3px 0px #cccccc;
+            outline: none;
+        }
+        
+        /* Tables */
+        .table-industrial {
+            border: 2px solid #1a1a1a;
+        }
+        
+        .table-industrial thead {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+        
+        .table-industrial thead th {
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            padding: 12px 15px;
+            border: none;
+        }
+        
+        .table-industrial tbody td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #dddddd;
+            vertical-align: middle;
+        }
+        
+        .table-industrial tbody tr:hover {
+            background-color: #f0f0f0;
+        }
+        
+        /* Status Badges */
+        .badge-status {
+            padding: 5px 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border-radius: 0;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        
+        .badge-operational { background-color: #00aa00; color: #ffffff; }
+        .badge-warning { background-color: #ffaa00; color: #000000; }
+        .badge-critical { background-color: #cc0000; color: #ffffff; }
+        .badge-offline { background-color: #666666; color: #ffffff; }
+        
+        /* Responsive */
+        @media (max-width: 992px) {
+            #sidebar-wrapper {
+                width: 70px;
+            }
+            
+            #sidebar-wrapper .sidebar-logo h1,
+            #sidebar-wrapper .sidebar-logo .logo-subtitle,
+            #sidebar-wrapper .nav-link span,
+            #sidebar-wrapper .status-indicator span {
+                display: none;
+            }
+            
+            #sidebar-wrapper .nav-link {
+                justify-content: center;
+                padding: 15px;
+            }
+            
+            #sidebar-wrapper .nav-link i {
+                margin-right: 0;
+                font-size: 1.4rem;
+            }
+            
+            #page-content-wrapper {
+                margin-left: 70px;
+            }
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav id="sidebar-wrapper">
+        <!-- Logo Block -->
+        <div class="sidebar-logo">
+            <h1><i class="bi bi-snow me-2"></i>C&H</h1>
+            <h1>REFRIGERACIÓN</h1>
+            <div class="logo-subtitle">SISTEMA DE GESTIÓN</div>
+        </div>
+        
+        <!-- Navigation -->
+        <div class="sidebar-nav">
+            <a href="{% url 'tablero' %}" class="nav-link {% block nav_tablero %}{% endblock %}">
+                <i class="bi bi-speedometer2"></i>
+                <span>Tablero</span>
+            </a>
+            <a href="{% url 'ingreso_equipo' %}" class="nav-link {% block nav_nuevo_ingreso %}{% endblock %}">
+                <i class="bi bi-plus-square"></i>
+                <span>Nuevo Ingreso</span>
+            </a>
+            <a href="{% url 'lista_clientes' %}" class="nav-link {% block nav_clientes %}{% endblock %}">
+                <i class="bi bi-people"></i>
+                <span>Clientes</span>
+            </a>
+            <a href="{% url 'lista_equipos' %}" class="nav-link {% block nav_equipos %}{% endblock %}">
+                <i class="bi bi-box-seam"></i>
+                <span>Equipos</span>
+            </a>
+            <a href="{% url 'calendario' %}" class="nav-link {% block nav_calendario %}{% endblock %}">
+                <i class="bi bi-calendar3"></i>
+                <span>Calendario</span>
+            </a>
+        </div>
+        
+        <!-- Status Indicator -->
+        <div class="sidebar-status">
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span>SISTEMA ACTIVO</span>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <div id="page-content-wrapper">
+        <!-- Top Header -->
+        <header class="top-header">
+            <h2 class="page-title">{% block page_title %}Panel de Control{% endblock %}</h2>
+            <div class="header-datetime" id="datetime-display">
+                <i class="bi bi-clock me-2"></i>
+                <span id="current-datetime"></span>
+            </div>
+        </header>
+        
+        <!-- Content Area -->
+        <main class="main-content">
+            {% block content %}
+            <!-- Child template content goes here -->
+            {% endblock %}
+        </main>
+    </div>
+    
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- DateTime Display Script -->
+    <script>
+        function updateDateTime() {
+            const now = new Date();
+            const options = { 
+                weekday: 'short', 
+                year: 'numeric', 
+                month: 'short', 
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            };
+            document.getElementById('current-datetime').textContent = 
+                now.toLocaleDateString('es-ES', options).toUpperCase();
+        }
+        
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

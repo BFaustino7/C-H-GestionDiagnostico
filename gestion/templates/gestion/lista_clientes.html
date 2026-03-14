@@ -1,0 +1,184 @@
+{% extends 'gestion/base.html' %}
+
+{% block title %}Clientes | C&H REFRIGERACIÓN{% endblock %}
+
+{% block nav_clientes %}active{% endblock %}
+
+{% block page_title %}GESTIÓN DE CLIENTES{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Cabecera con Buscador -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0" style="background: #f4f4f4; box-shadow: 5px 5px 0px rgba(0,0,0,0.1);">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-3" style="font-weight: bold; text-transform: uppercase; color: #1a1a1a;">
+                        <i class="bi bi-search"></i> BÚSQUEDA DE CLIENTES
+                    </h5>
+                    <form method="GET" action="{% url 'lista_clientes' %}" class="row g-3">
+                        <div class="col-md-8">
+                            <input 
+                                type="text" 
+                                class="form-control" 
+                                name="q" 
+                                placeholder="Nombre, teléfono o dirección..." 
+                                value="{{ request.GET.q }}"
+                                style="border: 2px solid #1a1a1a; border-radius: 0; padding: 10px 12px; font-family: 'Segoe UI', sans-serif; background: white;"
+                            >
+                        </div>
+                        <div class="col-md-4">
+                            <button 
+                                type="submit" 
+                                class="btn w-100" 
+                                style="background: #1a1a1a; color: white; border: none; border-radius: 0; padding: 10px; font-weight: bold; text-transform: uppercase; box-shadow: 4px 4px 0px rgba(0,0,0,0.2); transition: all 0.2s ease;"
+                                onmouseover="this.style.transform='translate(-2px, -2px)'; this.style.boxShadow='6px 6px 0px rgba(0,0,0,0.3)';"
+                                onmouseout="this.style.transform='translate(0, 0)'; this.style.boxShadow='4px 4px 0px rgba(0,0,0,0.2)';"
+                            >
+                                BUSCAR
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de Clientes -->
+    <div class="row">
+        <div class="col-12">
+            {% if lista_clientes %}
+            <div class="table-responsive" style="box-shadow: 5px 5px 0px rgba(0,0,0,0.1);">
+                <table class="table table-hover mb-0" style="background: white; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #1a1a1a; color: white; text-transform: uppercase; font-weight: bold; border: none;">
+                            <th style="padding: 16px; border: none; font-family: 'Segoe UI', sans-serif; font-size: 13px; letter-spacing: 0.5px;">ID</th>
+                            <th style="padding: 16px; border: none; font-family: 'Segoe UI', sans-serif; font-size: 13px; letter-spacing: 0.5px;">NOMBRE</th>
+                            <th style="padding: 16px; border: none; font-family: 'Segoe UI', sans-serif; font-size: 13px; letter-spacing: 0.5px;">TELÉFONO</th>
+                            <th style="padding: 16px; border: none; font-family: 'Segoe UI', sans-serif; font-size: 13px; letter-spacing: 0.5px;">DIRECCIÓN</th>
+                            <th style="padding: 16px; border: none; font-family: 'Segoe UI', sans-serif; font-size: 13px; letter-spacing: 0.5px;">EQUIPOS</th>
+                            <th style="padding: 16px; border: none; font-family: 'Segoe UI', sans-serif; font-size: 13px; letter-spacing: 0.5px;">ACCIONES</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cliente in lista_clientes %}
+                        <tr 
+                            style="border-bottom: 1px solid #e0e0e0; transition: all 0.2s ease;"
+                            onmouseover="this.style.background='#f0f0f0';"
+                            onmouseout="this.style.background='white';"
+                        >
+                            <td style="padding: 14px 16px; font-family: 'Courier New', monospace; color: #666; font-weight: bold;">
+                                #{{ cliente.id|stringformat:"05d" }}
+                            </td>
+                            <td style="padding: 14px 16px; font-family: 'Segoe UI', sans-serif; color: #1a1a1a; font-weight: 500;">
+                                {{ cliente.nombre }}
+                            </td>
+                            <td style="padding: 14px 16px; font-family: 'Courier New', monospace; color: #0066cc;">
+                                {{ cliente.telefono|default:"Sin registrar" }}
+                            </td>
+                            <td style="padding: 14px 16px; font-family: 'Segoe UI', sans-serif; color: #555; font-size: 14px;">
+                                {{ cliente.direccion|default:"Sin registrar" }}
+                            </td>
+                            <td style="padding: 14px 16px; text-align: center;">
+                                <span 
+                                    class="badge" 
+                                    style="background: #ffcc00; color: #1a1a1a; padding: 6px 10px; border-radius: 0; font-family: 'Courier New', monospace; font-weight: bold; font-size: 12px;"
+                                >
+                                    {{ cliente.equipos_count|default:0 }}
+                                </span>
+                            </td>
+                            <td style="padding: 14px 16px;">
+                                <a 
+                                    href="{% url 'ingreso_equipo' %}?cliente_id={{ cliente.id }}" 
+                                    class="btn btn-sm" 
+                                    style="background: #0066cc; color: white; border: none; border-radius: 0; padding: 6px 12px; font-size: 12px; font-weight: bold; text-transform: uppercase; transition: all 0.2s ease; box-shadow: 2px 2px 0px rgba(0,0,0,0.15);"
+                                    onmouseover="this.style.transform='translate(-1px, -1px)'; this.style.boxShadow='3px 3px 0px rgba(0,0,0,0.25)';"
+                                    onmouseout="this.style.transform='translate(0, 0)'; this.style.boxShadow='2px 2px 0px rgba(0,0,0,0.15)';"
+                                >
+                                    + NUEVA ORDEN
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Paginación -->
+            {% if is_paginated %}
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1&q={{ request.GET.q }}" style="border-radius: 0; border: 1px solid #ddd; color: #0066cc; background: white;">« PRIMERA</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}&q={{ request.GET.q }}" style="border-radius: 0; border: 1px solid #ddd; color: #0066cc; background: white;">‹ ANTERIOR</a>
+                    </li>
+                    {% endif %}
+
+                    <li class="page-item disabled">
+                        <span class="page-link" style="border-radius: 0; border: 1px solid #1a1a1a; background: #1a1a1a; color: #ffcc00; font-weight: bold;">
+                            PÁGINA {{ page_obj.number }} DE {{ page_obj.paginator.num_pages }}
+                        </span>
+                    </li>
+
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}&q={{ request.GET.q }}" style="border-radius: 0; border: 1px solid #ddd; color: #0066cc; background: white;">SIGUIENTE ›</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}&q={{ request.GET.q }}" style="border-radius: 0; border: 1px solid #ddd; color: #0066cc; background: white;">ÚLTIMA »</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+
+            {% else %}
+            <!-- Estado Vacío -->
+            <div class="card border-0" style="background: white; box-shadow: 5px 5px 0px rgba(0,0,0,0.1); padding: 60px 40px; text-align: center;">
+                <div style="margin-bottom: 20px;">
+                    <i class="bi bi-exclamation-triangle" style="font-size: 48px; color: #ffcc00;"></i>
+                </div>
+                <h4 style="color: #1a1a1a; font-weight: bold; text-transform: uppercase; margin-bottom: 10px;">
+                    NO HAY REGISTROS EN LA BASE DE DATOS
+                </h4>
+                <p style="color: #666; font-size: 14px; margin-bottom: 30px;">
+                    El sistema no encontró clientes que coincidan con tu búsqueda. 
+                    {% if request.GET.q %}
+                    Intenta con otros términos.
+                    {% else %}
+                    Comienza agregando un nuevo cliente mediante el formulario de ingreso.
+                    {% endif %}
+                </p>
+                {% if not request.GET.q %}
+                <a 
+                    href="{% url 'ingreso_equipo' %}" 
+                    class="btn" 
+                    style="background: #0066cc; color: white; border: none; border-radius: 0; padding: 12px 24px; font-weight: bold; text-transform: uppercase; box-shadow: 3px 3px 0px rgba(0,0,0,0.2); transition: all 0.2s ease; display: inline-block;"
+                    onmouseover="this.style.transform='translate(-2px, -2px)'; this.style.boxShadow='5px 5px 0px rgba(0,0,0,0.3)';"
+                    onmouseout="this.style.transform='translate(0, 0)'; this.style.boxShadow='3px 3px 0px rgba(0,0,0,0.2)';"
+                >
+                    + NUEVO INGRESO
+                </a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Enfoque automático en el buscador si hay búsqueda activa
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.querySelector('input[name="q"]');
+        if (searchInput && searchInput.value) {
+            searchInput.focus();
+        }
+    });
+</script>
+{% endblock %}

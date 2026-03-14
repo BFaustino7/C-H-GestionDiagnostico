@@ -124,26 +124,26 @@ def tablero_principal(request):
             'id': orden.id,
             'equipo_marca': f"{orden.equipo.marca} {orden.equipo.modelo}",
             
-            # Valores actuales (último de la lista)
-            'presion_baja_val': int(historial_presion_baja[-1]),
-            'presion_alta_val': int(historial_alta[-1]),
-            'temp_val': historial_temp[-1],
-            'sh_val': historial_superheat[-1], # <--- NUEVO VALOR
-            'watts_val': historial_watts[-1],
+            # VALORES ACTUALES (Para los displays PLC)
+            'baja_presion': int(historial_presion_baja[-1]),
+            'alta_presion': int(historial_alta[-1]),
+            'temperatura': historial_temp[-1],
+            'superheat': historial_superheat[-1],
+            'potencia': historial_watts[-1],
             
-            # Listas para gráficos
-            'data_baja': historial_presion_baja,
-            'data_alta': historial_alta,
-            'data_temp': historial_temp,
-            'data_watts': historial_watts,
-            'data_sh': historial_superheat,
+            # LISTAS PARA GRÁFICOS (Para los scripts de Chart.js)
+            'baja_presion_data': historial_presion_baja,
+            'alta_presion_data': historial_alta,
+            'temperatura_data': historial_temp,
+            'superheat_data': historial_superheat,
+            'potencia_data': historial_watts,
             'labels': labels,
         })
 
     return render(request, 'gestion/tablero.html', {
-        'taller': ordenes_taller,
-        'entregas': ordenes_para_entregar,
-        'historial': ordenes_entregadas,
+        'ordenes_en_proceso': ordenes_taller, 
+        'ordenes_para_entregar': ordenes_para_entregar,
+        'ordenes_entregadas': ordenes_entregadas,
         'banco_pruebas': banco_pruebas,
     })
 
@@ -183,13 +183,13 @@ def lista_clientes(request):
     else:
         clientes = Cliente.objects.all().order_by('nombre')
     
-    return render(request, 'gestion/lista_clientes.html', {'clientes': clientes})
+    return render(request, 'gestion/lista_clientes.html', {'lista_clientes': clientes})
 
 def lista_equipos(request):
     # Traemos los equipos con su cliente relacionado para no saturar la DB (select_related)
     equipos = Equipo.objects.select_related('cliente').all()
     
-    return render(request, 'gestion/lista_equipos.html', {'equipos': equipos})
+    return render(request, 'gestion/lista_equipos.html', {'lista_equipos': equipos})
 
 def calendario_taller(request):
     # Mostramos órdenes pendientes y en reparación para organizar la semana
@@ -205,3 +205,20 @@ def calendario_taller(request):
 def configuracion_sistema(request):
     productos = Producto.objects.all()
     return render(request, 'gestion/configuracion.html', {'productos': productos})
+
+from django.shortcuts import render, get_object_or_404
+from .models import Equipo, OrdenReparacion
+
+def historial_equipo(request, equipo_id):
+    # Buscamos el equipo o tiramos 404 si no existe
+    equipo = get_object_or_404(Equipo, id=equipo_id)
+    
+    # Traemos todas sus órdenes, de la más nueva a la más vieja
+    ordenes = OrdenReparacion.objects.filter(equipo=equipo).order_by('-fecha_ingreso')
+    
+    context = {
+        'equipo': equipo,
+        'ordenes': ordenes,
+    }
+    
+    return render(request, 'gestion/historial_equipo.html', context)

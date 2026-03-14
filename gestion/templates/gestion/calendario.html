@@ -1,0 +1,780 @@
+{% extends 'gestion/base.html' %}
+
+{% block title %}Calendario - C&H Refrigeración{% endblock %}
+{% block page_title %}Calendario del Taller{% endblock %}
+{% block nav_calendario %}active{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* =============================================
+       CALENDARIO SCADA - C&H REFRIGERACIÓN
+       ============================================= */
+
+    .cal-wrapper {
+        display: flex;
+        gap: 20px;
+        align-items: flex-start;
+    }
+
+    /* ------------------------------------------
+       BLOQUE PRINCIPAL DEL CALENDARIO
+    ------------------------------------------ */
+    .cal-main {
+        flex-grow: 1;
+        background: #ffffff;
+        border: 2px solid #1a1a1a;
+        box-shadow: 5px 5px 0px #1a1a1a;
+    }
+
+    /* Cabecera de navegación de mes */
+    .cal-header {
+        background-color: #1a1a1a;
+        color: #ffffff;
+        padding: 14px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 3px solid #000000;
+    }
+
+    .cal-header .month-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .cal-header .year-badge {
+        font-family: 'Courier New', monospace;
+        color: #ffcc00;
+        font-size: 1rem;
+        letter-spacing: 2px;
+    }
+
+    .cal-nav-btn {
+        background: transparent;
+        border: 2px solid #555555;
+        color: #ffffff;
+        width: 36px;
+        height: 36px;
+        border-radius: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+    }
+
+    .cal-nav-btn:hover {
+        background-color: #333333;
+        border-color: #ffcc00;
+        color: #ffcc00;
+        transform: translate(-2px, -2px);
+        box-shadow: 2px 2px 0px #000000;
+    }
+
+    /* Fila de nombres de día */
+    .cal-days-header {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        background-color: #333333;
+        border-bottom: 2px solid #000000;
+    }
+
+    .cal-day-name {
+        text-align: center;
+        padding: 10px 0;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: #aaaaaa;
+    }
+
+    .cal-day-name.weekend {
+        color: #ff6666;
+    }
+
+    /* Grilla de días */
+    .cal-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+    }
+
+    .cal-cell {
+        min-height: 110px;
+        border-right: 1px solid #cccccc;
+        border-bottom: 1px solid #cccccc;
+        padding: 8px;
+        vertical-align: top;
+        background-color: #ffffff;
+        position: relative;
+        transition: background-color 0.15s;
+    }
+
+    .cal-cell:nth-child(7n) {
+        border-right: none;
+    }
+
+    .cal-cell:hover {
+        background-color: #f5f5f5;
+    }
+
+    /* Dia vacio (mes anterior/siguiente) */
+    .cal-cell.empty {
+        background-color: #f9f9f9;
+    }
+
+    /* Dia de hoy - cian neon */
+    .cal-cell.today {
+        background-color: #e0fffe;
+        border: 2px solid #00e5ff;
+        box-shadow: inset 0 0 12px rgba(0, 229, 255, 0.15);
+    }
+
+    .cal-cell.today .day-number {
+        background-color: #00e5ff;
+        color: #000000;
+        box-shadow: 0 0 8px rgba(0, 229, 255, 0.8);
+    }
+
+    /* Numero del dia */
+    .day-number {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        font-family: 'Courier New', monospace;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 5px;
+    }
+
+    .cal-cell.weekend-day .day-number {
+        color: #cc4444;
+    }
+
+    /* Eventos dentro del dia */
+    .cal-events {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        margin-top: 2px;
+    }
+
+    .cal-event {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: 2px 6px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        border-radius: 0;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+        cursor: pointer;
+        transition: transform 0.1s;
+        border-left: 3px solid transparent;
+    }
+
+    .cal-event:hover {
+        transform: translateX(2px);
+    }
+
+    /* Entrega - verde */
+    .cal-event.entrega {
+        background-color: #e8f5e9;
+        color: #1b5e20;
+        border-left-color: #2e7d32;
+    }
+
+    .cal-event.entrega::before {
+        content: '';
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        background-color: #2e7d32;
+        border-radius: 0;
+        flex-shrink: 0;
+    }
+
+    /* Turno - azul */
+    .cal-event.turno {
+        background-color: #e3f2fd;
+        color: #0d47a1;
+        border-left-color: #1565c0;
+    }
+
+    .cal-event.turno::before {
+        content: '';
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        background-color: #1565c0;
+        border-radius: 0;
+        flex-shrink: 0;
+    }
+
+    /* Alerta / Vencimiento - rojo */
+    .cal-event.alerta {
+        background-color: #ffebee;
+        color: #b71c1c;
+        border-left-color: #c62828;
+    }
+
+    .cal-event.alerta::before {
+        content: '';
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        background-color: #c62828;
+        border-radius: 0;
+        flex-shrink: 0;
+    }
+
+    /* Mas eventos */
+    .more-events {
+        font-size: 0.65rem;
+        color: #888888;
+        font-family: 'Courier New', monospace;
+        padding: 1px 6px;
+        margin-top: 2px;
+        cursor: pointer;
+    }
+
+    .more-events:hover {
+        color: #1a1a1a;
+        text-decoration: underline;
+    }
+
+    /* ------------------------------------------
+       SIDEBAR AGENDA DEL DIA
+    ------------------------------------------ */
+    .cal-sidebar {
+        width: 270px;
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    /* Panel Hoy */
+    .agenda-panel {
+        background: #ffffff;
+        border: 2px solid #1a1a1a;
+        box-shadow: 5px 5px 0px #1a1a1a;
+    }
+
+    .agenda-panel .agenda-header {
+        background-color: #00e5ff;
+        color: #000000;
+        padding: 12px 16px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        border-bottom: 2px solid #000000;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .agenda-panel .agenda-body {
+        padding: 0;
+    }
+
+    /* Fecha grande */
+    .today-date-block {
+        padding: 14px 16px;
+        background-color: #1a1a1a;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        border-bottom: 1px solid #333333;
+    }
+
+    .today-date-block .day-big {
+        font-family: 'Courier New', monospace;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #00e5ff;
+        line-height: 1;
+    }
+
+    .today-date-block .day-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .today-date-block .day-name {
+        color: #ffffff;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .today-date-block .month-year {
+        color: #888888;
+        font-size: 0.75rem;
+        font-family: 'Courier New', monospace;
+        letter-spacing: 1px;
+    }
+
+    /* Tareas del dia */
+    .agenda-task {
+        padding: 12px 16px;
+        border-bottom: 1px solid #eeeeee;
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        transition: background-color 0.15s;
+        cursor: pointer;
+    }
+
+    .agenda-task:last-child {
+        border-bottom: none;
+    }
+
+    .agenda-task:hover {
+        background-color: #f9f9f9;
+    }
+
+    .task-time {
+        font-family: 'Courier New', monospace;
+        font-size: 0.75rem;
+        color: #888888;
+        min-width: 42px;
+        padding-top: 2px;
+        font-weight: 700;
+    }
+
+    .task-content {
+        flex-grow: 1;
+    }
+
+    .task-title {
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        line-height: 1.3;
+        margin-bottom: 2px;
+    }
+
+    .task-sub {
+        font-size: 0.72rem;
+        color: #888888;
+    }
+
+    .task-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 0;
+        flex-shrink: 0;
+        margin-top: 4px;
+    }
+
+    .task-dot.entrega  { background-color: #2e7d32; }
+    .task-dot.turno    { background-color: #1565c0; }
+    .task-dot.alerta   { background-color: #c62828; }
+
+    /* Estado vacio agenda */
+    .agenda-empty {
+        padding: 20px 16px;
+        text-align: center;
+        color: #aaaaaa;
+        font-size: 0.8rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    /* ------------------------------------------
+       PANEL LEYENDA
+    ------------------------------------------ */
+    .legend-panel {
+        background: #ffffff;
+        border: 2px solid #1a1a1a;
+        box-shadow: 5px 5px 0px #1a1a1a;
+    }
+
+    .legend-panel .legend-header {
+        background-color: #2a2a2a;
+        color: #ffffff;
+        padding: 10px 16px;
+        font-weight: 700;
+        font-size: 0.8rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        border-bottom: 2px solid #000000;
+    }
+
+    .legend-body {
+        padding: 14px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.8rem;
+        color: #333333;
+    }
+
+    .legend-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 0;
+        flex-shrink: 0;
+    }
+
+    /* ------------------------------------------
+       PANEL STATS DEL MES
+    ------------------------------------------ */
+    .stats-panel {
+        background: #1a1a1a;
+        border: 2px solid #000000;
+        box-shadow: 5px 5px 0px #000000;
+    }
+
+    .stats-panel .stats-header {
+        padding: 10px 16px;
+        color: #888888;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        border-bottom: 1px solid #333333;
+    }
+
+    .stats-body {
+        padding: 12px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .stat-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .stat-label {
+        font-size: 0.75rem;
+        color: #888888;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .stat-value {
+        font-family: 'Courier New', monospace;
+        font-size: 1.1rem;
+        font-weight: 700;
+    }
+
+    .stat-value.green  { color: #00ff00; }
+    .stat-value.blue   { color: #00e5ff; }
+    .stat-value.yellow { color: #ffcc00; }
+
+    /* ------------------------------------------
+       BOTONES AGREGAR EVENTO
+    ------------------------------------------ */
+    .btn-add-event {
+        background-color: #1a1a1a;
+        color: #ffffff;
+        border: 2px solid #000000;
+        border-radius: 0;
+        width: 100%;
+        padding: 10px;
+        font-size: 0.82rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+    }
+
+    .btn-add-event:hover {
+        background-color: #333333;
+        color: #ffcc00;
+        transform: translate(-2px, -2px);
+        box-shadow: 4px 4px 0px #000000;
+    }
+
+    .btn-add-event.green-variant {
+        background-color: #1b5e20;
+        border-color: #0d3d0d;
+        color: #ffffff;
+    }
+
+    .btn-add-event.green-variant:hover {
+        background-color: #2e7d32;
+        color: #ffffff;
+    }
+
+    .btn-add-event.blue-variant {
+        background-color: #0d47a1;
+        border-color: #082b64;
+        color: #ffffff;
+    }
+
+    .btn-add-event.blue-variant:hover {
+        background-color: #1565c0;
+        color: #ffffff;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Barra superior: navegacion de mes + botones agregar -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex align-items-center gap-2">
+        <!-- Mes anterior -->
+        <a href="?mes={{ mes_anterior }}&anio={{ anio_anterior }}" class="cal-nav-btn" title="Mes anterior">
+            <i class="bi bi-chevron-left"></i>
+        </a>
+        <div style="font-size:1.1rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#1a1a1a; min-width:200px; text-align:center;">
+            {{ nombre_mes|upper }} <span style="font-family:'Courier New',monospace; color:#888888;">{{ anio_actual }}</span>
+        </div>
+        <!-- Mes siguiente -->
+        <a href="?mes={{ mes_siguiente }}&anio={{ anio_siguiente }}" class="cal-nav-btn" title="Mes siguiente">
+            <i class="bi bi-chevron-right"></i>
+        </a>
+        <!-- Volver a hoy -->
+        <a href="?" class="cal-nav-btn ms-2" title="Ir a hoy" style="border-color:#00e5ff; color:#00e5ff;">
+            <i class="bi bi-calendar-check"></i>
+        </a>
+    </div>
+
+    <div class="d-flex gap-2">
+        <a href="{% url 'calendario' %}" class="btn-add-event blue-variant" style="width:auto; padding:8px 18px;">
+            <i class="bi bi-clock"></i> Nuevo Turno
+        </a>
+        <a href="{% url 'calendario' %}" class="btn-add-event green-variant" style="width:auto; padding:8px 18px;">
+            <i class="bi bi-box-arrow-up"></i> Nueva Entrega
+        </a>
+    </div>
+</div>
+
+<!-- Layout principal: calendario + sidebar -->
+<div class="cal-wrapper">
+
+    <!-- ===================== CALENDARIO MENSUAL ===================== -->
+    <div class="cal-main">
+
+        <!-- Cabecera del mes (usada en pantallas medianas como referencia) -->
+        <div class="cal-header">
+            <span class="month-title">{{ nombre_mes }}</span>
+            <span class="year-badge">[ AÑO {{ anio_actual }} ]</span>
+            <span style="font-size:0.75rem; color:#888888; font-family:'Courier New',monospace;">
+                {{ total_eventos_mes }} EVENTOS
+            </span>
+        </div>
+
+        <!-- Nombres de los días -->
+        <div class="cal-days-header">
+            <div class="cal-day-name">LUN</div>
+            <div class="cal-day-name">MAR</div>
+            <div class="cal-day-name">MIE</div>
+            <div class="cal-day-name">JUE</div>
+            <div class="cal-day-name">VIE</div>
+            <div class="cal-day-name weekend">SAB</div>
+            <div class="cal-day-name weekend">DOM</div>
+        </div>
+
+        <!-- Grilla de días -->
+        <div class="cal-grid">
+
+            {# Celdas vacías al inicio (días del mes anterior) #}
+            {% for vacio in dias_vacios_inicio %}
+            <div class="cal-cell empty"></div>
+            {% endfor %}
+
+            {# Dias del mes actual #}
+            {% for dia in dias_del_mes %}
+            <div class="cal-cell
+                {% if dia.es_hoy %}today{% endif %}
+                {% if dia.es_fin_de_semana %}weekend-day{% endif %}">
+
+                <div class="day-number">{{ dia.numero }}</div>
+
+                <div class="cal-events">
+                    {# Entregas del dia #}
+                    {% for entrega in dia.entregas %}
+                    <div class="cal-event entrega" title="{{ entrega.cliente }} - {{ entrega.equipo }}">
+                        {{ entrega.cliente|truncatechars:16 }}
+                    </div>
+                    {% endfor %}
+
+                    {# Turnos del dia #}
+                    {% for turno in dia.turnos %}
+                    <div class="cal-event turno" title="{{ turno.hora }} - {{ turno.descripcion }}">
+                        {{ turno.hora }} {{ turno.descripcion|truncatechars:12 }}
+                    </div>
+                    {% endfor %}
+
+                    {# Alertas del dia #}
+                    {% for alerta in dia.alertas %}
+                    <div class="cal-event alerta" title="{{ alerta.descripcion }}">
+                        {{ alerta.descripcion|truncatechars:18 }}
+                    </div>
+                    {% endfor %}
+
+                    {# Si hay muchos eventos, indicar cuantos mas #}
+                    {% if dia.mas_eventos %}
+                    <div class="more-events">+{{ dia.mas_eventos }} más...</div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+
+            {# Celdas vacías al final (días del mes siguiente) #}
+            {% for vacio in dias_vacios_fin %}
+            <div class="cal-cell empty"></div>
+            {% endfor %}
+
+        </div>{# /cal-grid #}
+    </div>{# /cal-main #}
+
+    <!-- ===================== SIDEBAR LATERAL ===================== -->
+    <div class="cal-sidebar">
+
+        <!-- AGENDA DEL DIA -->
+        <div class="agenda-panel">
+            <div class="agenda-header">
+                <i class="bi bi-lightning-charge-fill"></i>
+                AGENDA DEL DÍA
+            </div>
+            <div class="agenda-body">
+
+                <!-- Fecha grande en negro -->
+                <div class="today-date-block">
+                    <div class="day-big">{{ hoy_numero }}</div>
+                    <div class="day-info">
+                        <span class="day-name">{{ hoy_nombre_dia }}</span>
+                        <span class="month-year">{{ hoy_mes_anio }}</span>
+                    </div>
+                </div>
+
+                <!-- Lista de tareas/eventos del dia -->
+                {% if agenda_hoy %}
+                    {% for tarea in agenda_hoy %}
+                    <div class="agenda-task">
+                        <div class="task-dot {{ tarea.tipo }}"></div>
+                        <div class="task-time">{{ tarea.hora }}</div>
+                        <div class="task-content">
+                            <div class="task-title">{{ tarea.titulo }}</div>
+                            <div class="task-sub">{{ tarea.subtitulo }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="agenda-empty">
+                        <i class="bi bi-calendar-x" style="font-size:1.5rem; color:#dddddd; display:block; margin-bottom:6px;"></i>
+                        Sin eventos hoy
+                    </div>
+                {% endif %}
+
+            </div>
+        </div>
+
+        <!-- ESTADISTICAS DEL MES -->
+        <div class="stats-panel">
+            <div class="stats-header">Resumen del Mes</div>
+            <div class="stats-body">
+                <div class="stat-row">
+                    <span class="stat-label">Entregas</span>
+                    <span class="stat-value green">{{ stats_mes.total_entregas|default:"00" }}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Turnos</span>
+                    <span class="stat-value blue">{{ stats_mes.total_turnos|default:"00" }}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Alertas</span>
+                    <span class="stat-value yellow">{{ stats_mes.total_alertas|default:"00" }}</span>
+                </div>
+                <div class="stat-row" style="border-top:1px solid #333; padding-top:8px; margin-top:2px;">
+                    <span class="stat-label" style="color:#aaaaaa;">Total Eventos</span>
+                    <span class="stat-value" style="color:#ffffff;">{{ total_eventos_mes|default:"00" }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- LEYENDA -->
+        <div class="legend-panel">
+            <div class="legend-header">Leyenda</div>
+            <div class="legend-body">
+                <div class="legend-item">
+                    <div class="legend-dot" style="background-color:#00e5ff; box-shadow:0 0 6px rgba(0,229,255,0.7);"></div>
+                    <span>Dia de Hoy</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background-color:#2e7d32;"></div>
+                    <span>Entrega de Equipo</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background-color:#1565c0;"></div>
+                    <span>Turno / Visita</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background-color:#c62828;"></div>
+                    <span>Alerta / Vencimiento</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot" style="background-color:#f9f9f9; border:1px solid #cccccc;"></div>
+                    <span>Dia Inactivo</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ACCIONES RAPIDAS -->
+        <div style="display:flex; flex-direction:column; gap:8px;">
+            <a href="{% url 'ingreso_equipo' %}" class="btn-add-event">
+                <i class="bi bi-plus-circle"></i> Nuevo Ingreso
+            </a>
+            <a href="{% url 'tablero' %}" class="btn-add-event" style="background-color:#444444;">
+                <i class="bi bi-speedometer2"></i> Ir al Tablero
+            </a>
+        </div>
+
+    </div>{# /cal-sidebar #}
+
+</div>{# /cal-wrapper #}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Marcar visualmente el dia actual en la grilla si no viene del backend
+    (function () {
+        const today = new Date();
+        const todayNum = today.getDate();
+
+        document.querySelectorAll('.cal-cell .day-number').forEach(function (el) {
+            if (parseInt(el.textContent.trim()) === todayNum) {
+                const cell = el.closest('.cal-cell');
+                if (cell && !cell.classList.contains('empty')) {
+                    // Solo marcar si el backend no lo hizo ya
+                    if (!cell.classList.contains('today')) {
+                        cell.classList.add('today');
+                    }
+                }
+            }
+        });
+    })();
+</script>
+{% endblock %}
