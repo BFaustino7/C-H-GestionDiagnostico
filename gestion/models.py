@@ -25,7 +25,26 @@ class Equipo(models.Model):
     tipo = models.CharField(max_length=20, choices=TIPOS)
     marca = models.CharField(max_length=50)
     modelo = models.CharField(max_length=50, blank=True)
+    capacidad = models.CharField(max_length=50, blank=True, null=True, help_text="Ej: 3000 Frigorías, 400 Litros")
+    tipo_gas = models.CharField(max_length=50, blank=True, null=True, verbose_name="Tipo de Gas (Solo si aplica)")
     ubicacion = models.CharField(max_length=100, help_text="Ej: Dormitorio Principal")
+
+    @property
+    def total_reparaciones(self):
+        return self.ordenreparacion_set.count()
+
+    @property
+    def ultimo_service(self):
+        ultima_orden = self.ordenreparacion_set.order_by('-fecha_ingreso').first()
+        return ultima_orden.fecha_ingreso if ultima_orden else None
+
+    @property
+    def dias_desde_service(self):
+        from django.utils import timezone
+        ultimo = self.ultimo_service
+        if ultimo:
+            return (timezone.now() - ultimo).days
+        return 999 # Valor alto si nunca tuvo service
 
     def __str__(self):
         return f"{self.get_tipo_display()} {self.marca} - {self.cliente.nombre}"
@@ -62,6 +81,7 @@ class Producto(models.Model):
 
 # --- 4. TALLER Y REPARACIONES ---
 class OrdenReparacion(models.Model):
+    # --- 1. CONSTANTES (CHOICES) ---
     ESTADOS = [
         ('PENDIENTE', 'Pendiente de Revisión'),
         ('DIAGNOSTICO', 'En Diagnóstico'),
@@ -70,36 +90,44 @@ class OrdenReparacion(models.Model):
         ('TERMINADO', 'Terminado (Listo p/ entregar)'),
         ('ENTREGADO', 'Entregado al Cliente'),
     ]
-    # --- NUEVO: Opciones de Pago ---
+    
     ESTADOS_PAGO = [
         ('DEBE', 'Impago'),
         ('SENA', 'Seña / Anticipo'),
         ('PAGADO', 'Pagado Totalmente'),
     ]
-    estado_pago = models.CharField(max_length=20, choices=ESTADOS_PAGO, default='DEBE') 
-    en_banco_pruebas = models.BooleanField(default=False, help_text="Activa el panel SCADA para este equipo") 
-    #---------------------------------------------------------------------------------------------------------#
+
+    # --- 2. RELACIONES (CLAVES FORÁNEAS Y M2M) ---
     equipo = models.ForeignKey(Equipo, on_delete=models.PROTECT)
     tecnico = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
-    fecha_ingreso = models.DateTimeField(auto_now_add=True)
-    estado = models.CharField(max_length=20, choices=ESTADOS, default='PENDIENTE')
-    
-    falla_declarada = models.TextField(help_text="Qué dijo el cliente que pasa")
-    diagnostico_tecnico = models.TextField(blank=True)
-    
-    #Plata
-    costo_mano_obra = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    sena_monto = models.DecimalField(max_digits=10, decimal_places=2, default=0, help_text="Monto dejado a cuenta")
-    """
-    sena_monto:El cliente deja plata a cuenta para comprar insumo o repuesto.
-    """
-    
-    # Relación M-to-M con Productos usando la tabla intermedia
     insumos = models.ManyToManyField(Producto, through='DetalleInsumo')
 
+    # --- 3. ESTADO Y METADATOS ---
+    estado = models.CharField(max_length=20, choices=ESTADOS, default='PENDIENTE')
+    estado_pago = models.CharField(max_length=20, choices=ESTADOS_PAGO, default='DEBE') 
+    en_banco_pruebas = models.BooleanField(default=False, help_text="Activa el panel SCADA para este equipo") 
+    fecha_ingreso = models.DateTimeField(auto_now_add=True)
+    
+    # --- 4. TEXTOS (DESCRIPCIONES Y DIAGNÓSTICOS) ---
+    falla_declarada = models.TextField(help_text="Qué dijo el cliente que pasa")
+    diagnostico_tecnico = models.TextField(blank=True)
+    reparacion_realizada = models.TextField(blank=True)
+    detalle_insumos_extra = models.TextField(blank=True, help_text="Detalle rápido de insumos sin stock")
+    
+    # --- 5. FINANCIERO (PRECIOS Y COSTOS) ---
+    costo_mano_obra = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    sena_monto = models.DecimalField(max_digits=10, decimal_places=2, default=0, help_text="Monto dejado a cuenta para comprar insumo o repuesto")
+    costo_insumos_extra = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    # --- 6. PROPIEDADES CALCULADAS ---
+    @property
+    def total_calculado(self):
+        total_repuestos = sum(item.precio_congelado * item.cantidad for item in self.detalleinsumo_set.all())
+        return self.costo_mano_obra + total_repuestos
+    
+    # --- 7. MÉTODOS MÁGICOS ---
     def __str__(self):
         return f"Orden #{self.id} - {self.equipo}"
-
 class NotaTecnica(models.Model):
     """ Bitácora del día a día """
     orden = models.ForeignKey(OrdenReparacion, on_delete=models.CASCADE, related_name='notas')

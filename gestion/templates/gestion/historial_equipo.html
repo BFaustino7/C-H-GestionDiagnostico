@@ -10,59 +10,88 @@
             <h2 class="m-0 fw-bold text-uppercase">
                 <i class="bi bi-tools me-2"></i> {{ equipo.marca }} {{ equipo.modelo }}
             </h2>
-            <small class="text-secondary">PROPIETARIO: <strong>{{ equipo.cliente.nombre }}</strong></small>
+            <small class="text-secondary">PROPIETARIO: <strong style="color: #ffcc00;">{{ equipo.cliente.nombre }}</strong></small>
         </div>
         <div class="text-end">
-            <span class="badge bg-secondary badge-sq">ID EQUIPO: #{{ equipo.id }}</span>
+            <span class="badge" style="background-color: #333; font-family: 'Courier New', monospace; font-size: 0.9rem; border: 1px solid #666;">
+                ID EQUIPO: EQ-{{ equipo.id|stringformat:"05d" }}
+            </span>
         </div>
     </div>
 
     <div class="row">
         <div class="col-lg-12">
-            <h5 class="section-header text-uppercase fw-bold mb-3" style="border-left: 5px solid #000; padding-left: 15px;">
+            <h5 class="section-header text-uppercase fw-bold mb-3" style="border-left: 5px solid #ffcc00; padding-left: 15px; color: #1a1a1a;">
                 📜 Línea de Tiempo de Intervenciones
             </h5>
 
             {% if ordenes %}
                 <div class="timeline-wrapper">
                     {% for orden in ordenes %}
-                    <div class="card-industrial mb-4 p-0">
-                        <div class="d-flex justify-content-between align-items-center bg-light border-bottom border-black p-2 px-3">
-                            <span class="fw-bold">ORDEN #{{ orden.id }}</span>
-                            <span class="text-muted small"><i class="bi bi-calendar3"></i> {{ orden.fecha_ingreso|date:"d/m/Y" }}</span>
+                    <div class="card mb-4" style="border: 2px solid #1a1a1a; border-radius: 0; box-shadow: 4px 4px 0px rgba(0,0,0,0.15);">
+                        
+                        <div class="d-flex justify-content-between align-items-center p-2 px-3" style="background-color: #1a1a1a; color: #fff; border-bottom: 3px solid #ffcc00;">
+                            <span class="fw-bold" style="font-family: 'Courier New', monospace; font-size: 1.1rem;">ORDEN #{{ orden.id|stringformat:"05d" }}</span>
+                            <span style="font-size: 0.85rem; color: #aaa;"><i class="bi bi-calendar3"></i> {{ orden.fecha_ingreso|date:"d/m/Y H:i" }}</span>
                         </div>
                         
-                        <div class="card-body p-3">
-                            <div class="row">
-                                <div class="col-md-8">
-                                    <div class="p-3 mb-2" style="background: #1a1a1a; color: #00ff00; font-family: 'Courier New', monospace; border: 1px solid #333;">
-                                        <div class="small text-secondary mb-1">>>> DIAGNÓSTICO_TÉCNICO:</div>
-                                        {{ orden.diagnostico|default:"Sin diagnóstico cargado aún." }}
+                        <div class="card-body p-0">
+                            <div class="row g-0">
+                                
+                                <div class="col-md-8 p-3">
+                                    <div class="p-3 mb-3" style="background: #0d0d0d; color: #00ff00; font-family: 'Courier New', monospace; border: 1px solid #333;">
+                                        <div style="font-size: 0.75rem; color: #888; margin-bottom: 5px; text-transform: uppercase;">> DIAGNÓSTICO_TÉCNICO:</div>
+                                        <div style="white-space: pre-wrap; font-size: 0.9rem;">{{ orden.diagnostico_tecnico|default:"Sin diagnóstico cargado aún." }}</div>
                                     </div>
-                                    <div class="text-muted small">
-                                        <strong>TRABAJO REALIZADO:</strong> {{ orden.trabajo_realizado|default:"En proceso..." }}
+                                    
+                                    <div class="mb-3">
+                                        <strong style="font-size: 0.8rem; text-transform: uppercase; color: #666;">TRABAJO REALIZADO:</strong>
+                                        <div style="font-size: 0.95rem; color: #1a1a1a; margin-top: 4px; white-space: pre-wrap;">{{ orden.reparacion_realizada|default:"En proceso..." }}</div>
+                                    </div>
+                                    
+                                    <div>
+                                        <strong style="font-size: 0.8rem; text-transform: uppercase; color: #666;">REPUESTOS Y MATERIALES:</strong>
+                                        {% if orden.detalleinsumo_set.all %}
+                                            <ul style="list-style-type: none; padding-left: 0; margin-top: 5px; margin-bottom: 0; border-left: 3px solid #cccccc; padding-left: 10px;">
+                                            {% for item in orden.detalleinsumo_set.all %}
+                                                <li style="display: flex; justify-content: space-between; font-size: 0.9rem; padding: 3px 0; border-bottom: 1px dashed #eee;">
+                                                    <span>• {{ item.producto.nombre }} (x{{ item.cantidad }})</span>
+                                                    <strong style="color: #198754;">${{ item.precio_congelado }}</strong>
+                                                </li>
+                                            {% endfor %}
+                                            </ul>
+                                        {% else %}
+                                            <div style="font-size: 0.85rem; color: #888; font-style: italic; margin-top: 5px;">No se registraron repuestos adicionales en esta orden.</div>
+                                        {% endif %}
                                     </div>
                                 </div>
                                 
-                                <div class="col-md-4 border-start border-secondary d-flex flex-column justify-content-center align-items-center">
-                                    <div class="mb-2">
-                                        <span class="badge badge-sq w-100 py-2 
-                                            {% if orden.estado == 'PENDIENTE' %}bg-danger
-                                            {% elif orden.estado == 'DIAGNOSTICO' %}bg-warning text-dark
-                                            {% elif orden.estado == 'REPARACION' %}bg-primary
-                                            {% else %}bg-success{% endif %}">
-                                            {{ orden.get_estado_display|upper }}
+                                <div class="col-md-4 p-3 d-flex flex-column justify-content-center align-items-center" style="background-color: #f8f9fa; border-left: 2px dashed #ccc;">
+                                    
+                                    <div class="mb-3 w-100 text-center">
+                                        <span style="display: block; padding: 8px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; font-size: 0.85rem; color: #fff;
+                                            {% if orden.estado == 'PENDIENTE' %}background-color: #dc3545;
+                                            {% elif orden.estado == 'DIAGNOSTICO' %}background-color: #ffc107; color: #000;
+                                            {% elif orden.estado == 'ESPERA' %}background-color: #6c757d;
+                                            {% elif orden.estado == 'REPARACION' %}background-color: #0d6efd;
+                                            {% else %}background-color: #198754;{% endif %}">
+                                            {{ orden.get_estado_display }}
                                         </span>
                                     </div>
-                                    <div class="iot-display w-100 text-center" style="font-size: 1.5rem;">
-                                        <span class="iot-label">COSTO TOTAL</span>
-                                        <span class="val-watts">${{ orden.costo_mano_obra }}</span>
+                                    
+                                    <div class="w-100 text-center mb-3" style="background-color: #1a1a1a; padding: 15px 10px; border: 2px solid #000;">
+                                        <div style="font-size: 0.7rem; color: #ffcc00; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 5px;">COSTO TOTAL</div>
+                                        <div style="font-size: 1.8rem; font-weight: 700; color: #fff; font-family: 'Courier New', monospace;">
+                                            ${{ orden.total_calculado|stringformat:".2f" }}
+                                        </div>
                                     </div>
-                                    <div class="mt-3 w-100">
-                                        <a href="{% url 'detalle_orden' orden.id %}" class="btn btn-outline-dark btn-hard w-100 btn-sm">
-                                            <i class="bi bi-search"></i> DETALLES COMPLETOS
+                                    
+                                    <div class="w-100">
+                                        <a href="{% url 'detalle_orden' orden.id %}" class="btn w-100" style="background-color: #fff; color: #1a1a1a; border: 2px solid #1a1a1a; font-weight: bold; font-size: 0.85rem; border-radius: 0; transition: all 0.2s;">
+                                            <i class="bi bi-search me-1"></i> VER FICHA COMPLETA
                                         </a>
                                     </div>
+                                    
                                 </div>
                             </div>
                         </div>
@@ -70,18 +99,14 @@
                     {% endfor %}
                 </div>
             {% else %}
-                <div class="card-industrial p-5 text-center bg-white">
+                <div class="p-5 text-center" style="background-color: #fff; border: 2px dashed #ccc;">
                     <i class="bi bi-clipboard-x display-1 text-muted"></i>
-                    <h4 class="mt-3 text-uppercase fw-bold">Sin Historial</h4>
+                    <h4 class="mt-3 text-uppercase fw-bold" style="color: #1a1a1a;">Sin Historial</h4>
                     <p class="text-muted">Este equipo no registra intervenciones técnicas previas en el sistema.</p>
-                    <a href="{% url 'ingreso_equipo' %}" class="btn btn-dark btn-hard">CREAR PRIMERA ORDEN</a>
                 </div>
             {% endif %}
         </div>
     </div>
 </div>
 
-<a href="{% url 'lista_equipos' %}" class="btn btn-secondary btn-hard shadow" style="position: fixed; bottom: 30px; left: 290px; z-index: 1000;">
-    <i class="bi bi-arrow-left"></i> VOLVER A EQUIPOS
-</a>
 {% endblock %}

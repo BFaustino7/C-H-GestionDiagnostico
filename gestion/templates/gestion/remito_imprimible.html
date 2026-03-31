@@ -12,16 +12,20 @@
         .firma { margin-top: 80px; display: flex; justify-content: space-between; }
         .linea-firma { border-top: 1px solid black; width: 40%; text-align: center; padding-top: 10px; }
         
-        /* Ocultar botón al imprimir */
-        @media print { .no-print { display: none; } }
+        /* Ocultar botón y márgenes del navegador al imprimir */
+        @media print { 
+            .no-print { display: none; } 
+            @page { margin: 0; }
+            body { padding: 2cm; }
+        }
     </style>
 </head>
 <body>
 
-    <button onclick="window.print()" class="no-print" style="padding: 10px 20px; cursor: pointer; font-size: 16px;">🖨️ IMPRIMIR DOCUMENTO</button>
+    <button onclick="window.print()" class="no-print" style="padding: 10px 20px; cursor: pointer; font-size: 16px; margin-bottom: 20px;">🖨️ IMPRIMIR DOCUMENTO</button>
 
     <div class="header">
-        <h1>SR REFRIGERACIÓN</h1>
+        <h1>C&H REFRIGERACIÓN</h1>
         <p>Servicio Técnico Especializado - Villa Constitución</p>
         <h3>ORDEN DE SERVICIO / REMITO DE ENTREGA #{{ orden.id }}</h3>
     </div>
@@ -31,33 +35,43 @@
         <p>
             <strong>Nombre:</strong> {{ orden.equipo.cliente.nombre }}<br>
             <strong>Teléfono:</strong> {{ orden.equipo.cliente.telefono }}<br>
-            <strong>Dirección:</strong> {{ orden.equipo.cliente.direccion }}
+            <strong>Dirección:</strong> {{ orden.equipo.cliente.direccion|default:"-" }}
         </p>
     </div>
 
     <div class="info-box">
         <span class="titulo">EQUIPO:</span>
         <p>{{ orden.equipo.get_tipo_display }} - {{ orden.equipo.marca }} {{ orden.equipo.modelo }}</p>
-        <p><strong>Ubicación:</strong> {{ orden.equipo.ubicacion }}</p>
+        <p><strong>Ubicación:</strong> {{ orden.equipo.ubicacion|default:"-" }}</p>
+    </div>
+
+    <div class="info-box">
+            <span class="titulo">DIAGNÓSTICO TÉCNICO:</span>
+            <p>{{ orden.diagnostico_tecnico|default:"Sin descripción del problema."|linebreaksbr }}</p>
+            <hr>
+            <span class="titulo">REPUESTOS UTILIZADOS:</span>
+            <ul style="list-style-type: none; padding-left: 0; margin-bottom: 0;">
+                {% for item in orden.detalleinsumo_set.all %}
+                    <li style="display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px dotted #ccc;">
+                        <span>• {{ item.producto.nombre }} (x{{ item.cantidad }})</span>
+                        <strong>${{ item.precio_congelado }}</strong>
+                    </li>
+                {% empty %}
+                    <li style="padding: 5px 0; color: #777; font-style: italic;">Sin repuestos adicionales.</li>
+                {% endfor %}
+            </ul>
     </div>
 
     <div class="info-box">
         <span class="titulo">TRABAJO REALIZADO:</span>
-        <p>{{ orden.diagnostico_tecnico|linebreaksbr }}</p>
-        <hr>
-        <span class="titulo">REPUESTOS UTILIZADOS:</span>
-        <ul>
-            {% for item in orden.detalleinsumo_set.all %}
-                <li>{{ item.producto.nombre }} (x{{ item.cantidad }})</li>
-            {% empty %}
-                <li>Sin repuestos adicionales.</li>
-            {% endfor %}
-        </ul>
+        <p>{{ orden.reparacion_realizada|default:"-"|linebreaksbr }}</p>
+        <p style="text-align: right; margin-bottom: 0;"><strong>Costo Mano de Obra: ${{ orden.costo_mano_obra }}</strong></p>
     </div>
 
-    <div style="text-align: right; font-size: 1.2em; margin-top: 20px;">
-        <strong>TOTAL MANO DE OBRA: ${{ orden.costo_mano_obra }}</strong>
-        </div>
+    <div style="text-align: right; font-size: 1.4em; margin-top: 20px; padding: 10px; background-color: #f9f9f9; border: 1px solid #ccc; display: inline-block; float: right;">
+        <strong>TOTAL: ${{ total_general|stringformat:'.2f' }}</strong>
+    </div>
+    <div style="clear: both;"></div>
 
     <div class="legal">
         <strong>GARANTÍA:</strong> El presente trabajo cuenta con una garantía de 90 días sobre la mano de obra realizada. 

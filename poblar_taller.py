@@ -40,3 +40,5 @@ def poblar():
         )
 
     print(">>> Base de datos poblada con 3 registros limpios.")
+    if __name__ == "__main__":
+        poblar()

@@ -144,15 +144,15 @@
                 {% for orden in ordenes_en_proceso %}
                 <tr>
                   <td style="border: 1px solid #333; font-family: 'Courier New', monospace;">#{{ orden.id }}</td>
-                  <td style="border: 1px solid #333;">{{ orden.cliente }}</td>
+                  <td style="border: 1px solid #333;">{{ orden.equipo.cliente }}</td>
                   <td style="border: 1px solid #333;">
                     {% if orden.estado == 'PENDIENTE' %}
                     <span class="badge"
                       style="background: #dc3545; border-radius: 0; padding: 6px 10px; font-size: 11px; font-weight: bold;">PENDIENTE</span>
-                    {% elif orden.estado == 'DIAGNÓSTICO' %}
+                    {% elif orden.estado == 'DIAGNOSTICO' %}
                     <span class="badge"
                       style="background: #ffc107; color: #000; border-radius: 0; padding: 6px 10px; font-size: 11px; font-weight: bold;">DIAGNÓSTICO</span>
-                    {% elif orden.estado == 'REPARACIÓN' %}
+                    {% elif orden.estado == 'REPARACION' %}
                     <span class="badge"
                       style="background: #0d6efd; border-radius: 0; padding: 6px 10px; font-size: 11px; font-weight: bold;">REPARACIÓN</span>
                     {% endif %}
@@ -188,21 +188,21 @@
                 <tr>
                   <th style="border: 1px solid #333;">Cliente</th>
                   <th style="border: 1px solid #333;">Equipo</th>
-                  <th style="border: 1px solid #333;">Costo</th>
+                  <th style="border: 1px solid #333;">cobro</th>
                   <th style="border: 1px solid #333;">Acción</th>
                 </tr>
               </thead>
               <tbody>
                 {% for entrega in ordenes_para_entregar %}
                 <tr>
-                  <td style="border: 1px solid #333;">{{ entrega.cliente }}</td>
-                  <td style="border: 1px solid #333;">{{ entrega.equipo }}</td>
-                  <td style="border: 1px solid #333; font-family: 'Courier New', monospace; color: #ffc107;">${{
-                    entrega.costo }}</td>
+                  <td style="border: 1px solid #333;">{{ entrega.equipo.cliente.nombre }}</td>
+                  <td style="border: 1px solid #333;">{{ entrega.equipo.get_tipo_display }}</td>
+                  <td style="border: 1px solid #333; font-family: 'Courier New', monospace; color: #ffc107;">$
+                    <entrega class="total_calculado"></entrega></td>
                   <td style="border: 1px solid #333;">
                     <a href="{% url 'detalle_orden' entrega.id %}" class="btn btn-sm btn-success"
                       style="border-radius: 0; padding: 4px 8px; font-size: 11px; background: #28a745; border: 1px solid #28a745;">
-                      👁️ VER FICHA
+                      👁️ Ficha
                     </a>
                   </td>
                 </tr>

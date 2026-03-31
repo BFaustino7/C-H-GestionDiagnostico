@@ -474,27 +474,27 @@
         <a href="{% url 'lista_equipos' %}" class="btn-filter {% if not tipo_filtro %}active{% endif %}">
             <i class="bi bi-grid-3x3-gap"></i>
             TODOS
-            <span class="filter-count">{{ total_equipos|default:"0" }}</span>
+            <span class="filter-count">{{ counts.count_total|default:"0" }}</span>
         </a>
         <a href="{% url 'lista_equipos' %}?tipo=split" class="btn-filter {% if tipo_filtro == 'split' %}active{% endif %}">
             <i class="bi bi-wind"></i>
             AIRE SPLIT
-            <span class="filter-count">{{ count_split|default:"0" }}</span>
+            <span class="filter-count">{{ counts.count_split|default:"0" }}</span>
         </a>
         <a href="{% url 'lista_equipos' %}?tipo=heladera" class="btn-filter {% if tipo_filtro == 'heladera' %}active{% endif %}">
             <i class="bi bi-box-seam"></i>
             HELADERA
-            <span class="filter-count">{{ count_heladera|default:"0" }}</span>
+            <span class="filter-count">{{ counts.count_heladera|default:"0" }}</span>
         </a>
         <a href="{% url 'lista_equipos' %}?tipo=camara" class="btn-filter {% if tipo_filtro == 'camara' %}active{% endif %}">
             <i class="bi bi-snow3"></i>
             CAMARA
-            <span class="filter-count">{{ count_camara|default:"0" }}</span>
+            <span class="filter-count">{{ counts.count_camara|default:"0" }}</span>
         </a>
         <a href="{% url 'lista_equipos' %}?tipo=lavarropas" class="btn-filter {% if tipo_filtro == 'lavarropas' %}active{% endif %}">
             <i class="bi bi-water"></i>
             LAVARROPAS
-            <span class="filter-count">{{ count_lavarropas|default:"0" }}</span>
+            <span class="filter-count">{{ counts.count_lavarropas|default:"0" }}</span>
         </a>
     </div>
 </div>
@@ -511,14 +511,14 @@
     <div class="stat-box">
         <i class="bi bi-check-circle"></i>
         <div class="stat-info">
-            <span class="stat-value">{{ equipos_ok|default:"0" }}</span>
+            <span class="stat-value">{{ counts.equipos_ok|default:"0" }}</span>
             <span class="stat-label">Service al Dia</span>
         </div>
     </div>
     <div class="stat-box">
         <i class="bi bi-exclamation-triangle"></i>
         <div class="stat-info">
-            <span class="stat-value">{{ equipos_pendientes|default:"0" }}</span>
+            <span class="stat-value">{{ counts.equipos_pendientes|default:"0" }}</span>
             <span class="stat-label">Requieren Service</span>
         </div>
     </div>
@@ -531,13 +531,13 @@
         <div class="equipment-card">
             <div class="equipment-card-header">
                 <span class="equipment-type">
-                    {% if equipo.tipo == 'split' %}
+                    {% if equipo.tipo == 'SPLIT' %}
                         <i class="bi bi-wind me-1"></i> AIRE SPLIT
-                    {% elif equipo.tipo == 'heladera' %}
+                    {% elif equipo.tipo == 'HELADERA' %}
                         <i class="bi bi-box-seam me-1"></i> HELADERA
-                    {% elif equipo.tipo == 'camara' %}
+                    {% elif equipo.tipo == 'CAMARA' %}
                         <i class="bi bi-snow3 me-1"></i> CAMARA FRIGORIFICA
-                    {% elif equipo.tipo == 'lavarropas' %}
+                    {% elif equipo.tipo == 'LAVARROPAS' %}
                         <i class="bi bi-water me-1"></i> LAVARROPAS
                     {% else %}
                         <i class="bi bi-gear me-1"></i> {{ equipo.tipo|upper }}
@@ -547,13 +547,13 @@
             </div>
             
             <div class="type-icon">
-                {% if equipo.tipo == 'split' %}
+                {% if equipo.tipo == 'SPLIT' %}
                     <i class="bi bi-wind"></i>
-                {% elif equipo.tipo == 'heladera' %}
+                {% elif equipo.tipo == 'HELADERA' %}
                     <i class="bi bi-box-seam"></i>
-                {% elif equipo.tipo == 'camara' %}
+                {% elif equipo.tipo == 'CAMARA' %}
                     <i class="bi bi-snow3"></i>
-                {% elif equipo.tipo == 'lavarropas' %}
+                {% elif equipo.tipo == 'LAVARROPAS' %}
                     <i class="bi bi-water"></i>
                 {% else %}
                     <i class="bi bi-gear"></i>
@@ -573,7 +573,13 @@
                     </div>
                     <div class="detail-item">
                         <span class="detail-label">Tipo de Gas</span>
-                        <span class="detail-value">{{ equipo.tipo_gas|default:"N/A" }}</span>
+                        <span class="detail-value">
+                            {% if quipo.ficha.gas_tipo %}
+                                {{ quipo.ficha.gas_tipo }}
+                            {% else %}
+                                <span style="color: #999;">---</span>
+                            {% endif %}
+                        </span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-label">N de Serie</span>

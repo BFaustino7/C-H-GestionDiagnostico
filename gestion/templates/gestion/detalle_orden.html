@@ -6,11 +6,7 @@
 
 {% block extra_css %}
 <style>
-    /* ========================================
-       DETALLE ORDEN - FICHA TÉCNICA INDUSTRIAL
-       ======================================== */
-    
-    /* Cabecera Industrial */
+    /* Estilos base */
     .order-header {
         background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
         border: 3px solid #000000;
@@ -24,11 +20,7 @@
         gap: 15px;
     }
     
-    .order-id-block {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-    }
+    .order-id-block { display: flex; align-items: center; gap: 20px; }
     
     .order-number {
         font-family: 'Courier New', Courier, monospace;
@@ -38,9 +30,7 @@
         letter-spacing: 2px;
     }
     
-    .order-number span {
-        color: #ffcc00;
-    }
+    .order-number span { color: #ffcc00; }
     
     .order-date {
         font-family: 'Courier New', Courier, monospace;
@@ -51,7 +41,6 @@
         border: 1px solid #333333;
     }
     
-    /* Badge de Estado Grande */
     .status-badge-large {
         padding: 12px 30px;
         font-size: 1rem;
@@ -63,633 +52,269 @@
         box-shadow: 3px 3px 0px rgba(0,0,0,0.5);
     }
     
-    .status-pendiente {
-        background-color: #dc3545;
-        color: #ffffff;
-        border-color: #a71d2a;
-    }
+    .status-PENDIENTE { background-color: #dc3545; color: #ffffff; border-color: #a71d2a; }
+    .status-DIAGNOSTICO { background-color: #ffc107; color: #000000; border-color: #d39e00; }
+    .status-REPARACION { background-color: #0d6efd; color: #ffffff; border-color: #0a58ca; }
+    .status-COMPLETADO { background-color: #198754; color: #ffffff; border-color: #146c43; }
+    .status-ENTREGADO { background-color: #6c757d; color: #ffffff; border-color: #565e64; }
     
-    .status-diagnostico {
-        background-color: #ffc107;
-        color: #000000;
-        border-color: #d39e00;
-    }
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 25px; }
+    @media (max-width: 992px) { .info-grid { grid-template-columns: 1fr; } }
     
-    .status-reparacion {
-        background-color: #0d6efd;
-        color: #ffffff;
-        border-color: #0a58ca;
-    }
+    .info-panel { background-color: #ffffff; border: 2px solid #1a1a1a; box-shadow: 4px 4px 0px rgba(0,0,0,0.15); }
+    .info-panel-header { background-color: #1a1a1a; color: #ffffff; padding: 12px 20px; display: flex; align-items: center; gap: 12px; border-bottom: 3px solid #ffcc00; }
+    .info-panel-header i { font-size: 1.3rem; color: #ffcc00; }
+    .info-panel-header h3 { margin: 0; font-size: 0.95rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; }
+    .info-panel-body { padding: 20px; }
+    .info-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed #cccccc; }
+    .info-row:last-child { border-bottom: none; }
+    .info-label { font-size: 0.8rem; font-weight: 600; color: #666666; text-transform: uppercase; letter-spacing: 1px; }
+    .info-value { font-family: 'Courier New', Courier, monospace; font-size: 1rem; font-weight: 600; color: #1a1a1a; text-align: right; }
+    .info-value.highlight { color: #0d6efd; }
     
-    .status-completado {
-        background-color: #198754;
-        color: #ffffff;
-        border-color: #146c43;
-    }
+    .terminal-section { background-color: #ffffff; border: 2px solid #1a1a1a; margin-bottom: 25px; box-shadow: 4px 4px 0px rgba(0,0,0,0.15); }
+    .terminal-header { background-color: #1a1a1a; color: #ffffff; padding: 12px 20px; display: flex; align-items: center; gap: 12px; border-bottom: 3px solid #00ff00; }
+    .terminal-header i { font-size: 1.3rem; color: #00ff00; }
+    .terminal-header h3 { margin: 0; font-size: 0.95rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; }
+    .terminal-body { background-color: #0d0d0d; padding: 20px; min-height: 120px; }
+    .terminal-content { font-family: 'Courier New', Courier, monospace; font-size: 0.95rem; color: #00ff00; line-height: 1.8; white-space: pre-wrap; }
+    .terminal-prompt { color: #ffcc00; }
     
-    .status-entregado {
-        background-color: #6c757d;
-        color: #ffffff;
-        border-color: #565e64;
-    }
+    .edit-form-section { background-color: #ffffff; border: 2px solid #1a1a1a; margin-bottom: 25px; box-shadow: 4px 4px 0px rgba(0,0,0,0.15); }
+    .edit-form-header { background-color: #2a2a2a; color: #ffffff; padding: 12px 20px; display: flex; align-items: center; gap: 12px; border-bottom: 3px solid #0dcaf0; }
+    .edit-form-header i { font-size: 1.3rem; color: #0dcaf0; }
+    .edit-form-header h3 { margin: 0; font-size: 0.95rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; }
+    .edit-form-body { padding: 25px; }
+    .form-group-industrial { margin-bottom: 20px; }
+    .form-group-industrial label { display: block; font-size: 0.8rem; font-weight: 700; color: #1a1a1a; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; padding-left: 2px; }
+    .form-group-industrial label i { margin-right: 8px; color: #666666; }
     
-    /* Panel de Información - Grid 2 columnas */
-    .info-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 25px;
-        margin-bottom: 25px;
-    }
+    .cost-input-wrapper { display: flex; align-items: center; background-color: #1a1a1a; border: 2px solid #000000; padding: 5px; }
+    .cost-prefix { background-color: #ffcc00; color: #000000; padding: 12px 20px; font-family: 'Courier New', Courier, monospace; font-size: 1.2rem; font-weight: 700; }
+    .cost-input-wrapper .input-industrial { border: none; background-color: #ffffff; flex-grow: 1; }
     
-    @media (max-width: 992px) {
-        .info-grid {
-            grid-template-columns: 1fr;
-        }
-    }
+    .actions-section { display: flex; gap: 15px; flex-wrap: wrap; padding: 20px 0; }
+    .btn-action { padding: 16px 35px; font-size: 0.95rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; border: 3px solid; border-radius: 0; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
+    .btn-actualizar { background-color: #1a1a1a; color: #ffffff; border-color: #000000; }
+    .btn-actualizar:hover { background-color: #333333; transform: translate(-3px, -3px); box-shadow: 6px 6px 0px rgba(0,0,0,0.3); }
+    .btn-remito { background-color: #198754; color: #ffffff; border-color: #146c43; }
+    .btn-remito:hover { background-color: #20c997; transform: translate(-3px, -3px); box-shadow: 6px 6px 0px rgba(0,0,0,0.3); }
+    .btn-volver { background-color: transparent; color: #666666; border-color: #999999; }
     
-    .info-panel {
-        background-color: #ffffff;
-        border: 2px solid #1a1a1a;
-        box-shadow: 4px 4px 0px rgba(0,0,0,0.15);
-    }
+    .last-modified { font-family: 'Courier New', Courier, monospace; font-size: 0.75rem; color: #888888; padding: 10px 15px; background-color: #f5f5f5; border-left: 3px solid #cccccc; margin-top: 15px; }
     
-    .info-panel-header {
-        background-color: #1a1a1a;
-        color: #ffffff;
-        padding: 12px 20px;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        border-bottom: 3px solid #ffcc00;
-    }
-    
-    .info-panel-header i {
-        font-size: 1.3rem;
-        color: #ffcc00;
-    }
-    
-    .info-panel-header h3 {
-        margin: 0;
-        font-size: 0.95rem;
-        font-weight: 600;
-        letter-spacing: 1.5px;
-        text-transform: uppercase;
-    }
-    
-    .info-panel-body {
-        padding: 20px;
-    }
-    
-    .info-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px 0;
-        border-bottom: 1px dashed #cccccc;
-    }
-    
-    .info-row:last-child {
-        border-bottom: none;
-    }
-    
-    .info-label {
-        font-size: 0.8rem;
-        font-weight: 600;
-        color: #666666;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-    
-    .info-value {
-        font-family: 'Courier New', Courier, monospace;
-        font-size: 1rem;
-        font-weight: 600;
-        color: #1a1a1a;
-        text-align: right;
-    }
-    
-    .info-value.highlight {
-        color: #0d6efd;
-    }
-    
-    /* Sección de Diagnóstico - Estilo Terminal */
-    .terminal-section {
-        background-color: #ffffff;
-        border: 2px solid #1a1a1a;
-        margin-bottom: 25px;
-        box-shadow: 4px 4px 0px rgba(0,0,0,0.15);
-    }
-    
-    .terminal-header {
-        background-color: #1a1a1a;
-        color: #ffffff;
-        padding: 12px 20px;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        border-bottom: 3px solid #00ff00;
-    }
-    
-    .terminal-header i {
-        font-size: 1.3rem;
-        color: #00ff00;
-    }
-    
-    .terminal-header h3 {
-        margin: 0;
-        font-size: 0.95rem;
-        font-weight: 600;
-        letter-spacing: 1.5px;
-        text-transform: uppercase;
-    }
-    
-    .terminal-dots {
-        margin-left: auto;
-        display: flex;
-        gap: 6px;
-    }
-    
-    .terminal-dot {
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-    }
-    
-    .terminal-dot.red { background-color: #ff5f56; }
-    .terminal-dot.yellow { background-color: #ffbd2e; }
-    .terminal-dot.green { background-color: #27c93f; }
-    
-    .terminal-body {
-        background-color: #0d0d0d;
-        padding: 20px;
-        min-height: 120px;
-    }
-    
-    .terminal-content {
-        font-family: 'Courier New', Courier, monospace;
-        font-size: 0.95rem;
-        color: #00ff00;
-        line-height: 1.8;
-        white-space: pre-wrap;
-    }
-    
-    .terminal-prompt {
-        color: #ffcc00;
-    }
-    
-    /* Formulario de Edición */
-    .edit-form-section {
-        background-color: #ffffff;
-        border: 2px solid #1a1a1a;
-        margin-bottom: 25px;
-        box-shadow: 4px 4px 0px rgba(0,0,0,0.15);
-    }
-    
-    .edit-form-header {
-        background-color: #2a2a2a;
-        color: #ffffff;
-        padding: 12px 20px;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        border-bottom: 3px solid #0dcaf0;
-    }
-    
-    .edit-form-header i {
-        font-size: 1.3rem;
-        color: #0dcaf0;
-    }
-    
-    .edit-form-header h3 {
-        margin: 0;
-        font-size: 0.95rem;
-        font-weight: 600;
-        letter-spacing: 1.5px;
-        text-transform: uppercase;
-    }
-    
-    .edit-form-body {
-        padding: 25px;
-    }
-    
-    .form-group-industrial {
-        margin-bottom: 20px;
-    }
-    
-    .form-group-industrial label {
-        display: block;
-        font-size: 0.8rem;
-        font-weight: 700;
-        color: #1a1a1a;
-        text-transform: uppercase;
-        letter-spacing: 1.5px;
-        margin-bottom: 8px;
-        padding-left: 2px;
-    }
-    
-    .form-group-industrial label i {
-        margin-right: 8px;
-        color: #666666;
-    }
-    
+    /* Input industrial (forzado por si el form no carga) */
     .input-industrial {
-        width: 100%;
-        padding: 14px 18px;
-        font-size: 1rem;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        border: 2px solid #999999;
-        border-radius: 0;
-        background-color: #fafafa;
-        transition: all 0.2s ease;
-    }
-    
-    .input-industrial:focus {
-        outline: none;
-        border-color: #1a1a1a;
-        background-color: #ffffff;
-        box-shadow: 3px 3px 0px rgba(0,0,0,0.1);
-    }
-    
-    .input-industrial.input-numeric {
-        font-family: 'Courier New', Courier, monospace;
-        font-weight: 700;
-        font-size: 1.2rem;
-        letter-spacing: 1px;
-    }
-    
-    textarea.input-industrial {
-        min-height: 120px;
-        resize: vertical;
-        line-height: 1.6;
-    }
-    
-    /* Costo Total - Destacado */
-    .cost-input-wrapper {
-        display: flex;
-        align-items: center;
-        background-color: #1a1a1a;
-        border: 2px solid #000000;
-        padding: 5px;
-    }
-    
-    .cost-prefix {
-        background-color: #ffcc00;
-        color: #000000;
-        padding: 12px 20px;
-        font-family: 'Courier New', Courier, monospace;
-        font-size: 1.2rem;
-        font-weight: 700;
-    }
-    
-    .cost-input-wrapper .input-industrial {
-        border: none;
-        background-color: #ffffff;
-        flex-grow: 1;
-    }
-    
-    /* Botones de Acción */
-    .actions-section {
-        display: flex;
-        gap: 15px;
-        flex-wrap: wrap;
-        padding: 20px 0;
-    }
-    
-    .btn-action {
-        padding: 16px 35px;
-        font-size: 0.95rem;
-        font-weight: 700;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        border: 3px solid;
-        border-radius: 0;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        text-decoration: none;
-    }
-    
-    .btn-action i {
-        font-size: 1.2rem;
-    }
-    
-    .btn-actualizar {
-        background-color: #1a1a1a;
-        color: #ffffff;
-        border-color: #000000;
-    }
-    
-    .btn-actualizar:hover {
-        background-color: #333333;
-        color: #ffffff;
-        transform: translate(-3px, -3px);
-        box-shadow: 6px 6px 0px rgba(0,0,0,0.3);
-    }
-    
-    .btn-remito {
-        background-color: #198754;
-        color: #ffffff;
-        border-color: #146c43;
-    }
-    
-    .btn-remito:hover {
-        background-color: #20c997;
-        color: #ffffff;
-        transform: translate(-3px, -3px);
-        box-shadow: 6px 6px 0px rgba(0,0,0,0.3);
-    }
-    
-    .btn-volver {
-        background-color: transparent;
-        color: #666666;
-        border-color: #999999;
-    }
-    
-    .btn-volver:hover {
-        background-color: #f0f0f0;
-        color: #1a1a1a;
-        border-color: #1a1a1a;
-    }
-    
-    /* Indicador de Modificación */
-    .last-modified {
-        font-family: 'Courier New', Courier, monospace;
-        font-size: 0.75rem;
-        color: #888888;
-        padding: 10px 15px;
-        background-color: #f5f5f5;
-        border-left: 3px solid #cccccc;
-        margin-top: 15px;
-    }
-    
-    /* Historial compacto */
-    .history-badge {
-        display: inline-block;
-        padding: 4px 10px;
-        font-size: 0.7rem;
-        font-family: 'Courier New', Courier, monospace;
-        background-color: #e9ecef;
-        color: #495057;
-        margin-right: 8px;
-        margin-bottom: 5px;
+        width: 100%; padding: 14px 18px; font-size: 1rem; border: 2px solid #999; border-radius: 0 !important; background-color: #fafafa;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- Cabecera Industrial con ID y Estado -->
 <div class="order-header">
     <div class="order-id-block">
-        <div class="order-number">
-            ORDEN <span>#{{ orden.id|stringformat:"05d" }}</span>
-        </div>
-        <div class="order-date">
-            <i class="bi bi-calendar3 me-2"></i>
-            INGRESO: {{ orden.fecha_ingreso|date:"d/m/Y H:i" }}
-        </div>
+        <div class="order-number">ORDEN <span>#{{ orden.id|stringformat:"05d" }}</span></div>
+        <div class="order-date"><i class="bi bi-calendar3 me-2"></i>INGRESO: {{ orden.fecha_get_ingreso|default:orden.fecha_ingreso|date:"d/m/Y H:i" }}</div>
     </div>
     
-    <!-- Badge de Estado Grande -->
-    {% if orden.estado == 'PENDIENTE' %}
-        <div class="status-badge-large status-pendiente">
-            <i class="bi bi-exclamation-triangle me-2"></i>PENDIENTE
-        </div>
-    {% elif orden.estado == 'DIAGNOSTICO' %}
-        <div class="status-badge-large status-diagnostico">
-            <i class="bi bi-search me-2"></i>EN DIAGNÓSTICO
-        </div>
-    {% elif orden.estado == 'REPARACION' %}
-        <div class="status-badge-large status-reparacion">
-            <i class="bi bi-tools me-2"></i>EN REPARACIÓN
-        </div>
-    {% elif orden.estado == 'COMPLETADO' %}
-        <div class="status-badge-large status-completado">
-            <i class="bi bi-check-circle me-2"></i>COMPLETADO
-        </div>
-    {% elif orden.estado == 'ENTREGADO' %}
-        <div class="status-badge-large status-entregado">
-            <i class="bi bi-box-seam me-2"></i>ENTREGADO
-        </div>
-    {% else %}
-        <div class="status-badge-large status-pendiente">
-            {{ orden.estado }}
-        </div>
-    {% endif %}
+    <div class="status-badge-large status-{{ orden.estado }}">
+        <i class="bi bi-gear-wide-connected me-2"></i>{{ orden.get_estado_display|upper }}
+    </div>
 </div>
 
-<!-- Panel de Información: Cliente y Equipo -->
 <div class="info-grid">
-    <!-- Columna Izquierda: Datos del Cliente -->
     <div class="info-panel">
-        <div class="info-panel-header">
-            <i class="bi bi-person-badge"></i>
-            <h3>Datos del Cliente</h3>
-        </div>
+        <div class="info-panel-header"><i class="bi bi-person-badge"></i><h3>Datos del Cliente</h3></div>
         <div class="info-panel-body">
-            <div class="info-row">
-                <span class="info-label">Nombre</span>
-                <span class="info-value">{{ orden.cliente.nombre }}</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Teléfono</span>
-                <span class="info-value highlight">{{ orden.cliente.telefono }}</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Email</span>
-                <span class="info-value">{{ orden.cliente.email|default:"—" }}</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Dirección</span>
-                <span class="info-value">{{ orden.cliente.direccion|default:"—" }}</span>
-            </div>
+            <div class="info-row"><span class="info-label">Nombre</span><span class="info-value">{{ orden.equipo.cliente.nombre }}</span></div>
+            <div class="info-row"><span class="info-label">Teléfono</span><span class="info-value highlight">{{ orden.equipo.cliente.telefono }}</span></div>
+            <div class="info-row"><span class="info-label">Dirección</span><span class="info-value">{{ orden.equipo.cliente.direccion|default:"—" }}</span></div>
         </div>
     </div>
     
-    <!-- Columna Derecha: Datos del Equipo -->
     <div class="info-panel">
-        <div class="info-panel-header">
-            <i class="bi bi-cpu"></i>
-            <h3>Datos del Equipo</h3>
-        </div>
+        <div class="info-panel-header"><i class="bi bi-cpu"></i><h3>Datos del Equipo</h3></div>
         <div class="info-panel-body">
-            <div class="info-row">
-                <span class="info-label">Marca</span>
-                <span class="info-value">{{ orden.equipo.marca }}</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Modelo</span>
-                <span class="info-value">{{ orden.equipo.modelo }}</span>
-            </div>
+            <div class="info-row"><span class="info-label">Marca</span><span class="info-value">{{ orden.equipo.marca }}</span></div>
+            <div class="info-row"><span class="info-label">Modelo</span><span class="info-value">{{ orden.equipo.modelo }}</span></div>
             <div class="info-row">
                 <span class="info-label">Tipo de Gas</span>
-                <span class="info-value highlight">{{ orden.equipo.tipo_gas|default:"R-410A" }}</span>
+                <span class="info-value highlight">{{ form_ficha.instance.gas_tipo|default:"—" }}</span>
             </div>
-            <div class="info-row">
-                <span class="info-label">Número de Serie</span>
-                <span class="info-value">{{ orden.equipo.numero_serie|default:"N/A" }}</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Capacidad</span>
-                <span class="info-value">{{ orden.equipo.capacidad|default:"—" }}</span>
-            </div>
+            <div class="info-row"><span class="info-label">S/N</span><span class="info-value">{{ orden.equipo.numero_serie|default:"N/A" }}</span></div>
         </div>
     </div>
 </div>
 
-<!-- Sección de Diagnóstico - Estilo Terminal -->
 <div class="terminal-section">
-    <div class="terminal-header">
-        <i class="bi bi-terminal"></i>
-        <h3>Problema Reportado por el Cliente</h3>
-        <div class="terminal-dots">
-            <div class="terminal-dot red"></div>
-            <div class="terminal-dot yellow"></div>
-            <div class="terminal-dot green"></div>
-        </div>
-    </div>
+    <div class="terminal-header"><i class="bi bi-terminal"></i><h3>Problema Reportado</h3></div>
     <div class="terminal-body">
-        <div class="terminal-content"><span class="terminal-prompt">root@ch-taller:~$</span> cat /reporte/problema.log
-
-{{ orden.problema_reportado|default:"Sin descripción del problema." }}</div>
+        <div class="terminal-content"><span class="terminal-prompt">user@taller:~$</span> {{ orden.falla_declarada|default:"Sin descripción." }}</div>
     </div>
 </div>
 
-<!-- Formulario de Edición Técnica -->
-<form method="post" action="{% url 'detalle_orden' orden.id %}">
+<form method="post">
     {% csrf_token %}
     
     <div class="edit-form-section">
-        <div class="edit-form-header">
-            <i class="bi bi-pencil-square"></i>
-            <h3>Formulario de Edición Técnica</h3>
-        </div>
+        <div class="edit-form-header"><i class="bi bi-pencil-square"></i><h3>Edición Técnica</h3></div>
         <div class="edit-form-body">
-            <!-- Diagnóstico Técnico -->
-            <div class="form-group-industrial">
-                <label for="diagnostico_tecnico">
-                    <i class="bi bi-clipboard-pulse"></i>
-                    Diagnóstico Técnico
-                </label>
-                <textarea 
-                    name="diagnostico_tecnico" 
-                    id="diagnostico_tecnico" 
-                    class="input-industrial"
-                    placeholder="Describa el diagnóstico técnico detallado del equipo..."
-                >{{ orden.diagnostico_tecnico }}</textarea>
-            </div>
             
-            <!-- Reparación Realizada -->
             <div class="form-group-industrial">
-                <label for="reparacion_realizada">
-                    <i class="bi bi-wrench-adjustable"></i>
-                    Reparación Realizada
-                </label>
-                <textarea 
-                    name="reparacion_realizada" 
-                    id="reparacion_realizada" 
-                    class="input-industrial"
-                    placeholder="Detalle los trabajos de reparación ejecutados..."
-                >{{ orden.reparacion_realizada }}</textarea>
+                <label><i class="bi bi-clipboard-pulse"></i> Diagnóstico Técnico</label>
+                {{ form_orden.diagnostico_tecnico }}
             </div>
-            
-            <!-- Costo Total -->
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group-industrial">
+                        <label>Tipo de Gas</label>
+                        {{ form_ficha.gas_tipo }}
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group-industrial">
+                        <label>Carga (Kg/Gr)</label>
+                        {{ form_ficha.gas_cantidad }}
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group-industrial">
+                        <label>Datos Eléctricos</label>
+                        {{ form_ficha.datos_electricos }}
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
             <div class="form-group-industrial">
-                <label for="costo_total">
-                    <i class="bi bi-currency-dollar"></i>
-                    Costo Total
-                </label>
-                <div class="cost-input-wrapper">
-                    <span class="cost-prefix">$</span>
-                    <input 
-                        type="number" 
-                        name="costo_total" 
-                        id="costo_total" 
-                        class="input-industrial input-numeric"
-                        step="0.01"
-                        min="0"
-                        placeholder="0.00"
-                        value="{{ orden.costo_total|default:'' }}"
-                    >
+                <label><i class="bi bi-box-seam"></i> Insumos Utilizados</label>
+                {% if orden.detalleinsumo_set.all %}
+                <div class="mb-3 p-3" style="background: #f8f9fa; border: 2px solid #ddd;">
+                    {% for detalle in orden.detalleinsumo_set.all %}
+                    <div class="d-flex justify-content-between border-bottom border-secondary border-opacity-25 py-2">
+                        <span><strong>{{ detalle.producto.nombre }}</strong></span>
+                        <span style="color: #198754; font-weight: bold;">$ {{ detalle.precio_congelado }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <div id="insumos-grid">
+                    <div class="insumo-row d-flex gap-2 mb-2">
+                        <input type="text" class="input-industrial insumo-nombre" placeholder="Nuevo repuesto...">
+                        <div class="cost-input-wrapper" style="width: 180px;">
+                            <span class="cost-prefix">$</span>
+                            <input type="number" class="input-industrial insumo-precio" step="0.01" placeholder="0.00">
+                        </div>
+                    </div>
+                </div>
+                <button type="button" id="btn-add-insumo" class="btn btn-sm btn-outline-dark" style="border-radius: 0;">+ AGREGAR FILA</button>
+            </div>
+
+            <hr>
+
+            <div class="form-group-industrial">
+                <label><i class="bi bi-wrench-adjustable"></i> Trabajo Realizado y Mano de Obra</label>
+                <div class="d-flex gap-2">
+                    <div style="flex-grow: 1;">{{ form_orden.reparacion_realizada }}</div>
+                    <div class="cost-input-wrapper" style="width: 200px;">
+                        <span class="cost-prefix">$</span>
+                        {{ form_orden.costo_mano_obra }}
+                    </div>
                 </div>
             </div>
             
-            <!-- Selector de Estado -->
             <div class="form-group-industrial">
-                <label for="estado">
-                    <i class="bi bi-flag"></i>
-                    Actualizar Estado
-                </label>
-                <select name="estado" id="estado" class="input-industrial">
-                    <option value="PENDIENTE" {% if orden.estado == 'PENDIENTE' %}selected{% endif %}>PENDIENTE</option>
-                    <option value="DIAGNOSTICO" {% if orden.estado == 'DIAGNOSTICO' %}selected{% endif %}>EN DIAGNÓSTICO</option>
-                    <option value="REPARACION" {% if orden.estado == 'REPARACION' %}selected{% endif %}>EN REPARACIÓN</option>
-                    <option value="COMPLETADO" {% if orden.estado == 'COMPLETADO' %}selected{% endif %}>COMPLETADO</option>
-                    <option value="ENTREGADO" {% if orden.estado == 'ENTREGADO' %}selected{% endif %}>ENTREGADO</option>
-                </select>
+                <label><i class="bi bi-flag"></i> Estado de la Orden</label>
+                {{ form_orden.estado }}
             </div>
-            
-            {% if orden.fecha_modificacion %}
-            <div class="last-modified">
-                <i class="bi bi-clock-history me-2"></i>
-                ÚLTIMA MODIFICACIÓN: {{ orden.fecha_modificacion|date:"d/m/Y H:i:s" }}
+
+            <div class="mt-4 p-4 text-end" style="background: #1a1a1a; border: 2px solid #000;">
+                <span style="color: #ffcc00; font-family: 'Courier New', monospace; letter-spacing: 2px;">TOTAL ACTUALIZADO:</span>
+                <h2 style="color: #fff; font-family: 'Courier New', monospace; margin: 0;">$ {{ total_general|stringformat:".2f" }}</h2>
             </div>
-            {% endif %}
+
         </div>
     </div>
     
-    <!-- Botones de Acción -->
     <div class="actions-section">
-        <button type="submit" class="btn-action btn-actualizar">
-            <i class="bi bi-save"></i>
-            ACTUALIZAR FICHA
-        </button>
-        
-        <a href="{% url 'imprimir_remito' orden.id %}" class="btn-action btn-remito">
-            <i class="bi bi-file-earmark-text"></i>
-            GENERAR REMITO
-        </a>
-        
-        <a href="{% url 'tablero' %}" class="btn-action btn-volver">
-            <i class="bi bi-arrow-left"></i>
-            VOLVER
-        </a>
+        <button type="submit" class="btn-action btn-actualizar"><i class="bi bi-save"></i> GUARDAR CAMBIOS</button>
+        <a href="{% url 'imprimir_remito' orden.id %}" class="btn-action btn-remito"><i class="bi bi-file-earmark-text"></i> IMPRIMIR REMITO</a>
+        <a href="{% url 'tablero' %}" class="btn-action btn-volver"><i class="bi bi-arrow-left"></i> VOLVER</a>
     </div>
 </form>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-    // Formateo automático del costo
-    const costoInput = document.getElementById('costo_total');
-    
-    costoInput.addEventListener('blur', function() {
-        if (this.value) {
-            this.value = parseFloat(this.value).toFixed(2);
-        }
+    // Agregar filas de insumos
+    document.getElementById('btn-add-insumo').addEventListener('click', function() {
+        const grid = document.getElementById('insumos-grid');
+        const row = document.createElement('div');
+        row.className = 'insumo-row d-flex gap-2 mb-2';
+        row.innerHTML = `
+            <input type="text" class="input-industrial insumo-nombre" placeholder="Nuevo repuesto...">
+            <div class="cost-input-wrapper" style="width: 180px;">
+                <span class="cost-prefix">$</span>
+                <input type="number" class="input-industrial insumo-precio" step="0.01" placeholder="0.00">
+            </div>
+            <button type="button" class="btn btn-danger btn-sm" style="border-radius:0" onclick="this.parentElement.remove()">X</button>
+        `;
+        grid.appendChild(row);
     });
-    
-    // Confirmación antes de salir si hay cambios
-    let formChanged = false;
-    const form = document.querySelector('form');
-    const inputs = form.querySelectorAll('input, textarea, select');
-    
-    inputs.forEach(input => {
-        input.addEventListener('change', () => {
-            formChanged = true;
+
+    // Anular envío tradicional y usar API Fetch
+    document.querySelector('form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // 1. Extraer cuadrilla de insumos a Array de Objetos JSON
+        const insumos = [];
+        document.querySelectorAll('.insumo-row').forEach(row => {
+            const nombre = row.querySelector('.insumo-nombre').value.trim();
+            const precio = row.querySelector('.insumo-precio').value;
+            if (nombre && precio) {
+                insumos.push({ nombre: nombre, precio: parseFloat(precio) });
+            }
         });
+
+        // 2. Construir Payload final unificando modelo principal y arrays
+        const payload = {
+            diagnostico_tecnico: document.querySelector('[name="diagnostico_tecnico"]').value,
+            reparacion_realizada: document.querySelector('[name="reparacion_realizada"]').value,
+            costo_mano_obra: document.querySelector('[name="costo_mano_obra"]').value,
+            estado: document.querySelector('[name="estado"]').value,
+            gas_tipo: document.querySelector('[name="gas_tipo"]').value,
+            gas_cantidad: document.querySelector('[name="gas_cantidad"]').value || 0,
+            datos_electricos: document.querySelector('[name="datos_electricos"]').value,
+            insumos: insumos
+        };
+
+        // 3. Transmisión asíncrona
+        fetch(window.location.href, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.status === 'success') {
+                window.onbeforeunload = null;
+                window.location.reload(); // Refrescar para ver totales actualizados
+            } else {
+                console.error(data.errors);
+                alert('Fallo en la validación de datos.');
+            }
+        })
+        .catch(error => console.error('Error de red:', error));
     });
-    
-    window.addEventListener('beforeunload', (e) => {
-        if (formChanged) {
-            e.preventDefault();
-            e.returnValue = '';
-        }
-    });
-    
-    form.addEventListener('submit', () => {
-        formChanged = false;
-    });
+
+    let changed = false;
+    document.querySelectorAll('input, textarea, select').forEach(i => i.onchange = () => changed = true);
+    window.onbeforeunload = () => changed ? 'Cambios sin guardar' : null;
 </script>
 {% endblock %}
