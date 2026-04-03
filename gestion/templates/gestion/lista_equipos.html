@@ -471,27 +471,27 @@
         <i class="bi bi-funnel me-2"></i>FILTRAR POR TIPO DE EQUIPO
     </div>
     <div class="filter-buttons">
-        <a href="{% url 'lista_equipos' %}" class="btn-filter {% if not tipo_filtro %}active{% endif %}">
+        <a href="{% url 'lista_equipos' %}" class="btn-filter {% if not tipo_actual %}active{% endif %}">
             <i class="bi bi-grid-3x3-gap"></i>
             TODOS
             <span class="filter-count">{{ counts.count_total|default:"0" }}</span>
         </a>
-        <a href="{% url 'lista_equipos' %}?tipo=split" class="btn-filter {% if tipo_filtro == 'split' %}active{% endif %}">
+        <a href="{% url 'lista_equipos' %}?tipo=split" class="btn-filter {% if tipo_actual == 'split' %}active{% endif %}">
             <i class="bi bi-wind"></i>
             AIRE SPLIT
             <span class="filter-count">{{ counts.count_split|default:"0" }}</span>
         </a>
-        <a href="{% url 'lista_equipos' %}?tipo=heladera" class="btn-filter {% if tipo_filtro == 'heladera' %}active{% endif %}">
+        <a href="{% url 'lista_equipos' %}?tipo=heladera" class="btn-filter {% if tipo_actual == 'heladera' %}active{% endif %}">
             <i class="bi bi-box-seam"></i>
             HELADERA
             <span class="filter-count">{{ counts.count_heladera|default:"0" }}</span>
         </a>
-        <a href="{% url 'lista_equipos' %}?tipo=camara" class="btn-filter {% if tipo_filtro == 'camara' %}active{% endif %}">
+        <a href="{% url 'lista_equipos' %}?tipo=camara" class="btn-filter {% if tipo_actual == 'camara' %}active{% endif %}">
             <i class="bi bi-snow3"></i>
             CAMARA
             <span class="filter-count">{{ counts.count_camara|default:"0" }}</span>
         </a>
-        <a href="{% url 'lista_equipos' %}?tipo=lavarropas" class="btn-filter {% if tipo_filtro == 'lavarropas' %}active{% endif %}">
+        <a href="{% url 'lista_equipos' %}?tipo=lavarropas" class="btn-filter {% if tipo_actual == 'lavarropas' %}active{% endif %}">
             <i class="bi bi-water"></i>
             LAVARROPAS
             <span class="filter-count">{{ counts.count_lavarropas|default:"0" }}</span>
@@ -504,7 +504,7 @@
     <div class="stat-box">
         <i class="bi bi-gear-wide-connected"></i>
         <div class="stat-info">
-            <span class="stat-value">{{ total_equipos|default:"0" }}</span>
+            <span class="stat-value">{{ counts.count_total|default:"0" }}</span>
             <span class="stat-label">Equipos Registrados</span>
         </div>
     </div>
@@ -574,8 +574,8 @@
                     <div class="detail-item">
                         <span class="detail-label">Tipo de Gas</span>
                         <span class="detail-value">
-                            {% if quipo.ficha.gas_tipo %}
-                                {{ quipo.ficha.gas_tipo }}
+                            {% if equipo.tipo_gas %}
+                                {{ equipo.tipo_gas }}
                             {% else %}
                                 <span style="color: #999;">---</span>
                             {% endif %}
@@ -628,7 +628,7 @@
             </div>
             <div class="empty-title">SIN EQUIPOS REGISTRADOS</div>
             <p class="empty-text">
-                No hay equipos en el sistema{% if tipo_filtro %} del tipo "{{ tipo_filtro|upper }}"{% endif %}.<br>
+                No hay equipos en el sistema{% if tipo_actual %} del tipo "{{ tipo_actual|upper }}"{% endif %}.<br>
                 Los equipos se registran automaticamente al crear una orden de ingreso.
             </p>
             <a href="{% url 'ingreso_equipo' %}" class="btn-empty-action">
@@ -644,10 +644,10 @@
 <div class="pagination-wrapper">
     <div class="pagination-industrial">
         {% if lista_equipos.has_previous %}
-            <a href="?page=1{% if tipo_filtro %}&tipo={{ tipo_filtro }}{% endif %}" class="page-btn">
+            <a href="?page=1{% if tipo_actual %}&tipo={{ tipo_actual }}{% endif %}" class="page-btn">
                 <i class="bi bi-chevron-double-left"></i>
             </a>
-            <a href="?page={{ lista_equipos.previous_page_number }}{% if tipo_filtro %}&tipo={{ tipo_filtro }}{% endif %}" class="page-btn">
+            <a href="?page={{ lista_equipos.previous_page_number }}{% if tipo_actual %}&tipo={{ tipo_actual }}{% endif %}" class="page-btn">
                 <i class="bi bi-chevron-left"></i>
             </a>
         {% else %}
@@ -659,15 +659,15 @@
             {% if lista_equipos.number == num %}
                 <span class="page-btn active">{{ num }}</span>
             {% elif num > lista_equipos.number|add:'-3' and num < lista_equipos.number|add:'3' %}
-                <a href="?page={{ num }}{% if tipo_filtro %}&tipo={{ tipo_filtro }}{% endif %}" class="page-btn">{{ num }}</a>
+                <a href="?page={{ num }}{% if tipo_actual %}&tipo={{ tipo_actual }}{% endif %}" class="page-btn">{{ num }}</a>
             {% endif %}
         {% endfor %}
         
         {% if lista_equipos.has_next %}
-            <a href="?page={{ lista_equipos.next_page_number }}{% if tipo_filtro %}&tipo={{ tipo_filtro }}{% endif %}" class="page-btn">
+            <a href="?page={{ lista_equipos.next_page_number }}{% if tipo_actual %}&tipo={{ tipo_actual }}{% endif %}" class="page-btn">
                 <i class="bi bi-chevron-right"></i>
             </a>
-            <a href="?page={{ lista_equipos.paginator.num_pages }}{% if tipo_filtro %}&tipo={{ tipo_filtro }}{% endif %}" class="page-btn">
+            <a href="?page={{ lista_equipos.paginator.num_pages }}{% if tipo_actual %}&tipo={{ tipo_actual }}{% endif %}" class="page-btn">
                 <i class="bi bi-chevron-double-right"></i>
             </a>
         {% else %}

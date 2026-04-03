@@ -53,9 +53,9 @@ class FichaTecnica(models.Model):
     """ Datos de ingeniería separados del equipo físico """
     equipo = models.OneToOneField(Equipo, on_delete=models.CASCADE, related_name='ficha')
     gas_tipo = models.CharField(max_length=20, help_text="Ej: R410a")
-    gas_cantidad = models.IntegerField(help_text="Carga en gramos")
+    gas_cantidad = models.IntegerField(help_text="Carga en gramos", null = True, blank = True)
     datos_electricos = models.TextField(blank=True, help_text="Datos del compresor, capacitor, etc.")
-    
+
     def __str__(self):
         return f"Ficha de {self.equipo}"
 
@@ -83,12 +83,11 @@ class Producto(models.Model):
 class OrdenReparacion(models.Model):
     # --- 1. CONSTANTES (CHOICES) ---
     ESTADOS = [
-        ('PENDIENTE', 'Pendiente de Revisión'),
-        ('DIAGNOSTICO', 'En Diagnóstico'),
-        ('ESPERA', 'Esperando Repuesto/Aprobación'),
-        ('REPARACION', 'En Reparación'),
-        ('TERMINADO', 'Terminado (Listo p/ entregar)'),
-        ('ENTREGADO', 'Entregado al Cliente'),
+        ('PENDIENTE', 'Pendiente'),
+        ('DIAGNOSTICO', 'Diagnóstico'),
+        ('REPARACION', 'Reparación'),
+        ('COMPLETADO', 'Completado'),
+        ('ENTREGADO', 'Entregado'),
     ]
     
     ESTADOS_PAGO = [
@@ -150,3 +149,21 @@ class DetalleInsumo(models.Model):
         if not self.precio_congelado:
             self.precio_congelado = self.producto.precio_venta
         super().save(*args, **kwargs)
+
+class EventoCalendario(models.Model):
+    TIPOS = [
+        ('TURNO', 'Turno / Visita'),
+        ('ENTREGA', 'Entrega de Equipo'),
+        ('ALERTA', 'Alerta / Recordatorio'),
+    ]
+    
+    tipo = models.CharField(max_length=20, choices=TIPOS)
+    fecha_hora = models.DateTimeField()
+    titulo = models.CharField(max_length=100, help_text="Ej: Visita a domicilio, Entrega Heladera")
+    descripcion = models.TextField(blank=True, null=True)
+    
+    # Opcional: Relacionar el evento con una reparación en curso
+    orden = models.ForeignKey('OrdenReparacion', on_delete=models.SET_NULL, null=True, blank=True, related_name='eventos')
+
+    def __str__(self):
+        return f"{self.get_tipo_display()} - {self.titulo}"

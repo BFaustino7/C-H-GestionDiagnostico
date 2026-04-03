@@ -6,7 +6,7 @@
 
 {% block extra_css %}
 <style>
-    /* Estilos base */
+    /* Estilos base intactos */
     .order-header {
         background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
         border: 3px solid #000000;
@@ -85,6 +85,7 @@
     .edit-form-header i { font-size: 1.3rem; color: #0dcaf0; }
     .edit-form-header h3 { margin: 0; font-size: 0.95rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; }
     .edit-form-body { padding: 25px; }
+    
     .form-group-industrial { margin-bottom: 20px; }
     .form-group-industrial label { display: block; font-size: 0.8rem; font-weight: 700; color: #1a1a1a; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; padding-left: 2px; }
     .form-group-industrial label i { margin-right: 8px; color: #666666; }
@@ -103,7 +104,6 @@
     
     .last-modified { font-family: 'Courier New', Courier, monospace; font-size: 0.75rem; color: #888888; padding: 10px 15px; background-color: #f5f5f5; border-left: 3px solid #cccccc; margin-top: 15px; }
     
-    /* Input industrial (forzado por si el form no carga) */
     .input-industrial {
         width: 100%; padding: 14px 18px; font-size: 1rem; border: 2px solid #999; border-radius: 0 !important; background-color: #fafafa;
     }
@@ -114,9 +114,8 @@
 <div class="order-header">
     <div class="order-id-block">
         <div class="order-number">ORDEN <span>#{{ orden.id|stringformat:"05d" }}</span></div>
-        <div class="order-date"><i class="bi bi-calendar3 me-2"></i>INGRESO: {{ orden.fecha_get_ingreso|default:orden.fecha_ingreso|date:"d/m/Y H:i" }}</div>
+        <div class="order-date"><i class="bi bi-calendar3 me-2"></i>INGRESO: {{ orden.fecha_ingreso|date:"d/m/Y H:i" }}</div>
     </div>
-    
     <div class="status-badge-large status-{{ orden.estado }}">
         <i class="bi bi-gear-wide-connected me-2"></i>{{ orden.get_estado_display|upper }}
     </div>
@@ -127,66 +126,60 @@
         <div class="info-panel-header"><i class="bi bi-person-badge"></i><h3>Datos del Cliente</h3></div>
         <div class="info-panel-body">
             <div class="info-row"><span class="info-label">Nombre</span><span class="info-value">{{ orden.equipo.cliente.nombre }}</span></div>
-            <div class="info-row"><span class="info-label">Teléfono</span><span class="info-value highlight">{{ orden.equipo.cliente.telefono }}</span></div>
-            <div class="info-row"><span class="info-label">Dirección</span><span class="info-value">{{ orden.equipo.cliente.direccion|default:"—" }}</span></div>
+            <div class="info-row"><span class="info-label">Teléfono</span><span class="info-value">{{ orden.equipo.cliente.telefono }}</span></div>
         </div>
     </div>
-    
     <div class="info-panel">
         <div class="info-panel-header"><i class="bi bi-cpu"></i><h3>Datos del Equipo</h3></div>
         <div class="info-panel-body">
-            <div class="info-row"><span class="info-label">Marca</span><span class="info-value">{{ orden.equipo.marca }}</span></div>
-            <div class="info-row"><span class="info-label">Modelo</span><span class="info-value">{{ orden.equipo.modelo }}</span></div>
-            <div class="info-row">
-                <span class="info-label">Tipo de Gas</span>
-                <span class="info-value highlight">{{ form_ficha.instance.gas_tipo|default:"—" }}</span>
-            </div>
-            <div class="info-row"><span class="info-label">S/N</span><span class="info-value">{{ orden.equipo.numero_serie|default:"N/A" }}</span></div>
+            <div class="info-row"><span class="info-label">Marca/Modelo</span><span class="info-value">{{ orden.equipo.marca }} {{ orden.equipo.modelo }}</span></div>
+            <div class="info-row"><span class="info-label">Gas actual</span><span class="info-value highlight">{{ orden.equipo.tipo_gas|default:"—" }}</span></div>
         </div>
     </div>
 </div>
 
-<div class="terminal-section">
-    <div class="terminal-header"><i class="bi bi-terminal"></i><h3>Problema Reportado</h3></div>
-    <div class="terminal-body">
-        <div class="terminal-content"><span class="terminal-prompt">user@taller:~$</span> {{ orden.falla_declarada|default:"Sin descripción." }}</div>
-    </div>
-</div>
-
-<form method="post">
+<form id="form-orden-tecnica">
     {% csrf_token %}
     
     <div class="edit-form-section">
         <div class="edit-form-header"><i class="bi bi-pencil-square"></i><h3>Edición Técnica</h3></div>
         <div class="edit-form-body">
             
-            <div class="form-group-industrial">
-                <label><i class="bi bi-clipboard-pulse"></i> Diagnóstico Técnico</label>
-                {{ form_orden.diagnostico_tecnico }}
-            </div>
-
             <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="form-group-industrial">
-                        <label>Tipo de Gas</label>
-                        {{ form_ficha.gas_tipo }}
+                        <label><i class="bi bi-fuel-pump"></i> Gas (Equipo)</label>
+                        {{ form_equipo.tipo_gas }}
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="form-group-industrial">
-                        <label>Carga (Kg/Gr)</label>
+                        <label><i class="bi bi-box"></i> Capacidad</label>
+                        {{ form_equipo.capacidad }}
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group-industrial">
+                        <label><i class="bi bi-fuel-pump"></i> Carga (Gr)</label>
                         {{ form_ficha.gas_cantidad }}
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group-industrial">
-                        <label>Datos Eléctricos</label>
+                        <label><i class="bi bi-moisture"></i> Datos Eléctricos</label>
                         {{ form_ficha.datos_electricos }}
                     </div>
                 </div>
             </div>
 
-            <hr>
+            <hr class="my-4" style="border-top: 2px dashed #333;">
+
+            <div class="form-group-industrial">
+                <label><i class="bi bi-clipboard-pulse"></i> Diagnóstico Técnico</label>
+                {{ form_orden.diagnostico_tecnico }}
+            </div>
+
+            <hr class="my-4" style="border-top: 2px dashed #333;">
 
             <div class="form-group-industrial">
                 <label><i class="bi bi-box-seam"></i> Insumos Utilizados</label>
@@ -213,7 +206,7 @@
                 <button type="button" id="btn-add-insumo" class="btn btn-sm btn-outline-dark" style="border-radius: 0;">+ AGREGAR FILA</button>
             </div>
 
-            <hr>
+            <hr class="my-4" style="border-top: 2px dashed #333;">
 
             <div class="form-group-industrial">
                 <label><i class="bi bi-wrench-adjustable"></i> Trabajo Realizado y Mano de Obra</label>
@@ -255,7 +248,7 @@
         const row = document.createElement('div');
         row.className = 'insumo-row d-flex gap-2 mb-2';
         row.innerHTML = `
-            <input type="text" class="input-industrial insumo-nombre" placeholder="Nuevo repuesto...">
+            <input type="text" class="input-industrial insumo-nombre" placeholder="Repuesto...">
             <div class="cost-input-wrapper" style="width: 180px;">
                 <span class="cost-prefix">$</span>
                 <input type="number" class="input-industrial insumo-precio" step="0.01" placeholder="0.00">
@@ -265,11 +258,9 @@
         grid.appendChild(row);
     });
 
-    // Anular envío tradicional y usar API Fetch
-    document.querySelector('form').addEventListener('submit', function(e) {
+    document.getElementById('form-orden-tecnica').addEventListener('submit', function(e) {
         e.preventDefault();
         
-        // 1. Extraer cuadrilla de insumos a Array de Objetos JSON
         const insumos = [];
         document.querySelectorAll('.insumo-row').forEach(row => {
             const nombre = row.querySelector('.insumo-nombre').value.trim();
@@ -279,19 +270,24 @@
             }
         });
 
-        // 2. Construir Payload final unificando modelo principal y arrays
+        // Captura segura de campos (usando || '' por si alguno no existe en el DOM)
+        const getVal = (name) => {
+            const el = document.querySelector(`[name="${name}"]`);
+            return el ? el.value : '';
+        };
+
         const payload = {
-            diagnostico_tecnico: document.querySelector('[name="diagnostico_tecnico"]').value,
-            reparacion_realizada: document.querySelector('[name="reparacion_realizada"]').value,
-            costo_mano_obra: document.querySelector('[name="costo_mano_obra"]').value,
-            estado: document.querySelector('[name="estado"]').value,
-            gas_tipo: document.querySelector('[name="gas_tipo"]').value,
-            gas_cantidad: document.querySelector('[name="gas_cantidad"]').value || 0,
-            datos_electricos: document.querySelector('[name="datos_electricos"]').value,
+            tipo_gas: getVal('tipo_gas'),
+            capacidad: getVal('capacidad'),
+            gas_cantidad: getVal('gas_cantidad') || 0,
+            datos_electricos: getVal('datos_electricos'),
+            diagnostico_tecnico: getVal('diagnostico_tecnico'),
+            reparacion_realizada: getVal('reparacion_realizada'),
+            costo_mano_obra: getVal('costo_mano_obra') || 0,
+            estado: getVal('estado'),
             insumos: insumos
         };
 
-        // 3. Transmisión asíncrona
         fetch(window.location.href, {
             method: 'POST',
             headers: {
@@ -304,17 +300,12 @@
         .then(data => {
             if(data.status === 'success') {
                 window.onbeforeunload = null;
-                window.location.reload(); // Refrescar para ver totales actualizados
+                window.location.reload(); 
             } else {
-                console.error(data.errors);
-                alert('Fallo en la validación de datos.');
+                alert('Error de validación: ' + JSON.stringify(data.errors));
             }
         })
-        .catch(error => console.error('Error de red:', error));
+        .catch(error => alert('Error crítico en el servidor'));
     });
-
-    let changed = false;
-    document.querySelectorAll('input, textarea, select').forEach(i => i.onchange = () => changed = true);
-    window.onbeforeunload = () => changed ? 'Cambios sin guardar' : null;
 </script>
 {% endblock %}

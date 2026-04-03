@@ -13,5 +13,8 @@ urlpatterns = [
     path('calendario/', views.calendario_taller, name='calendario'),
     path('configuracion/', views.configuracion_sistema, name='configuracion'),
     path('ingresar/', views.ingreso_equipo, name= 'ingreso_equipo'),
-    path('equipo/historial/<int:equipo_id>/', views.historial_equipo, name='historial_equipo')
+    path('equipo/historial/<int:equipo_id>/', views.historial_equipo, name='historial_equipo'),
+    path('cliente/editar/<int:cliente_id>/', views.editar_cliente, name='editar_cliente'),
+    path('calendario/', views.calendario_taller, name='calendario'),
+    path('api/eventos/crear/', views.crear_evento_api, name='crear_evento_api')
 ]

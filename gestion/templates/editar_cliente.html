@@ -1,0 +1,61 @@
+{% extends 'gestion/base.html' %}
+
+{% block title %}Editar Cliente - SCADA System{% endblock %}
+
+{% block page_title %}MODIFICACIÓN DE REGISTRO: CLIENTE{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            
+            <div class="card" style="border: 3px solid #000; border-radius: 0; box-shadow: 8px 8px 0px rgba(0,0,0,0.2);">
+                <div class="card-header bg-dark text-white d-flex align-items-center justify-content-between" style="border-bottom: 3px solid #ffcc00; border-radius: 0;">
+                    <span style="font-family: 'Courier New', monospace; font-weight: bold; letter-spacing: 2px;">
+                        <i class="bi bi-person-lines-fill me-2"></i>ID_CLIENTE: #{{ cliente.id|stringformat:"04d" }}
+                    </span>
+                    <span class="badge bg-warning text-dark" style="border-radius: 0;">MODO EDICIÓN</span>
+                </div>
+
+                <div class="card-body p-4" style="background-color: #f8f9fa;">
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        <div class="row g-4">
+                            {% for field in form %}
+                            <div class="col-md-6 mb-3">
+                                <label class="fw-bold text-uppercase mb-2" style="font-size: 0.8rem; letter-spacing: 1px;">
+                                    {{ field.label }}
+                                </label>
+                                {{ field }}
+                                {% if field.errors %}
+                                    <div class="text-danger small mt-1" style="font-family: 'Courier New', monospace;">
+                                        {{ field.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <hr style="border-top: 2px solid #000; opacity: 1;" class="my-4">
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="{% url 'lista_clientes' %}" class="btn btn-outline-dark" style="border-radius: 0; border: 2px solid #000; font-weight: bold;">
+                                <i class="bi bi-arrow-left"></i> CANCELAR
+                            </a>
+                            <button type="submit" class="btn btn-dark" style="border-radius: 0; padding: 10px 30px; font-weight: bold; letter-spacing: 2px; border: 2px solid #000; box-shadow: 4px 4px 0px #ffcc00;">
+                                <i class="bi bi-save"></i> ACTUALIZAR REGISTRO
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="card-footer bg-light text-muted" style="border-top: 1px solid #ddd; font-family: 'Courier New', monospace; font-size: 0.75rem;">
+                    SYSTEM_STATUS: Conexión estable con MSSQL-Server | {{ now|date:"H:i:s" }}
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

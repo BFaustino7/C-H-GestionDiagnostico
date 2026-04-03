@@ -561,12 +561,12 @@
     </div>
 
     <div class="d-flex gap-2">
-        <a href="{% url 'calendario' %}" class="btn-add-event blue-variant" style="width:auto; padding:8px 18px;">
+        <button type="button" class="btn-add-event blue-variant" onclick="abrirModalEvento('TURNO')" style="width:auto; padding:8px 18px;">
             <i class="bi bi-clock"></i> Nuevo Turno
-        </a>
-        <a href="{% url 'calendario' %}" class="btn-add-event green-variant" style="width:auto; padding:8px 18px;">
+        </button>
+        <button type="button" class="btn-add-event green-variant" onclick="abrirModalEvento('ENTREGA')" style="width:auto; padding:8px 18px;">
             <i class="bi bi-box-arrow-up"></i> Nueva Entrega
-        </a>
+        </button>
     </div>
 </div>
 
@@ -755,26 +755,103 @@
     </div>{# /cal-sidebar #}
 
 </div>{# /cal-wrapper #}
+
+<div class="modal fade" id="modalEvento" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border: 3px solid #1a1a1a; border-radius: 0; box-shadow: 8px 8px 0px rgba(0,0,0,0.3);">
+            <div class="modal-header" style="background-color: #1a1a1a; color: white; border-bottom: 3px solid #00e5ff; border-radius: 0;">
+                <h5 class="modal-title" style="font-family: 'Courier New', monospace; font-weight: bold; letter-spacing: 1px;">NUEVO EVENTO</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="form-nuevo-evento">
+                    {% csrf_token %} <div class="form-group-industrial">
+                        <label>Tipo de Evento</label>
+                        {{ form_evento.tipo }}
+                    </div>
+                    <div class="form-group-industrial">
+                        <label>Fecha y Hora</label>
+                        {{ form_evento.fecha_hora }}
+                    </div>
+                    <div class="form-group-industrial">
+                        <label>Título (Cliente/Equipo)</label>
+                        {{ form_evento.titulo }}
+                    </div>
+                    <div class="form-group-industrial">
+                        <label>Descripción / Detalles</label>
+                        {{ form_evento.descripcion }}
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer" style="border-top: 2px dashed #ccc;">
+                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal" style="border-radius: 0; font-weight: bold;">CANCELAR</button>
+                <button type="button" class="btn btn-dark" id="btn-guardar-evento" style="border-radius: 0; font-weight: bold;">GUARDAR</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block extra_js %}
 <script>
-    // Marcar visualmente el dia actual en la grilla si no viene del backend
-    (function () {
-        const today = new Date();
-        const todayNum = today.getDate();
+let modalEventoInstancia;
 
-        document.querySelectorAll('.cal-cell .day-number').forEach(function (el) {
-            if (parseInt(el.textContent.trim()) === todayNum) {
-                const cell = el.closest('.cal-cell');
-                if (cell && !cell.classList.contains('empty')) {
-                    // Solo marcar si el backend no lo hizo ya
-                    if (!cell.classList.contains('today')) {
-                        cell.classList.add('today');
-                    }
-                }
+document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar el modal de Bootstrap
+    modalEventoInstancia = new bootstrap.Modal(document.getElementById('modalEvento'));
+});
+
+function abrirModalEvento(tipo) {
+    // 1. Limpiar formulario anterior
+    document.getElementById('form-nuevo-evento').reset();
+    
+    // 2. Seleccionar el tipo automáticamente y bloquearlo si es necesario
+    const tipoSelect = document.querySelector('#form-nuevo-evento [name="tipo"]');
+    if(tipoSelect) tipoSelect.value = tipo;
+
+    // 3. Cambiar color del encabezado según tipo
+    const header = document.querySelector('#modalEvento .modal-header');
+    header.style.borderBottomColor = tipo === 'TURNO' ? '#1565c0' : '#2e7d32';
+
+    // 4. Mostrar
+    modalEventoInstancia.show();
+}
+
+document.getElementById('btn-guardar-evento').addEventListener('click', function() {
+    const form = document.getElementById('form-nuevo-evento');
+    
+    const payload = {
+        tipo: form.querySelector('[name="tipo"]').value,
+        fecha_hora: form.querySelector('[name="fecha_hora"]').value,
+        titulo: form.querySelector('[name="titulo"]').value,
+        descripcion: form.querySelector('[name="descripcion"]').value
+    };
+
+    fetch("{% url 'crear_evento_api' %}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify(payload)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.status === 'success') {
+            modalEventoInstancia.hide();
+            // Recargamos la página silenciosamente para que el evento aparezca en la grilla
+            window.location.reload(); 
+        } else {
+            let errorMsg = "Revise los campos:\n";
+            for (let field in data.errors) {
+                errorMsg += `- ${field}: ${data.errors[field]}\n`;
             }
-        });
-    })();
+            alert(errorMsg);
+        }
+    })
+    .catch(error => alert('Error de conexión con el servidor.'));
+});
 </script>
+
 {% endblock %}

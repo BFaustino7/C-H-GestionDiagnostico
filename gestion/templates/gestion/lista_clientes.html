@@ -88,14 +88,10 @@
                                 </span>
                             </td>
                             <td style="padding: 14px 16px;">
-                                <a 
-                                    href="{% url 'ingreso_equipo' %}?cliente_id={{ cliente.id }}" 
-                                    class="btn btn-sm" 
+                                <a href="{% url 'editar_cliente' cliente.id %}" 
+                                    class="btn btn-sm btn-outline-dark" 
                                     style="background: #0066cc; color: white; border: none; border-radius: 0; padding: 6px 12px; font-size: 12px; font-weight: bold; text-transform: uppercase; transition: all 0.2s ease; box-shadow: 2px 2px 0px rgba(0,0,0,0.15);"
-                                    onmouseover="this.style.transform='translate(-1px, -1px)'; this.style.boxShadow='3px 3px 0px rgba(0,0,0,0.25)';"
-                                    onmouseout="this.style.transform='translate(0, 0)'; this.style.boxShadow='2px 2px 0px rgba(0,0,0,0.15)';"
-                                >
-                                    + NUEVA ORDEN
+                                    <i class="bi bi-pencil-square me-1"></i> EDITAR CONTACTO
                                 </a>
                             </td>
                         </tr>
