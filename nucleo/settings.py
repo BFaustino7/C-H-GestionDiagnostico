@@ -1,5 +1,8 @@
 from pathlib import Path
 import os
+from dotenv import load_dotenv
+# --- CARGAR VARIABLES DE ENTORNO (.env) ---
+load_dotenv()
 
 # --- PARCHE PARA SQL SERVER 2022 (Librería mssql-django) ---
 # Obligatorio: Engaña a la librería para que crea que es la versión 2019
@@ -11,9 +14,13 @@ except Exception:
 # -----------------------------------------------------------
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-SECRET_KEY = 'django-insecure-clave-fix-ms'
-DEBUG = True
-ALLOWED_HOSTS = []
+# --- SEGURIDAD BLINDADA ---
+# Toma la clave secreta del .env
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-clave-por-defecto')
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
+# Convierte el string del .env (ej: "localhost,192.168.101.84") en una lista de Python
+allowed_hosts_env = os.getenv('ALLOWED_HOSTS', '*')
+ALLOWED_HOSTS = allowed_hosts_env.split(',') if allowed_hosts_env else []
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -59,9 +66,11 @@ WSGI_APPLICATION = 'nucleo.wsgi.application'
 # --- BASE DE DATOS (Configuración para mssql-django) ---
 DATABASES = {
     'default': {
-        'ENGINE': 'mssql',  # <--- CAMBIO IMPORTANTE: Este es el motor oficial
-        'NAME': 'GestionTallerDB',
-        'HOST': 'localhost',
+        'ENGINE': 'mssql', 
+        'NAME': os.getenv('DB_NAME', 'GestionTallerDB'),
+        'HOST': os.getenv('DB_HOST', 'localhost'),
+        'USER': os.getenv('DB_USER', ''),       # Queda vacío si usas Windows Authentication
+        'PASSWORD': os.getenv('DB_PASSWORD', ''), # Queda vacío si usas Windows Authentication
         'OPTIONS': {
             'driver': 'ODBC Driver 18 for SQL Server',
             'extra_params': 'TrustServerCertificate=yes',
