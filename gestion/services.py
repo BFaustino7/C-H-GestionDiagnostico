@@ -1,8 +1,10 @@
 import calendar
 from collections import defaultdict
 from datetime import datetime, timedelta
+from decimal import Decimal, InvalidOperation
 from django.db import transaction
 from .models import FichaTecnica, Producto, DetalleInsumo, OrdenReparacion, EventoCalendario
+from .constants import ESTADOS_EN_PROCESO, ESTADOS_PARA_ENTREGAR, ESTADOS_ENTREGADOS
 
 @transaction.atomic
 def registrar_nuevo_ingreso(cliente_form, equipo_form, orden_form):
@@ -13,13 +15,66 @@ def registrar_nuevo_ingreso(cliente_form, equipo_form, orden_form):
     equipo.cliente = cliente
     equipo.save()
 
-    # Crear ficha técnica inicial
+    # Crear ficha técnica inicial (gas_tipo ahora permite vacío)
     FichaTecnica.objects.create(equipo=equipo)
 
     orden = orden_form.save(commit=False)
     orden.equipo = equipo
     orden.save()
     return orden
+
+
+# ----------------------------------------------------------------
+# GUARDAR DETALLE DE ORDEN (POST desde detalle_orden)
+# ----------------------------------------------------------------
+def guardar_detalle_orden(orden, ficha, equipo, data):
+    """Guarda diagnóstico, reparación, estado, costo y presupuesto de insumos."""
+    errores = []
+
+    # --- Equipo: campos opcionales desde el POST ---
+    if 'tipo_gas' in data and data['tipo_gas'] is not None:
+        equipo.tipo_gas = str(data['tipo_gas']) if data['tipo_gas'] else ''
+    if 'capacidad' in data:
+        equipo.capacidad = data['capacidad'] if data['capacidad'] else ''
+    equipo.save()
+
+    # --- Ficha Técnica ---
+    if 'gas_cantidad' in data:
+        try:
+            val = data['gas_cantidad']
+            ficha.gas_cantidad = int(val) if val and str(val).strip() else None
+        except (ValueError, TypeError):
+            errores.append("Cantidad de gas inválida")
+    if 'tipo_gas' in data:
+        ficha.gas_tipo = str(data['tipo_gas']) if data['tipo_gas'] else ''
+    if 'datos_electricos' in data:
+        ficha.datos_electricos = data['datos_electricos']
+    ficha.save()
+
+    # --- Orden de Reparación ---
+    for campo in ('diagnostico_tecnico', 'reparacion_realizada'):
+        if campo in data:
+            setattr(orden, campo, data[campo] if data[campo] else '')
+    if 'costo_mano_obra' in data:
+        try:
+            orden.costo_mano_obra = Decimal(str(data['costo_mano_obra'] or '0'))
+        except InvalidOperation:
+            errores.append("Costo de mano de obra inválido")
+    if 'estado' in data and data['estado']:
+        if data['estado'] in ESTADOS_EN_PROCESO:
+            orden.estado = data['estado']
+        else:
+            errores.append(f"Estado inválido: {data['estado']}")
+    orden.save()
+
+    # --- Insumos (reutiliza la función existente) ---
+    insumos = data.get('insumos') or []
+    if insumos:
+        procesar_insumos_orden(orden, insumos)
+
+    if errores:
+        return False, errores
+    return True, None
 
 @transaction.atomic
 def procesar_insumos_orden(orden, insumos_data):

@@ -1,6 +1,7 @@
 from django.db.models import Q, Max, F
 from django.utils import timezone
 from .models import OrdenReparacion, Cliente, Equipo, Producto
+from .constants import ESTADOS_EN_PROCESO, ESTADOS_PARA_ENTREGAR, ESTADOS_ENTREGADOS
 
 def get_equipos_con_stats(tipo_filtro=None):
     # Usamos annotate para traer la fecha de la última orden de cada equipo en una sola consulta
@@ -42,11 +43,10 @@ def get_equipos_con_stats(tipo_filtro=None):
     
 def get_ordenes_tablero():
     return OrdenReparacion.objects.filter(
-        estado__in=['PENDIENTE', 'DIAGNOSTICO', 'ESPERA', 'REPARACION']
+        estado__in=ESTADOS_EN_PROCESO
     ).order_by('-fecha_ingreso')
 
 def get_ordenes_para_entregar():
-    # Corregido: Usamos 'TERMINADO' que es el valor de tu Model
     return OrdenReparacion.objects.filter(estado='COMPLETADO').order_by('-fecha_ingreso')
 
 def get_ordenes_recientes_entregadas(limite=5):

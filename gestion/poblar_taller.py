@@ -5,7 +5,6 @@ from datetime import datetime, timedelta
 
 # Configuración de Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'nucleo.settings')
-
 django.setup()
 
 from gestion.models import Cliente, Equipo, OrdenReparacion
@@ -19,21 +18,18 @@ def poblar():
 
     # 2. CREACIÓN CONTROLADA
     nombres = ['Juan Perez', 'Maria Garcia', 'Talleres Rosario']
-    tipos_eq = ['SPLIT', 'VENTANA', 'HELADERA', 'COMERCIAL', 'LAVARROPAS']
+    
     for n in nombres:
         # get_or_create evita que se duplique el cliente si ya existe
         c, _ = Cliente.objects.get_or_create(nombre=n, telefono='3415551234')
         
-        # Elegir un tipo al azar de la lista válida
-        tipo = random.choice(tipos_eq)
-        ubicacion = random.choice(['Living', 'Dormitorio', 'Cocina', 'Oficina'])
-        
+        # Usamos un tipo válido del modelo y agregamos ubicación
         e = Equipo.objects.create(
             cliente=c, 
             marca=random.choice(['BGH', 'Samsung', 'Surrey']),
             modelo='Inverter 4500',
-            tipo=tipo,
-            ubicacion=ubicacion
+            tipo=random.choice(['SPLIT', 'VENTANA', 'HELADERA', 'COMERCIAL', 'LAVARROPAS']),
+            ubicacion=random.choice(['Living', 'Dormitorio', 'Cocina'])
         )
 
         # 3. CREAR SOLO 1 ORDEN POR EQUIPO PARA PROBAR

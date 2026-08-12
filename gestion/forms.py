@@ -1,4 +1,5 @@
 from django import forms
+from django.core.exceptions import ValidationError
 from django.utils import timezone
 from .models import Cliente, Equipo, OrdenReparacion, FichaTecnica, EventoCalendario
 
@@ -27,7 +28,7 @@ class OrdenIngresoForm(IndustrialForm):
 class EquipoForm(IndustrialForm):
     class Meta:
         model = Equipo
-        fields = ['tipo_gas', 'capacidad', 'modelo'] # Datos de identidad del equipo
+        fields = ['tipo', 'marca', 'modelo', 'capacidad', 'tipo_gas', 'ubicacion'] # Datos de identidad del equipo
 
 class EspecificacionesForm(IndustrialForm):
     class Meta:

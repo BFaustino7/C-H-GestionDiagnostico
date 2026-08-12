@@ -38,6 +38,12 @@ class EquipoAdmin(admin.ModelAdmin):
     # AQUI ESTÁ LA CLAVE: Agregamos Ficha Técnica Y Fotos juntas
     inlines = [FichaTecnicaInline, FotoEquipoInline]
 
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        # Mostrar solo equipos con ficha técnica completada
+        return qs.filter(ficha__isnull=False)
+
+
 class OrdenAdmin(admin.ModelAdmin):
     list_display = ('id', 'equipo', 'estado_color', 'fecha_ingreso', 'tecnico')
     list_filter = ('estado', 'tecnico')
@@ -49,9 +55,8 @@ class OrdenAdmin(admin.ModelAdmin):
         colores = {
             'PENDIENTE': 'red',
             'DIAGNOSTICO': 'orange',
-            'ESPERA': 'orange',
             'REPARACION': 'blue',
-            'TERMINADO': 'green',
+            'COMPLETADO': 'green',
             'ENTREGADO': 'gray',
         }
         color = colores.get(obj.estado, 'black')

@@ -17,9 +17,10 @@ from iot.iot_simulador import generar_datos_banco_pruebas
 from .services import ServicioCalendario
 from .utils import api_success, api_error
 
+@login_required
 def tablero_principal(request):
     ordenes_taller = sel.get_ordenes_tablero()
-    equipos_monitoreo = ordenes_taller.filter(estado='REPARACION') or ordenes_taller.filter(estado='DIAGNOSTICO')
+    equipos_monitoreo = ordenes_taller.filter(estado__in=sel.ESTADOS_EN_PROCESO)
 
     return render(request, 'gestion/tablero.html', {
         'ordenes_en_proceso': ordenes_taller,

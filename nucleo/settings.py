@@ -1,27 +1,23 @@
-from pathlib import Path
+"""
+Configuración de seguridad y producción para el proyecto C-H GestionDiagnostico.
+"""
 import os
-from dotenv import load_dotenv
-# --- CARGAR VARIABLES DE ENTORNO (.env) ---
-load_dotenv()
+from pathlib import Path
 
-# --- PARCHE PARA SQL SERVER 2022 (Librería mssql-django) ---
-# Obligatorio: Engaña a la librería para que crea que es la versión 2019
-import mssql.base
-try:
-    mssql.base.DatabaseWrapper.sql_server_version = property(lambda self: 2019)
-except Exception:
-    pass
-# -----------------------------------------------------------
-
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-# --- SEGURIDAD BLINDADA ---
-# Toma la clave secreta del .env
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-clave-por-defecto')
-DEBUG = os.getenv('DEBUG', 'False') == 'True'
-# Convierte el string del .env (ej: "localhost,192.168.101.84") en una lista de Python
-allowed_hosts_env = os.getenv('ALLOWED_HOSTS', '*')
-ALLOWED_HOSTS = allowed_hosts_env.split(',') if allowed_hosts_env else []
 
+# SECURITY WARNING: keep the secret key secret in production!
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-clave-por-defecto-desarrollo')
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
+
+# Hosts que pueden servir este Django
+allowed_hosts_env = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1')
+ALLOWED_HOSTS = [h.strip() for h in allowed_hosts_env.split(',') if h.strip()]
+
+# Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -30,7 +26,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'gestion',
-    'iot',
 ]
 
 MIDDLEWARE = [
@@ -64,14 +59,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'nucleo.wsgi.application'
 
-# --- BASE DE DATOS (Configuración para mssql-django) ---
+# Database
+# https://docs.djangoproject.com/en/stable/ref/settings/#databases
 DATABASES = {
     'default': {
         'ENGINE': 'mssql', 
         'NAME': os.getenv('DB_NAME', 'GestionTallerDB'),
         'HOST': os.getenv('DB_HOST', 'localhost'),
-        'USER': os.getenv('DB_USER', ''),       # Queda vacío si usas Windows Authentication
-        'PASSWORD': os.getenv('DB_PASSWORD', ''), # Queda vacío si usas Windows Authentication
+        'USER': os.getenv('DB_USER', ''),
+        'PASSWORD': os.getenv('DB_PASSWORD', ''),
         'OPTIONS': {
             'driver': 'ODBC Driver 18 for SQL Server',
             'extra_params': 'TrustServerCertificate=yes',
@@ -79,19 +75,57 @@ DATABASES = {
     }
 }
 
-AUTH_PASSWORD_VALIDATORS = []
+# Internationalization
 LANGUAGE_CODE = 'es-ar'
 TIME_ZONE = 'America/Argentina/Buenos_Aires'
 USE_I18N = True
 USE_TZ = True
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/stable/how/static-files/
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'nucleo' / 'static',]
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-print(">>> DEBUG: Configuración mssql-django cargada <<<")
+# --- CONFIGURACIÓN DE SEGURIDAD ADICIONAL ---
 
-# --- CONFIGURACIÓN DE ARCHIVOS MULTIMEDIA (FOTOS) ---
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-# ----------------------------------------------------
+# Validadores de contraseña
+AUTH_PASSWORD_VALIDATORS = [
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+]
+
+# URLs de autenticación
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = 'tablero'
+LOGOUT_REDIRECT_URL = 'login'
+
+# Logging
+import logging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {name} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+}
+
+# Seguridad: desactivado DEBUG print
+# El print(">>> DEBUG: ...") fue removido intencionalmente.

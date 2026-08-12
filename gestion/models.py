@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User # Importamos la tabla de usuarios/técnicos
+from .constants import ESTADOS_ORDEN, ESTADOS_ORDEN_DICT, ESTADOS_EN_PROCESO, ESTADOS_PARA_ENTREGAR, TIPOS_EQUIPO
 
 # --- 1. PERSONAS ---
 class Cliente(models.Model):
@@ -13,13 +14,7 @@ class Cliente(models.Model):
 
 # --- 2. EL PACIENTE (EQUIPO) ---
 class Equipo(models.Model):
-    TIPOS = [
-        ('SPLIT', 'Aire Acondicionado Split'),
-        ('VENTANA', 'Aire Acondicionado Ventana'),
-        ('HELADERA', 'Heladera Familiar'),
-        ('COMERCIAL', 'Heladera Comercial/Exhibidora'),
-        ('LAVARROPAS', 'Lavarropas'),
-    ]
+    TIPOS = TIPOS_EQUIPO
     
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
     tipo = models.CharField(max_length=20, choices=TIPOS)
