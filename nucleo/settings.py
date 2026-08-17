@@ -4,8 +4,13 @@ Configuración de seguridad y producción para el proyecto C-H GestionDiagnostic
 import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Carga las variables del archivo .env (SECRET_KEY, DB_*, etc.)
+load_dotenv(BASE_DIR / '.env')
 
 # SECURITY WARNING: keep the secret key secret in production!
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-clave-por-defecto-desarrollo')
@@ -63,15 +68,12 @@ WSGI_APPLICATION = 'nucleo.wsgi.application'
 # https://docs.djangoproject.com/en/stable/ref/settings/#databases
 DATABASES = {
     'default': {
-        'ENGINE': 'mssql', 
-        'NAME': os.getenv('DB_NAME', 'GestionTallerDB'),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME', 'gestion_diagnostico'),
         'HOST': os.getenv('DB_HOST', 'localhost'),
-        'USER': os.getenv('DB_USER', ''),
+        'USER': os.getenv('DB_USER', 'gestion'),
         'PASSWORD': os.getenv('DB_PASSWORD', ''),
-        'OPTIONS': {
-            'driver': 'ODBC Driver 18 for SQL Server',
-            'extra_params': 'TrustServerCertificate=yes',
-        },
+        'PORT': os.getenv('DB_PORT', '5432'),
     }
 }
 

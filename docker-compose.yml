@@ -1,0 +1,26 @@
+# PostgreSQL 17 con extensión pgvector preinstalada
+# - pgvector: habilita embeddings para el asistente IA (Fase 1.5)
+# - Las credenciales se leen de .env (POSTGRES_DB / POSTGRES_USER / POSTGRES_PASSWORD)
+# - Los datos persisten en el volumen nombrado `pgdata`
+services:
+  db:
+    image: pgvector/pgvector:pg17
+    container_name: gestion_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+volumes:
+  pgdata:

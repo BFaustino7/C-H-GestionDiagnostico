@@ -1,6 +1,7 @@
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.contrib.auth.models import User
+from gestion.models import Cliente, Equipo, OrdenReparacion
 from datetime import datetime, timedelta
 
 

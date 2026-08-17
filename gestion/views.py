@@ -16,6 +16,7 @@ from . import services as svc
 from iot.iot_simulador import generar_datos_banco_pruebas
 from .services import ServicioCalendario
 from .utils import api_success, api_error
+from django.contrib.auth.decorators import login_required
 
 @login_required
 def tablero_principal(request):
