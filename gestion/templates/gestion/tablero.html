@@ -3,13 +3,71 @@
 {% block page_title %}Panel de Control{% endblock %}
 {% block nav_tablero %}active{% endblock %}
 
+{% block extra_css %}
+<style>
+    html { scroll-behavior: smooth; }
+
+    /* Tarjeta KPI navegable (botón hacia su lista) */
+    .kpi-card {
+        display: block;
+        text-decoration: none;
+        color: inherit;
+        transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+        cursor: pointer;
+    }
+    .kpi-card:hover {
+        transform: translate(-2px, -2px);
+        box-shadow: 6px 6px 0px #1a1a1a;
+        border-color: #00e5ff;
+    }
+    .kpi-card:hover .kpi-cta {
+        color: #00e5ff;
+    }
+    .kpi-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.65rem;
+        font-family: 'JetBrains Mono', monospace;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #999;
+        margin-top: 10px;
+        border-top: 1px solid #eee;
+        padding-top: 8px;
+        transition: color 0.15s;
+    }
+
+    /* Lista colapsable */
+    .collapsible-head {
+        cursor: pointer;
+        user-select: none;
+    }
+    .collapsible-head .chevron {
+        transition: transform 0.2s;
+    }
+    .collapsible-body {
+        overflow: hidden;
+    }
+    .collapsible[data-collapsed="true"] .collapsible-body {
+        display: none;
+    }
+    .collapsible[data-collapsed="true"] .chevron {
+        transform: rotate(-90deg);
+    }
+    .section-anchor {
+        scroll-margin-top: 20px;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 
-{# ============================== 1. SYSTEM METRICS ROW — 4 KPI cards ============================== #}
+{# ============================== 1. SYSTEM METRICS ROW — 4 KPI cards navegables ============================== #}
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
 
-    {# --- Card 1: Órdenes Activas --- #}
-    <div class="card-industrial p-5">
+    {# --- Card 1: Órdenes Activas → scroll a su lista --- #}
+    <a href="#seccion-ordenes-activas" class="card-industrial p-5 kpi-card">
         <div class="flex items-center gap-3 mb-3">
             <div class="w-10 h-10 flex items-center justify-center bg-[#e8ffe8] border border-[#00cc00]">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -26,11 +84,14 @@
         </div>
         <div class="crt-text text-4xl font-mono font-bold">{{ ordenes_en_proceso|length }}</div>
         <div class="text-[0.7rem] text-[#999] font-mono mt-1">EN PROCESO</div>
-    </div>
+        <div class="kpi-cta">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            Ver lista
+        </div>
+    </a>
 
-    
-    {# --- Card 2: Pendientes Entrega --- #}
-    <div class="card-industrial p-5">
+    {# --- Card 2: Pendientes Entrega → scroll a su lista --- #}
+    <a href="#seccion-pendientes-entrega" class="card-industrial p-5 kpi-card">
         <div class="flex items-center gap-3 mb-3">
             <div class="w-10 h-10 flex items-center justify-center bg-[#e0f7fa] border border-[#00e5ff]">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -47,10 +108,14 @@
             {{ ordenes_para_entregar|length }}
         </div>
         <div class="text-[0.7rem] text-[#999] font-mono mt-1">COMPLETADAS</div>
-    </div>
+        <div class="kpi-cta">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            Ver lista
+        </div>
+    </a>
 
-    {# --- Card 3: Entregadas Recientes --- #}
-    <div class="card-industrial p-5">
+    {# --- Card 3: Entregadas Recientes → scroll a su lista --- #}
+    <a href="#seccion-entregas" class="card-industrial p-5 kpi-card">
         <div class="flex items-center gap-3 mb-3">
             <div class="w-10 h-10 flex items-center justify-center bg-[#fff8e0] border border-[#ffcc00]">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -65,10 +130,14 @@
         </div>
         <div class="crt-text-amber text-4xl font-mono font-bold">{{ ordenes_entregadas|length }}</div>
         <div class="text-[0.7rem] text-[#999] font-mono mt-1">ÚLTIMAS 5</div>
-    </div>
+        <div class="kpi-cta">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            Ver lista
+        </div>
+    </a>
 
-    {# --- Card 4: Banco de Pruebas (Monitoreo Activo) --- #}
-    <div class="card-industrial p-5">
+    {# --- Card 4: Banco de Pruebas (Monitoreo Activo) → scroll a su sección --- #}
+    <a href="#seccion-monitoreo" class="card-industrial p-5 kpi-card">
         <div class="flex items-center gap-3 mb-3">
             <div class="w-10 h-10 flex items-center justify-center bg-[#e8ffe8] border border-[#00cc00]">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -82,22 +151,31 @@
         </div>
         <div class="crt-text text-4xl font-mono font-bold">{{ banco_pruebas|length }}</div>
         <div class="text-[0.7rem] text-[#999] font-mono mt-1">EN BANCO</div>
-    </div>
+        <div class="kpi-cta">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            Ver sección
+        </div>
+    </a>
 
 </div>
 
 
-{# ============================== 2. ACTIVE WORK ORDERS TABLE ============================== #}
-<div class="card-industrial mb-8">
-    <div class="px-5 py-4 border-b-2 border-[#00f900] flex items-center justify-between">
+{# ============================== 2. ÓRDENES ACTIVAS (colapsable) ============================== #}
+<div id="seccion-ordenes-activas" class="card-industrial mb-8 section-anchor collapsible" data-collapsed="false">
+    <div class="px-5 py-4 border-b-2 border-[#00f900] flex items-center justify-between collapsible-head"
+         onclick="toggleColapsable(this)">
         <div class="flex items-center gap-2">
             <span class="w-2 h-2 rounded-full bg-[#00f900] animate-pulse"></span>
             <h3 class="font-mono text-sm uppercase tracking-widest font-bold m-0">Órdenes Activas</h3>
         </div>
-        <span class="font-mono text-xs text-[#666]">{{ ordenes_en_proceso|length }} registro{{ ordenes_en_proceso|length|pluralize }}</span>
+        <div class="flex items-center gap-3">
+            <span class="font-mono text-xs text-[#666]">{{ ordenes_en_proceso|length }} registro{{ ordenes_en_proceso|length|pluralize }}</span>
+            <svg class="chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                 fill="none" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
     </div>
 
-    <div class="overflow-x-auto">
+    <div class="collapsible-body overflow-x-auto">
         <table class="table-industrial">
             <thead>
                 <tr>
@@ -176,21 +254,121 @@
     </div>
 </div>
 
-{# ============================== 3. BOTTOM ROW — Últimas Entregas + Resumen Rápido ============================== #}
+
+{# ============================== 3. PENDIENTES DE ENTREGA (colapsable) ============================== #}
+<div id="seccion-pendientes-entrega" class="card-industrial mb-8 section-anchor collapsible" data-collapsed="false">
+    <div class="px-5 py-4 border-b-2 border-[#00e5ff] flex items-center justify-between collapsible-head"
+         onclick="toggleColapsable(this)">
+        <div class="flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                 fill="none" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 16h6"/><path d="M19 11v7.2c0 1.2-1 2.2-2.2 2.2H7.2c-1.2 0-2.2-1-2.2-2.2V5c0-1.2 1-2.2 2.2-2.2H12"/>
+                <path d="m9 11 2 2 4-4"/>
+            </svg>
+            <h3 class="font-mono text-sm uppercase tracking-widest font-bold m-0">Pendientes de Entrega</h3>
+        </div>
+        <div class="flex items-center gap-3">
+            <span class="font-mono text-xs text-[#666]">{{ ordenes_para_entregar|length }} registro{{ ordenes_para_entregar|length|pluralize }}</span>
+            <svg class="chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                 fill="none" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </div>
+    </div>
+
+    <div class="collapsible-body overflow-x-auto">
+        <table class="table-industrial">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Cliente</th>
+                    <th>Equipo</th>
+                    <th>Estado</th>
+                    <th>Ingreso</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for orden in ordenes_para_entregar %}
+                <tr>
+                    <td class="font-bold">#{{ orden.id }}</td>
+                    <td>{{ orden.equipo.cliente.nombre }}</td>
+                    <td>
+                        <span class="text-[#1a1a1a]">{{ orden.equipo.get_tipo_display }}</span>
+                        <span class="text-[#666]">{{ orden.equipo.marca }} {{ orden.equipo.modelo }}</span>
+                    </td>
+                    <td>
+                        <span class="badge-status badge-cyan">Completado</span>
+                    </td>
+                    <td class="text-[#666]">{{ orden.fecha_ingreso|date:"d/m/Y" }}</td>
+                    <td>
+                        <div class="flex items-center gap-1.5">
+                            <a href="{% url 'detalle_orden' orden_id=orden.id %}"
+                               class="btn-industrial btn-green text-[0.7rem] py-1.5 px-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                                Ver
+                            </a>
+                            <a href="{% url 'imprimir_remito' orden.id %}"
+                               class="btn-industrial btn-amber text-[0.7rem] py-1.5 px-3"
+                               title="Imprimir remito de la orden">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+                                    <path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6"/>
+                                    <rect x="6" y="14" width="12" height="8" rx="1"/>
+                                </svg>
+                                Remito
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center py-10">
+                        <div class="flex flex-col items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+                                 fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M18 16h6"/><path d="M19 11v7.2c0 1.2-1 2.2-2.2 2.2H7.2c-1.2 0-2.2-1-2.2-2.2V5c0-1.2 1-2.2 2.2-2.2H12"/>
+                                <path d="m9 11 2 2 4-4"/>
+                            </svg>
+                            <span class="font-mono text-sm text-[#999] uppercase tracking-wider">
+                                No hay órdenes listas para entregar
+                            </span>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+{# ============================== 4. BOTTOM ROW — Últimas Entregas + Monitoreo Activo (colapsables) ============================== #}
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
     {# --- Left Panel: Últimas Entregas --- #}
-    <div class="card-industrial">
-        <div class="px-5 py-4 border-b border-[#e5e5e5] flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                 fill="none" stroke="#00f900" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
-                <path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>
-            </svg>
-            <h3 class="font-mono text-xs uppercase tracking-widest font-bold m-0">Últimas Entregas</h3>
+    <div id="seccion-entregas" class="card-industrial section-anchor collapsible" data-collapsed="false">
+        <div class="px-5 py-4 border-b-2 border-[#ffcc00] flex items-center justify-between collapsible-head"
+             onclick="toggleColapsable(this)">
+            <div class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                     fill="none" stroke="#ffcc00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
+                    <polyline points="16 7 22 7 22 13"/>
+                </svg>
+                <h3 class="font-mono text-xs uppercase tracking-widest font-bold m-0">Últimas Entregas</h3>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="font-mono text-xs text-[#666]">{{ ordenes_entregadas|length }}</span>
+                <svg class="chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                     fill="none" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
         </div>
 
-        <div class="overflow-x-auto">
+        <div class="collapsible-body overflow-x-auto">
             <table class="table-industrial">
                 <thead>
                     <tr>
@@ -225,45 +403,53 @@
         </div>
     </div>
 
-    {# --- Right Panel: Resumen Rápido --- #}
-    <div class="card-industrial">
-        <div class="px-5 py-4 border-b border-[#e5e5e5] flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                 fill="none" stroke="#00f900" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-            </svg>
-            <h3 class="font-mono text-xs uppercase tracking-widest font-bold m-0">Resumen Rápido</h3>
+    {# --- Right Panel: Monitoreo Activo (placeholder IoT) --- #}
+    <div id="seccion-monitoreo" class="card-industrial section-anchor collapsible" data-collapsed="true">
+        <div class="px-5 py-4 border-b-2 border-[#00f900] flex items-center justify-between collapsible-head"
+             onclick="toggleColapsable(this)">
+            <div class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                     fill="none" stroke="#00f900" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+                </svg>
+                <h3 class="font-mono text-xs uppercase tracking-widest font-bold m-0">Monitoreo Activo</h3>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="font-mono text-xs text-[#666]">{{ banco_pruebas|length }} en banco</span>
+                <svg class="chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                     fill="none" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
         </div>
 
-        <div class="p-5 flex flex-col gap-4">
-            {# Row: Órdenes en Proceso #}
-            <div class="flex items-center justify-between py-2 border-b border-[#f0f0f0]">
-                <span class="text-xs font-mono uppercase tracking-wider text-[#666]">Órdenes en Proceso</span>
-                <span class="crt-text text-lg font-mono font-bold">{{ ordenes_en_proceso|length }}</span>
-            </div>
-
-            {# Row: Pendientes de Entrega #}
-            <div class="flex items-center justify-between py-2 border-b border-[#f0f0f0]">
-                <span class="text-xs font-mono uppercase tracking-wider text-[#666]">Pendientes de Entrega</span>
-                <span class="crt-text text-lg font-mono font-bold" style="color:#00e5ff; text-shadow:0 0 8px rgba(0,229,255,0.6);">
-                    {{ ordenes_para_entregar|length }}
+        <div class="collapsible-body p-6">
+            <div class="flex flex-col items-center gap-3 py-6">
+                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24"
+                     fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    <path d="M9 12l2 2 4-4"/>
+                </svg>
+                <span class="font-mono text-sm text-[#999] uppercase tracking-wider text-center">
+                    Módulo IoT pendiente de configuración
                 </span>
-            </div>
-
-            {# Row: Equipo en Banco de Pruebas #}
-            <div class="flex items-center justify-between py-2 border-b border-[#f0f0f0]">
-                <span class="text-xs font-mono uppercase tracking-wider text-[#666]">Equipo en Banco</span>
-                <span class="crt-text text-lg font-mono font-bold">{{ banco_pruebas|length }}</span>
-            </div>
-
-            {# Row: Entregadas Recientes #}
-            <div class="flex items-center justify-between py-2">
-                <span class="text-xs font-mono uppercase tracking-wider text-[#666]">Entregadas Recientes</span>
-                <span class="crt-text-amber text-lg font-mono font-bold">{{ ordenes_entregadas|length }}</span>
+                <span class="text-xs text-[#aaa] text-center max-w-sm">
+                    El monitoreo en tiempo real del banco de pruebas requiere hardware de telemetría
+                    (presión, temperatura, sobrecalentamiento) y la lógica de captura asociada.
+                </span>
             </div>
         </div>
     </div>
 
 </div>
 
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleColapsable(header) {
+    const card = header.closest('.collapsible');
+    if (!card) return;
+    const collapsed = card.getAttribute('data-collapsed') === 'true';
+    card.setAttribute('data-collapsed', collapsed ? 'false' : 'true');
+}
+</script>
 {% endblock %}
