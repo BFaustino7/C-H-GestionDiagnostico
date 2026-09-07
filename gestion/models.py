@@ -8,6 +8,9 @@ class Cliente(models.Model):
     telefono = models.CharField(max_length=50)
     direccion = models.CharField(max_length=200, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
+    cuit = models.CharField(max_length=20, blank=True, null=True)
+    contacto = models.CharField(max_length=100, blank=True, null=True)
+    notas = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.nombre} ({self.telefono})"
@@ -195,6 +198,8 @@ class EventoCalendario(models.Model):
     fecha_hora = models.DateTimeField()
     titulo = models.CharField(max_length=100, help_text="Ej: Visita a domicilio, Entrega Heladera")
     descripcion = models.TextField(blank=True, null=True)
+    tag = models.CharField(max_length=20, blank=True, null=True)
+    completado = models.BooleanField(default=False)
     
     # Opcional: Relacionar el evento con una reparación en curso
     orden = models.ForeignKey('OrdenReparacion', on_delete=models.SET_NULL, null=True, blank=True, related_name='eventos')

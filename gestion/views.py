@@ -150,6 +150,20 @@ def crear_evento_api(request):
     return api_error(message='Método no permitido', status=405)
 
 @login_required
+def crear_cliente_api(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            form = ClienteForm(data)
+            if form.is_valid():
+                form.save()
+                return api_success()
+            return api_error(errors=form.errors)
+        except Exception as e:
+            return api_error(message=str(e), status=500)
+    return api_error(message='Método no permitido', status=405)
+
+@login_required
 def configuracion_sistema(request):
     config = ConfiguracionSistema.obtener()
     if request.method == 'POST':

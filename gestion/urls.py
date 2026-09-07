@@ -21,5 +21,6 @@ urlpatterns = [
     path('ingresar/', views.ingreso_equipo, name='ingreso_equipo'),
     path('equipo/historial/<int:equipo_id>/', views.historial_equipo, name='historial_equipo'),
     path('cliente/editar/<int:cliente_id>/', views.editar_cliente, name='editar_cliente'),
-    path('api/eventos/crear/', views.crear_evento_api, name='crear_evento_api')
+    path('api/eventos/crear/', views.crear_evento_api, name='crear_evento_api'),
+    path('api/clientes/crear/', views.crear_cliente_api, name='crear_cliente_api')
 ]

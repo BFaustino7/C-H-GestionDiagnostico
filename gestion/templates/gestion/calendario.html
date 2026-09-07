@@ -685,9 +685,9 @@
     </div>
 
     <div class="flex gap-2">
-        <button type="button" class="btn-action blue" onclick="abrirModalEvento('TURNO')">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            Nuevo Turno
+        <button type="button" class="btn-green btn-industrial" onclick="abrirModalEvento('TURNO')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
+            NUEVO TURNO
         </button>
         <button type="button" class="btn-action green" onclick="abrirModalEvento('ENTREGA')">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 16h6"/><path d="M19 11v7.2c0 1.2-1 2.2-2.2 2.2H7.2c-1.2 0-2.2-1-2.2-2.2V5c0-1.2 1-2.2 2.2-2.2H12"/><path d="m9 11 2 2 4-4"/></svg>
@@ -868,11 +868,11 @@
     </div>
 </div>
 
-{# ===================== MODAL NUEVO EVENTO ===================== #}
+{# ===================== MODAL NUEVO TURNO ===================== #}
 <div class="scada-modal-overlay" id="modalEvento">
     <div class="scada-modal">
         <div class="scada-modal-header">
-            <h5>NUEVO EVENTO</h5>
+            <h5>NUEVO TURNO / EVENTO</h5>
             <button type="button" class="scada-modal-close" onclick="cerrarModalEvento()">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
             </button>
@@ -880,27 +880,57 @@
         <div class="scada-modal-body">
             <form id="form-nuevo-evento">
                 {% csrf_token %}
-                <div class="form-group-scada">
-                    <label>Tipo de Evento</label>
-                    {{ form_evento.tipo }}
+
+                <div id="banner-error-evento" class="hidden bg-[#ffe8e8] border-2 border-[#ff3333] text-[#880000] px-3 py-3 font-mono text-xs mb-4"></div>
+
+                <div class="form-group-industrial mb-4">
+                    <label for="evt-titulo">Titulo / Asunto <span class="text-[#ba1a1a]">*</span></label>
+                    <input type="text" id="evt-titulo" name="titulo" required placeholder="Ej: Mantenimiento Compresor Central #2" class="input-industrial">
                 </div>
-                <div class="form-group-scada">
-                    <label>Fecha y Hora</label>
-                    {{ form_evento.fecha_hora }}
+
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div class="form-group-industrial">
+                        <label for="evt-tipo">Tipo de Evento</label>
+                        <select id="evt-tipo" name="tipo" class="input-industrial uppercase">
+                            <option value="TURNO">TURNO / SERVICE</option>
+                            <option value="ENTREGA">ENTREGA DE EQUIPO</option>
+                            <option value="ALERTA">ALERTA / REVISION</option>
+                        </select>
+                    </div>
+                    <div class="form-group-industrial">
+                        <label for="evt-tag">Etiqueta (TAG)</label>
+                        <input type="text" id="evt-tag" name="tag" placeholder="TR-102 o MANT-C" class="input-industrial uppercase">
+                    </div>
                 </div>
-                <div class="form-group-scada">
-                    <label>Título (Cliente/Equipo)</label>
-                    {{ form_evento.titulo }}
+
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div class="form-group-industrial">
+                        <label for="evt-fecha">Fecha</label>
+                        <input type="date" id="evt-fecha" name="fecha" class="input-industrial">
+                    </div>
+                    <div class="form-group-industrial">
+                        <label for="evt-hora">Hora</label>
+                        <input type="time" id="evt-hora" name="hora" class="input-industrial">
+                    </div>
                 </div>
-                <div class="form-group-scada">
-                    <label>Descripción / Detalles</label>
-                    {{ form_evento.descripcion }}
+
+                <div class="form-group-industrial mb-4">
+                    <label for="evt-cliente">Cliente Vinculado</label>
+                    <input type="text" id="evt-cliente" name="cliente" placeholder="Ej: Frigoríficos del Plata S.A." class="input-industrial">
+                </div>
+
+                <div class="form-group-industrial">
+                    <label for="evt-descripcion">Detalles / Sintomas / Instrucciones</label>
+                    <textarea id="evt-descripcion" name="descripcion" rows="3" placeholder="Notas para el equipo tecnico..." class="textarea-industrial"></textarea>
                 </div>
             </form>
         </div>
         <div class="scada-modal-footer">
-            <button type="button" class="btn-modal-cancel" onclick="cerrarModalEvento()">Cancelar</button>
-            <button type="button" class="btn-modal-save" id="btn-guardar-evento">Guardar</button>
+            <button type="button" class="btn-outline uppercase font-bold text-sm px-4 py-2" onclick="cerrarModalEvento()">Cancelar</button>
+            <button type="submit" form="form-nuevo-evento" class="btn-green uppercase font-bold text-sm px-6 py-2 inline-flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                Guardar
+            </button>
         </div>
     </div>
 </div>
@@ -911,15 +941,22 @@
 <script>
 (function() {
     const modal = document.getElementById('modalEvento');
+    const form = document.getElementById('form-nuevo-evento');
+    const banner = document.getElementById('banner-error-evento');
+
+    const pad = function(n) { return String(n).padStart(2, '0'); };
 
     window.abrirModalEvento = function(tipo) {
-        document.getElementById('form-nuevo-evento').reset();
+        form.reset();
+        banner.classList.add('hidden');
 
-        const tipoSelect = document.querySelector('#form-nuevo-evento [name="tipo"]');
+        const tipoSelect = document.getElementById('evt-tipo');
         if (tipoSelect) tipoSelect.value = tipo;
 
-        const header = modal.querySelector('.scada-modal-header');
-        header.style.borderBottomColor = tipo === 'TURNO' ? '#1565c0' : '#2e7d32';
+        const ahora = new Date();
+        document.getElementById('evt-fecha').value =
+            ahora.getFullYear() + '-' + pad(ahora.getMonth() + 1) + '-' + pad(ahora.getDate());
+        document.getElementById('evt-hora').value = pad(ahora.getHours()) + ':' + pad(ahora.getMinutes());
 
         modal.classList.add('active');
     };
@@ -938,21 +975,57 @@
         }
     });
 
-    document.getElementById('btn-guardar-evento').addEventListener('click', function() {
-        const form = document.getElementById('form-nuevo-evento');
+    function mostrarErrores(data) {
+        const msgs = [];
+        if (data.errors) {
+            for (const field in data.errors) {
+                const err = data.errors[field];
+                msgs.push(Array.isArray(err) ? err.join(' ') : err);
+            }
+        }
+        if (data.message) msgs.push(data.message);
+        banner.textContent = msgs.join(' | ') || 'No se pudo guardar el evento.';
+        banner.classList.remove('hidden');
+    }
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        banner.classList.add('hidden');
+
+        const fecha = document.getElementById('evt-fecha').value;
+        const hora = document.getElementById('evt-hora').value;
+        if (!fecha) {
+            banner.textContent = 'Falta completar la fecha.';
+            banner.classList.remove('hidden');
+            return;
+        }
+        if (!hora) {
+            banner.textContent = 'Falta completar la hora.';
+            banner.classList.remove('hidden');
+            return;
+        }
+
+        const titulo = document.getElementById('evt-titulo').value.trim();
+        let tituloFinal = titulo;
+        const cliente = document.getElementById('evt-cliente').value.trim();
+        if (cliente && tituloFinal.indexOf(cliente) === -1) {
+            tituloFinal = cliente + ' - ' + tituloFinal;
+        }
 
         const payload = {
-            tipo: form.querySelector('[name="tipo"]').value,
-            fecha_hora: form.querySelector('[name="fecha_hora"]').value,
-            titulo: form.querySelector('[name="titulo"]').value,
-            descripcion: form.querySelector('[name="descripcion"]').value
+            tipo: document.getElementById('evt-tipo').value,
+            fecha_hora: fecha + 'T' + hora,
+            titulo: tituloFinal,
+            descripcion: document.getElementById('evt-descripcion').value,
+            tag: document.getElementById('evt-tag').value,
+            completado: false
         };
 
         fetch("{% url 'crear_evento_api' %}", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value
             },
             body: JSON.stringify(payload)
         })
@@ -962,14 +1035,13 @@
                 cerrarModalEvento();
                 window.location.reload();
             } else {
-                var errorMsg = "Revise los campos:\n";
-                for (var field in data.errors) {
-                    errorMsg += "- " + field + ": " + data.errors[field] + "\n";
-                }
-                alert(errorMsg);
+                mostrarErrores(data);
             }
         })
-        .catch(function() { alert('Error de conexión con el servidor.'); });
+        .catch(function() {
+            banner.textContent = 'Error de conexión con el servidor.';
+            banner.classList.remove('hidden');
+        });
     });
 })();
 </script>

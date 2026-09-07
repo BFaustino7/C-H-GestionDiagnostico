@@ -31,6 +31,8 @@ TIPOS_EQUIPO = [
     ('COMERCIAL', 'Heladera Comercial/Exhibidora'),
     ('CAMARA', 'Cámara Frigorífica'),
     ('LAVARROPAS', 'Lavarropas'),
+    ('COMPRESOR_SEMI', 'Compresor Semihermético'),
+    ('COMPRESOR_TORNILLO', 'Compresor Tornillo (Screw)'),
 ]
 
 # --- Estados de Pago ---

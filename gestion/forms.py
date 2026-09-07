@@ -16,7 +16,12 @@ class IndustrialForm(forms.ModelForm):
 class ClienteForm(IndustrialForm):
     class Meta:
         model = Cliente
-        fields = ['nombre', 'telefono', 'direccion', 'email']
+        fields = ['nombre', 'telefono', 'direccion', 'email', 'cuit', 'contacto', 'notas']
+        widgets = {
+            'notas': forms.Textarea(attrs={'rows': 3}),
+            'cuit': forms.TextInput(attrs={'placeholder': '30-12345678-9'}),
+            'contacto': forms.TextInput(attrs={'placeholder': 'Nombre de la persona encargada'}),
+        }
 
 class OrdenIngresoForm(IndustrialForm):
     class Meta:
@@ -64,9 +69,10 @@ class EventoCalendarioForm(IndustrialForm): # O forms.ModelForm
 
     class Meta:
         model = EventoCalendario
-        fields = ['tipo', 'fecha_hora', 'titulo', 'descripcion', 'orden']
+        fields = ['tipo', 'fecha_hora', 'titulo', 'descripcion', 'orden', 'tag', 'completado']
         widgets = {
             'descripcion': forms.Textarea(attrs={'rows': 2}),
+            'tag': forms.TextInput(attrs={'placeholder': 'Ej: TR-102'}),
         }
 
     def clean_fecha_hora(self):
