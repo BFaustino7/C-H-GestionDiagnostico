@@ -36,7 +36,7 @@
 <div class="card-industrial overflow-hidden">
     {% if lista_clientes %}
     <div class="overflow-x-auto">
-        <table class="table-industrial">
+        <table class="table-industrial tabla-fichas-movil">
             <thead>
                 <tr>
                     <th>NOMBRE</th>
@@ -50,16 +50,16 @@
             <tbody>
                 {% for cliente in lista_clientes %}
                 <tr>
-                    <td class="font-medium text-[#1a1a1a]">{{ cliente.nombre }}</td>
-                    <td class="font-mono text-[#0066cc]">{{ cliente.telefono|default:"Sin registrar" }}</td>
-                    <td class="text-[#555] text-sm">{{ cliente.direccion|default:"Sin registrar" }}</td>
-                    <td class="font-mono text-sm">{{ cliente.email|default:"-" }}</td>
-                    <td class="text-center">
+                    <td data-label="NOMBRE" class="font-medium text-[#1a1a1a]">{{ cliente.nombre }}</td>
+                    <td data-label="TELEFONO" class="font-mono text-[#0066cc]">{% if cliente.telefono %}<a href="tel:{{ cliente.telefono }}" class="no-underline text-[#0066cc]">{{ cliente.telefono }}</a>{% else %}Sin registrar{% endif %}</td>
+                    <td data-label="DIRECCION" class="text-[#555] text-sm">{{ cliente.direccion|default:"Sin registrar" }}</td>
+                    <td data-label="EMAIL" class="font-mono text-sm">{{ cliente.email|default:"-" }}</td>
+                    <td data-label="EQUIPOS" class="text-center">
                         <span class="font-mono text-sm font-bold {% if cliente.total_equipos %}text-[#1b5e20]{% else %}text-[#999]{% endif %}">
                             {{ cliente.total_equipos }}
                         </span>
                     </td>
-                    <td class="text-center">
+                    <td data-label="ACCIONES" class="text-center">
                         <div class="flex items-center justify-center gap-1.5">
                             <a href="{% url 'editar_cliente' cliente_id=cliente.id %}" class="btn-outline inline-flex items-center gap-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>

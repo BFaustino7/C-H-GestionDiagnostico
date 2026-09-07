@@ -295,6 +295,83 @@
   border-bottom: none;
 }
 
+/* ========================
+   MOBILE: table -> stacked cards
+   Aplicar clase .tabla-fichas-movil a tablas de listas
+   para que en pantallas angostas (<640px) cada fila se
+   convierta en una tarjeta apilada legible.
+   ======================== */
+@media (max-width: 640px) {
+  .tabla-fichas-movil thead {
+    display: none;
+  }
+
+  .tabla-fichas-movil,
+  .tabla-fichas-movil tbody,
+  .tabla-fichas-movil tbody tr,
+  .tabla-fichas-movil tbody td {
+    display: block;
+    width: 100%;
+  }
+
+  .tabla-fichas-movil tbody tr {
+    border: 2px solid #1a1a1a;
+    box-shadow: 3px 3px 0px #1a1a1a;
+    border-radius: 0;
+    margin-bottom: 16px;
+    background-color: #ffffff;
+    padding: 8px 0;
+  }
+
+  .tabla-fichas-movil tbody tr:hover {
+    background-color: #ffffff;
+  }
+
+  .tabla-fichas-movil tbody tr:last-child {
+    margin-bottom: 0;
+  }
+
+  .tabla-fichas-movil tbody td {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 16px;
+    border-bottom: 1px dashed #ddd;
+    white-space: normal;
+    text-align: right;
+  }
+
+  .tabla-fichas-movil tbody td::before {
+    content: attr(data-label);
+    display: block;
+    flex-shrink: 0;
+    font-family: "Inter", sans-serif;
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #888;
+    padding-top: 2px;
+  }
+
+  .tabla-fichas-movil tbody td:last-child {
+    border-bottom: none;
+  }
+
+  .tabla-fichas-movil tbody td:last-child > div {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .tabla-fichas-movil tbody td.text-center {
+    text-align: right;
+  }
+}
+
 /* Form group with label */
 .form-group-industrial {
   display: flex;
