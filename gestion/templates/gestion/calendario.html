@@ -736,16 +736,6 @@
         box-shadow: 2px 2px 0px #000000;
     }
 
-    .cal-footer-btn.green {
-        background-color: #1b5e20;
-        border-color: #0d3d0d;
-    }
-
-    .cal-footer-btn.green:hover {
-        background-color: #2e7d32;
-        color: #ffffff;
-    }
-
     @media (max-width: 1024px) {
         .cal-wrapper {
             flex-direction: column;
@@ -884,10 +874,6 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
                     HISTORIAL
                 </a>
-                <button type="button" class="cal-footer-btn green" onclick="abrirModalEvento('TURNO')">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-                    + NUEVO TURNO
-                </button>
             </div>
         </div>
     </div>
@@ -1035,10 +1021,6 @@
             <a href="{% url 'ingreso_equipo' %}" class="btn-action w-full">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
                 Nuevo Ingreso
-            </a>
-            <a href="{% url 'tablero' %}" class="btn-action w-full" style="background-color:#444444;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
-                Ir al Tablero
             </a>
         </div>
 
