@@ -1,0 +1,93 @@
+{% extends 'gestion/base.html' %}
+
+{% block title %}Registro - C&H Refrigeración{% endblock %}
+{% block page_title %}CREAR CUENTA{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto mt-24">
+    <!-- Registro Card -->
+    <div class="card-industrial">
+        <!-- Header -->
+        <div class="bg-[#1a1a1a] text-white px-6 py-5 border-b-3 border-[#00f900]">
+            <h3 class="text-base font-bold tracking-widest uppercase m-0 font-sans
+                       flex items-center gap-3">
+                <!-- UserPlus icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                     fill="none" stroke="#00f900" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <line x1="19" x2="19" y1="8" y2="14"/>
+                    <line x1="22" x2="16" y1="11" y2="11"/>
+                </svg>
+                CREAR CUENTA
+            </h3>
+        </div>
+
+        <!-- Body -->
+        <div class="p-6">
+            {% if form.errors %}
+                <div class="bg-[#ffdad6] border border-[#ba1a1a] text-[#93000a] px-4 py-2 font-mono text-xs mb-4">
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <div class="flex items-center gap-2">
+                                <!-- AlertTriangle icon -->
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0">
+                                    <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+                                    <path d="M12 9v4"/><path d="M12 17h.01"/>
+                                </svg>
+                                {{ error }}
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+                    {% for error in form.non_field_errors %}
+                        <div class="flex items-center gap-2">
+                            <!-- AlertTriangle icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0">
+                                <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+                                <path d="M12 9v4"/><path d="M12 17h.01"/>
+                            </svg>
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                <div class="form-group-industrial mb-4">
+                    <label for="id_username">USUARIO</label>
+                    {{ form.username }}
+                </div>
+
+                <div class="form-group-industrial mb-4">
+                    <label for="id_password1">CONTRASEÑA</label>
+                    {{ form.password1 }}
+                </div>
+
+                <div class="form-group-industrial mb-5">
+                    <label for="id_password2">CONFIRMAR CONTRASEÑA</label>
+                    {{ form.password2 }}
+                </div>
+
+                <button type="submit"
+                        class="btn-green w-full justify-center text-sm">
+                    <!-- Check icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 6 9 17l-5-5"/>
+                    </svg>
+                    CREAR CUENTA
+                </button>
+
+                <div class="text-center mt-4 text-xs text-[#666]">
+                    ¿Ya tenés cuenta?
+                    <a href="{% url 'login' %}" class="text-[#888] hover:text-[#00f900] transition-colors">Iniciar sesión</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,336 @@
+{% extends 'gestion/base.html' %}
+
+{% block title %}Configuración - C&H Refrigeración{% endblock %}
+{% block page_title %}CONFIGURACIÓN DE SISTEMA{% endblock %}
+{% block nav_configuracion %}active{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto flex flex-col gap-6">
+
+    {% if messages %}
+        {% for message in messages %}
+        <div class="bg-[#77ff61] border border-[#026e00] text-[#002200] px-4 py-2.5 font-mono text-xs font-bold flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 6 9 17l-5-5"/>
+            </svg>
+            <span>{{ message }}</span>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post" class="flex flex-col gap-6" novalidate>
+        {% csrf_token %}
+
+        {# Campos de solo lectura: se mantienen en el POST #}
+        {{ form.id_operador }}
+        {{ form.nivel_acceso }}
+        {{ form.token_valido_horas }}
+
+        <!-- ================================ HEADER ================================ -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#1a1a1a] pb-3">
+            <div>
+                <h2 class="font-mono text-2xl font-bold uppercase tracking-tight text-[#1a1a1a] m-0">
+                    CONFIGURACIÓN DE SISTEMA
+                </h2>
+                <p class="font-mono text-xs text-[#666] uppercase mt-0.5 mb-0">
+                    ID DE OPERADOR: {{ config.id_operador }} // NIVEL DE ACCESO: {{ config.nivel_acceso }}
+                </p>
+            </div>
+
+            <div class="flex items-center gap-2.5">
+                <a href="{% url 'configuracion' %}"
+                   class="btn-industrial btn-outline px-4 py-2 text-xs flex items-center gap-1.5">
+                    <!-- RotateCcw -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                        <path d="M3 3v5h5"/>
+                    </svg>
+                    <span>DESHACER</span>
+                </a>
+
+                <button type="submit"
+                        class="flex items-center gap-1.5 px-6 py-2 bg-[#1a1a1a] text-white border-2 border-[#1a1a1a] font-mono text-xs font-bold uppercase hover:bg-[#333] transition-colors shadow-[2px_2px_0px_0px_rgba(0,249,0,1)] active:translate-x-[1px] active:translate-y-[1px]">
+                    <!-- Save -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                         fill="none" stroke="#00f900" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/>
+                        <path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"/>
+                        <path d="M7 3v4a1 1 0 0 0 1 1h7"/>
+                    </svg>
+                    <span>GUARDAR CAMBIOS</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ================================ TABS ================================ -->
+        <div class="flex border-b border-[#1a1a1a] gap-8 font-mono text-xs font-bold uppercase tracking-wider overflow-x-auto">
+            <button type="button" data-tab="1"
+                    class="pb-2.5 transition-colors relative text-black">
+                <span>1. DATOS DE PERFIL</span>
+                <div class="tab-indicator absolute bottom-0 left-0 right-0 h-1 bg-[#00f900]"></div>
+            </button>
+            <button type="button" data-tab="2"
+                    class="pb-2.5 transition-colors relative text-[#888] hover:text-black">
+                <span>2. MÉTRICAS DEL SISTEMA Y PREFERENCIAS</span>
+                <div class="tab-indicator absolute bottom-0 left-0 right-0 h-1 bg-[#00f900] hidden"></div>
+            </button>
+            <button type="button" data-tab="3"
+                    class="pb-2.5 transition-colors relative text-[#888] hover:text-black">
+                <span>3. CÁLCULOS Y TARIFAS</span>
+                <div class="tab-indicator absolute bottom-0 left-0 right-0 h-1 bg-[#00f900] hidden"></div>
+            </button>
+        </div>
+
+        <!-- ================================ TAB 1: DATOS DE PERFIL ================================ -->
+        <section class="tab-panel border border-[#1a1a1a] bg-white flex flex-col" data-panel="1">
+            <div class="bg-[#f0f0f0] border-b border-[#1a1a1a] px-4 py-2 flex items-center justify-between">
+                <h3 class="font-mono text-xs font-bold uppercase tracking-wider text-[#1a1a1a] m-0">DATOS DE PERFIL</h3>
+                <!-- User -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                     fill="none" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                </svg>
+            </div>
+
+            <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-xs">
+                <div>
+                    <label class="block text-[10px] uppercase text-[#666] font-semibold mb-1">NOMBRE DEL OPERADOR</label>
+                    {{ form.nombre_operador }}
+                </div>
+
+                <div>
+                    <label class="block text-[10px] uppercase text-[#666] font-semibold mb-1">PIN DE FIRMA DIGITAL</label>
+                    <div class="relative">
+                        {{ form.pin_firma_digital }}
+                        <button type="button" id="toggle-pin"
+                                class="absolute right-2 top-1/2 -translate-y-1/2 text-[#888] hover:text-black">
+                            <!-- Eye -->
+                            <svg id="eye-open" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                            <!-- EyeOff -->
+                            <svg id="eye-off" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hidden">
+                                <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/>
+                                <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/>
+                                <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/>
+                                <line x1="2" x2="22" y1="2" y2="22"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] uppercase text-[#666] font-semibold mb-1">ROL / POSICIÓN</label>
+                    {{ form.rol_posicion }}
+                </div>
+
+                <div>
+                    <label class="block text-[10px] uppercase text-[#666] font-semibold mb-1">ESTADO DE AUTENTICACIÓN</label>
+                    <div class="border border-[#1a1a1a] p-2 bg-[#f9f9f9] flex items-center gap-2">
+                        <!-- ShieldCheck -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                             fill="none" stroke="#026d00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1 1 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>
+                            <path d="m9 12 2 2 4-4"/>
+                        </svg>
+                        <div class="flex items-center gap-1.5 text-[11px]">
+                            <span class="w-2 h-2 bg-[#00f900] border border-[#1a1a1a] inline-block"></span>
+                            <span class="font-semibold text-[#1a1a1a]">Token válido (Expira en {{ config.token_valido_horas }}h)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================== TAB 2: MÉTRICAS DEL SISTEMA Y PREFERENCIAS ===================== -->
+        <section class="tab-panel hidden border border-[#1a1a1a] bg-white flex flex-col" data-panel="2">
+            <div class="bg-[#f0f0f0] border-b border-[#1a1a1a] px-4 py-2 flex items-center justify-between">
+                <h3 class="font-mono text-xs font-bold uppercase tracking-wider text-[#1a1a1a] m-0">MÉTRICAS DEL SISTEMA Y PREFERENCIAS</h3>
+                <!-- Sliders -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                     fill="none" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/>
+                    <line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/>
+                    <line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/>
+                    <line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/>
+                </svg>
+            </div>
+
+            <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-6 font-mono text-xs">
+                <div class="flex flex-col gap-3">
+                    <div>
+                        <label class="block text-[10px] uppercase text-[#666] font-semibold mb-1">UNIDADES DE PRESIÓN</label>
+                        {{ form.unidades_presion }}
+                    </div>
+                    <div>
+                        <label class="block text-[10px] uppercase text-[#666] font-semibold mb-1">UNIDADES DE TEMPERATURA</label>
+                        {{ form.unidades_temperatura }}
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-3">
+                    <span class="block text-[10px] uppercase text-[#666] font-semibold">UMBRALES DE ALERTA CRÍTICA</span>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[9px] uppercase text-[#777] mb-0.5">TEMP MÁX ADV</label>
+                            <div class="flex">
+                                {{ form.temp_max_adv }}
+                                <span class="bg-[#f0f0f0] border border-[#1a1a1a] px-2 py-2 text-[11px]">°C</span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[9px] uppercase text-[#ba1a1a] font-bold mb-0.5">TEMP MÁX CRÍT</label>
+                            <div class="flex">
+                                {{ form.temp_max_crit }}
+                                <span class="bg-[#ffdad6] border border-[#ba1a1a] px-2 py-2 text-[11px] text-[#93000a] font-bold">°C</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[9px] uppercase text-[#777] mb-0.5">PRES MÁX ADV</label>
+                            <div class="flex">
+                                {{ form.pres_max_adv }}
+                                <span class="bg-[#f0f0f0] border border-[#1a1a1a] px-2 py-2 text-[11px]">PSI</span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[9px] uppercase text-[#ba1a1a] font-bold mb-0.5">PRES MÁX CRÍT</label>
+                            <div class="flex">
+                                {{ form.pres_max_crit }}
+                                <span class="bg-[#ffdad6] border border-[#ba1a1a] px-2 py-2 text-[11px] text-[#93000a] font-bold">PSI</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================================ TAB 3: CÁLCULOS Y TARIFAS ================================ -->
+        <section class="tab-panel hidden border border-[#1a1a1a] bg-white flex flex-col" data-panel="3">
+            <div class="bg-[#f0f0f0] border-b border-[#1a1a1a] px-4 py-2 flex items-center justify-between">
+                <h3 class="font-mono text-xs font-bold uppercase tracking-wider text-[#1a1a1a] m-0">CÁLCULOS Y TARIFAS</h3>
+                <!-- Calculator -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                     fill="none" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect width="16" height="20" x="4" y="2" rx="2"/>
+                    <line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/>
+                    <path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/>
+                    <path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/>
+                </svg>
+            </div>
+
+            <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-6 font-mono text-xs">
+                <div class="flex flex-col gap-3">
+                    <div>
+                        <label class="block text-[10px] uppercase text-[#666] font-semibold mb-1">VALOR DE HORA TÉCNICA ($)</label>
+                        <div class="flex">
+                            <span class="bg-[#1a1a1a] text-white border border-[#1a1a1a] px-3 py-2 font-bold">$</span>
+                            {{ form.valor_hora_tecnica_usd }}
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] uppercase text-[#666] font-semibold mb-1">TIPO DE CAMBIO (USD/ARS)</label>
+                        <div class="flex">
+                            <span class="bg-[#1a1a1a] text-white border border-[#1a1a1a] px-3 py-2 font-bold">$</span>
+                            {{ form.tipo_cambio_usd_ars }}
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] uppercase text-[#666] font-semibold mb-1">MARGEN DE GANANCIA SUGERIDO (%)</label>
+                        <div class="flex">
+                            {{ form.margen_ganancia_sugerido }}
+                            <span class="bg-[#f1c100] text-black border border-[#1a1a1a] px-3 py-2 font-bold">%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border border-[#1a1a1a] p-3 bg-[#f9f9f9] flex flex-col gap-3">
+                    <span class="block text-[10px] uppercase text-[#666] font-semibold border-b border-[#ddd] pb-1">TARIFAS DE SERVICIO</span>
+
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-[#1a1a1a]">DIAGNÓSTICO</span>
+                        <div class="flex items-center w-36">
+                            <span class="bg-[#f0f0f0] border border-[#1a1a1a] border-r-0 px-2 py-1">$</span>
+                            {{ form.tarifa_diagnostico_usd }}
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-[#1a1a1a]">MANTENIMIENTO (ESTÁNDAR)</span>
+                        <div class="flex items-center w-36">
+                            <span class="bg-[#f0f0f0] border border-[#1a1a1a] border-r-0 px-2 py-1">$</span>
+                            {{ form.tarifa_mantenimiento_usd }}
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-2 border-t border-[#ddd]">
+                        <div class="flex items-center gap-1.5 text-[#ba1a1a]">
+                            <!-- AlertTriangle -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+                                <path d="M12 9v4"/><path d="M12 17h.01"/>
+                            </svg>
+                            <span class="font-bold">MULTIPLICADOR DE URGENCIA</span>
+                        </div>
+                        <div class="flex items-center w-28">
+                            {{ form.multiplicador_urgencia }}
+                            <span class="bg-[#ffdad6] border border-[#ba1a1a] text-[#ba1a1a] px-2 py-1 font-bold">X</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function () {
+        // ===== TABS =====
+        const tabBtns = document.querySelectorAll('[data-tab]');
+        const panels = document.querySelectorAll('.tab-panel');
+
+        function activateTab(tabId) {
+            panels.forEach(p => {
+                p.classList.toggle('hidden', p.dataset.panel !== String(tabId));
+            });
+            tabBtns.forEach(b => {
+                const active = b.dataset.tab === String(tabId);
+                b.classList.toggle('text-black', active);
+                b.classList.toggle('text-[#888]', !active);
+                b.classList.toggle('hover:text-black', !active);
+                const indicator = b.querySelector('.tab-indicator');
+                if (indicator) indicator.classList.toggle('hidden', !active);
+            });
+        }
+
+        tabBtns.forEach(b => b.addEventListener('click', () => activateTab(b.dataset.tab)));
+        activateTab(1);
+
+        // ===== PIN: mostrar / ocultar =====
+        const pinInput = document.getElementById('id_pin_firma_digital');
+        const pinToggle = document.getElementById('toggle-pin');
+        if (pinInput && pinToggle) {
+            pinToggle.addEventListener('click', () => {
+                const show = pinInput.type === 'password';
+                pinInput.type = show ? 'text' : 'password';
+                document.getElementById('eye-open').classList.toggle('hidden', show);
+                document.getElementById('eye-off').classList.toggle('hidden', !show);
+            });
+        }
+    })();
+</script>
+{% endblock %}

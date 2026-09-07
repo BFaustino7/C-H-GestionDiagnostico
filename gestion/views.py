@@ -2,12 +2,15 @@ import json
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from django.contrib.auth import login as auth_login
 from datetime import datetime
 
 # --- MODELOS Y FORMULARIOS ---
-from .models import OrdenReparacion, Equipo, FichaTecnica, Producto, Cliente
+from .models import OrdenReparacion, Equipo, FichaTecnica, Producto, Cliente, ConfiguracionSistema
 from .forms import (ClienteForm, EquipoForm, OrdenIngresoForm, 
-                    OrdenTecnicaForm, EspecificacionesForm, EventoCalendarioForm)
+                    OrdenTecnicaForm, EspecificacionesForm, EventoCalendarioForm,
+                    ConfiguracionSistemaForm, RegistroUsuarioForm)
 
 # --- CAPAS DE ABSTRACCIÓN (MODULARIZACIÓN) ---
 from . import query_selectors as sel  # Nombre corregido
@@ -30,6 +33,7 @@ def tablero_principal(request):
         'banco_pruebas': generar_datos_banco_pruebas(equipos_monitoreo),
     })
 
+@login_required
 def ingreso_equipo(request):
     if request.method == 'POST':
         c_form, e_form, o_form = ClienteForm(request.POST), EquipoForm(request.POST), OrdenIngresoForm(request.POST)
@@ -43,6 +47,7 @@ def ingreso_equipo(request):
         'cliente_form': c_form, 'equipo_form': e_form, 'orden_form': o_form
     })
 
+@login_required
 def detalle_orden(request, orden_id):
     orden = get_object_or_404(OrdenReparacion, pk=orden_id)
     equipo = orden.equipo
@@ -70,10 +75,12 @@ def detalle_orden(request, orden_id):
         'total_repuestos': sum(item.precio_congelado * item.cantidad for item in orden.detalleinsumo_set.all())
     })
 
+@login_required
 def imprimir_remito(request, orden_id):
     orden = get_object_or_404(OrdenReparacion, pk=orden_id)
     return render(request, 'gestion/remito_imprimible.html', {'orden': orden})
 
+@login_required
 def lista_clientes(request):
     query = request.GET.get('q', '')   
     clientes = sel.buscar_clientes(query)
@@ -84,6 +91,7 @@ def lista_clientes(request):
         'total_clientes': clientes.count()
     })
 
+@login_required
 def lista_equipos(request):
     tipo = request.GET.get('tipo')
     equipos_list, counts = sel.get_equipos_con_stats(tipo)
@@ -99,6 +107,7 @@ def lista_equipos(request):
         'tipo_actual': tipo # Coincide con el HTML corregido
     })
 
+@login_required
 def historial_equipo(request, equipo_id):
     equipo = get_object_or_404(Equipo.objects.prefetch_related('ficha'), id=equipo_id)
     return render(request, 'gestion/historial_equipo.html', {
@@ -106,6 +115,7 @@ def historial_equipo(request, equipo_id):
         'ordenes': sel.get_historial_equipo(equipo_id)
     })
 
+@login_required
 def calendario_taller(request):
     hoy = datetime.now()
     try:
@@ -121,6 +131,7 @@ def calendario_taller(request):
     
     return render(request, 'gestion/calendario.html', contexto)
 
+@login_required
 def crear_evento_api(request):
     if request.method == 'POST':
         try:
@@ -138,10 +149,20 @@ def crear_evento_api(request):
             
     return api_error(message='Método no permitido', status=405)
 
+@login_required
 def configuracion_sistema(request):
-    productos = Producto.objects.all()
-    return render(request, 'gestion/configuracion.html', {'productos': productos})
+    config = ConfiguracionSistema.obtener()
+    if request.method == 'POST':
+        form = ConfiguracionSistemaForm(request.POST, instance=config)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Configuración, umbrales y tarifas actualizadas en el sistema SCADA.')
+            return redirect('configuracion')
+    else:
+        form = ConfiguracionSistemaForm(instance=config)
+    return render(request, 'gestion/configuracion.html', {'form': form, 'config': config})
 
+@login_required
 def editar_cliente(request, cliente_id):
     cliente = get_object_or_404(Cliente, pk=cliente_id)
     
@@ -155,3 +176,16 @@ def editar_cliente(request, cliente_id):
         'form': form,
         'cliente': cliente
     })
+
+def registro_usuario(request):
+    if request.user.is_authenticated:
+        return redirect('tablero')
+    if request.method == 'POST':
+        form = RegistroUsuarioForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            auth_login(request, user)
+            return redirect('tablero')
+    else:
+        form = RegistroUsuarioForm()
+    return render(request, 'gestion/registro.html', {'form': form})

@@ -14,6 +14,7 @@ urlpatterns = [
     # --- RUTAS DE AUTENTICACIÓN ---
     path('login/', auth_views.LoginView.as_view(template_name='gestion/login.html', redirect_authenticated_user=True), name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
+    path('registro/', views.registro_usuario, name='registro'),
     # --- MISMA RUTA (única) ---
     path('calendario/', views.calendario_taller, name='calendario'),
     path('configuracion/', views.configuracion_sistema, name='configuracion'),
