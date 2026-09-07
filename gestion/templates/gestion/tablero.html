@@ -176,7 +176,7 @@
     </div>
 
     <div class="collapsible-body overflow-x-auto">
-        <table class="table-industrial">
+        <table class="table-industrial tabla-fichas-movil">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -190,13 +190,13 @@
             <tbody>
                 {% for orden in ordenes_en_proceso %}
                 <tr>
-                    <td class="font-bold">#{{ orden.id }}</td>
-                    <td>{{ orden.equipo.cliente.nombre }}</td>
-                    <td>
+                    <td data-label="ID" class="font-bold">#{{ orden.id }}</td>
+                    <td data-label="CLIENTE">{{ orden.equipo.cliente.nombre }}</td>
+                    <td data-label="EQUIPO">
                         <span class="text-[#1a1a1a]">{{ orden.equipo.get_tipo_display }}</span>
                         <span class="text-[#666]">{{ orden.equipo.marca }} {{ orden.equipo.modelo }}</span>
                     </td>
-                    <td>
+                    <td data-label="ESTADO">
                         {% if orden.estado == 'PENDIENTE' %}
                             <span class="badge-status badge-amber">Pendiente</span>
                         {% elif orden.estado == 'DIAGNOSTICO' %}
@@ -207,8 +207,8 @@
                             <span class="badge-status badge-cyan">{{ orden.get_estado_display }}</span>
                         {% endif %}
                     </td>
-                    <td class="text-[#666]">{{ orden.fecha_ingreso|date:"d/m/Y" }}</td>
-                    <td>
+                    <td data-label="INGRESO" class="text-[#666]">{{ orden.fecha_ingreso|date:"d/m/Y" }}</td>
+                    <td data-label="ACCIONES">
                         <div class="flex items-center gap-1.5">
                             <a href="{% url 'detalle_orden' orden_id=orden.id %}"
                                class="btn-industrial btn-green text-[0.7rem] py-1.5 px-3">
@@ -275,7 +275,7 @@
     </div>
 
     <div class="collapsible-body overflow-x-auto">
-        <table class="table-industrial">
+        <table class="table-industrial tabla-fichas-movil">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -289,17 +289,17 @@
             <tbody>
                 {% for orden in ordenes_para_entregar %}
                 <tr>
-                    <td class="font-bold">#{{ orden.id }}</td>
-                    <td>{{ orden.equipo.cliente.nombre }}</td>
-                    <td>
+                    <td data-label="ID" class="font-bold">#{{ orden.id }}</td>
+                    <td data-label="CLIENTE">{{ orden.equipo.cliente.nombre }}</td>
+                    <td data-label="EQUIPO">
                         <span class="text-[#1a1a1a]">{{ orden.equipo.get_tipo_display }}</span>
                         <span class="text-[#666]">{{ orden.equipo.marca }} {{ orden.equipo.modelo }}</span>
                     </td>
-                    <td>
+                    <td data-label="ESTADO">
                         <span class="badge-status badge-cyan">Completado</span>
                     </td>
-                    <td class="text-[#666]">{{ orden.fecha_ingreso|date:"d/m/Y" }}</td>
-                    <td>
+                    <td data-label="INGRESO" class="text-[#666]">{{ orden.fecha_ingreso|date:"d/m/Y" }}</td>
+                    <td data-label="ACCIONES">
                         <div class="flex items-center gap-1.5">
                             <a href="{% url 'detalle_orden' orden_id=orden.id %}"
                                class="btn-industrial btn-green text-[0.7rem] py-1.5 px-3">
@@ -369,7 +369,7 @@
         </div>
 
         <div class="collapsible-body overflow-x-auto">
-            <table class="table-industrial">
+            <table class="table-industrial tabla-fichas-movil">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -381,13 +381,13 @@
                 <tbody>
                     {% for orden in ordenes_entregadas %}
                     <tr>
-                        <td class="font-bold">#{{ orden.id }}</td>
-                        <td>{{ orden.equipo.cliente.nombre }}</td>
-                        <td>
+                        <td data-label="ID" class="font-bold">#{{ orden.id }}</td>
+                        <td data-label="CLIENTE">{{ orden.equipo.cliente.nombre }}</td>
+                        <td data-label="EQUIPO">
                             <span class="text-[#1a1a1a]">{{ orden.equipo.get_tipo_display }}</span>
                             <span class="text-[#666]">{{ orden.equipo.marca }}</span>
                         </td>
-                        <td class="text-[#666]">{{ orden.fecha_ingreso|date:"d/m/Y" }}</td>
+                        <td data-label="FECHA" class="text-[#666]">{{ orden.fecha_ingreso|date:"d/m/Y" }}</td>
                     </tr>
                     {% empty %}
                     <tr>

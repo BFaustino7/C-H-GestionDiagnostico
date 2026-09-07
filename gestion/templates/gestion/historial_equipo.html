@@ -48,7 +48,7 @@
 <div class="card-industrial overflow-hidden">
     {% if ordenes %}
     <div class="overflow-x-auto">
-        <table class="table-industrial">
+        <table class="table-industrial tabla-fichas-movil">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -63,9 +63,9 @@
             <tbody>
                 {% for orden in ordenes %}
                 <tr>
-                    <td class="font-mono text-sm">#{{ orden.id|stringformat:"05d" }}</td>
-                    <td class="font-mono text-sm">{{ orden.fecha_ingreso|date:"d/m/Y" }}</td>
-                    <td>
+                    <td data-label="ID" class="font-mono text-sm">#{{ orden.id|stringformat:"05d" }}</td>
+                    <td data-label="FECHA" class="font-mono text-sm">{{ orden.fecha_ingreso|date:"d/m/Y" }}</td>
+                    <td data-label="ESTADO">
                         {% if orden.estado == 'PENDIENTE' %}
                             <span class="badge-red">{{ orden.get_estado_display }}</span>
                         {% elif orden.estado == 'DIAGNOSTICO' %}
@@ -82,18 +82,18 @@
                             <span class="badge-status">{{ orden.get_estado_display }}</span>
                         {% endif %}
                     </td>
-                    <td class="max-w-xs text-sm text-[#555] truncate" title="{{ orden.diagnostico_tecnico }}">
+                    <td data-label="DIAGNOSTICO" class="max-w-xs text-sm text-[#555] truncate" title="{{ orden.diagnostico_tecnico }}">
                         {{ orden.diagnostico_tecnico|default:"Sin diagnostico"|truncatewords:10 }}
                     </td>
-                    <td class="font-mono text-sm">
+                    <td data-label="REPUESTOS" class="font-mono text-sm">
                         {% if orden.detalleinsumo_set.all %}
                             {{ orden.detalleinsumo_set.all|length }} items
                         {% else %}
                             <span class="text-[#999]">-</span>
                         {% endif %}
                     </td>
-                    <td class="font-mono text-right font-bold text-[#0066cc]">${{ orden.total_calculado|stringformat:".2f" }}</td>
-                    <td class="text-center">
+                    <td data-label="COSTO" class="font-mono text-right font-bold text-[#0066cc]">${{ orden.total_calculado|stringformat:".2f" }}</td>
+                    <td data-label="DETALLE" class="text-center">
                         <a href="{% url 'detalle_orden' orden.id %}" class="btn-outline inline-flex items-center gap-2 text-xs">
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
                             VER

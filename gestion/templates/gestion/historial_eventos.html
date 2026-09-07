@@ -39,7 +39,7 @@
 
     {# Tabla #}
     <div class="overflow-x-auto">
-        <table class="table-industrial">
+        <table class="table-industrial tabla-fichas-movil">
             <thead>
                 <tr>
                     <th>Fecha / Hora</th>
@@ -54,8 +54,8 @@
             <tbody>
                 {% for evento in eventos %}
                 <tr>
-                    <td class="font-mono text-sm">{{ evento.fecha_hora|date:"d/m/Y H:i" }}</td>
-                    <td>
+                    <td data-label="FECHA / HORA" class="font-mono text-sm">{{ evento.fecha_hora|date:"d/m/Y H:i" }}</td>
+                    <td data-label="TIPO">
                         {% if evento.tipo == 'ENTREGA' %}
                         <span style="background-color:#e8f5e9; color:#1b5e20; border:1px solid #2e7d32; font-family:'JetBrains Mono',monospace; font-size:0.65rem; font-weight:700; padding:2px 8px;">ENTREGA</span>
                         {% elif evento.tipo == 'TURNO' %}
@@ -64,19 +64,19 @@
                         <span style="background-color:#ffebee; color:#b71c1c; border:1px solid #c62828; font-family:'JetBrains Mono',monospace; font-size:0.65rem; font-weight:700; padding:2px 8px;">ALERTA</span>
                         {% endif %}
                     </td>
-                    <td class="font-medium text-[#1a1a1a]">{{ evento.titulo }}</td>
-                    <td>
+                    <td data-label="TITULO / ASUNTO" class="font-medium text-[#1a1a1a]">{{ evento.titulo }}</td>
+                    <td data-label="CLIENTE">
                         {% if evento.orden %}{{ evento.orden.equipo.cliente.nombre }}{% else %}<span class="text-[#999]">-</span>{% endif %}
                     </td>
-                    <td class="font-mono text-sm">{{ evento.tag|default:"-" }}</td>
-                    <td>
+                    <td data-label="TAG" class="font-mono text-sm">{{ evento.tag|default:"-" }}</td>
+                    <td data-label="ESTADO">
                         {% if evento.completado %}
                         <span class="badge-status badge-green">Completado</span>
                         {% else %}
                         <span class="badge-status badge-amber">Pendiente</span>
                         {% endif %}
                     </td>
-                    <td class="text-center">
+                    <td data-label="ACCIONES" class="text-center">
                         <button type="button"
                                 class="btn-outline text-xs px-3 py-1 uppercase"
                                 data-url="{% url 'toggle_evento_api' evento.id %}"

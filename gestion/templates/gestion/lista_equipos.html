@@ -100,7 +100,7 @@
 <div class="card-industrial overflow-hidden">
     {% if lista_equipos %}
     <div class="overflow-x-auto">
-        <table class="table-industrial">
+        <table class="table-industrial tabla-fichas-movil">
             <thead>
                 <tr>
                     <th>TIPO</th>
@@ -115,7 +115,7 @@
             <tbody>
                 {% for equipo in lista_equipos %}
                 <tr class="cursor-pointer" onclick="window.location='{% url 'historial_equipo' equipo_id=equipo.id %}'">
-                    <td>
+                    <td data-label="TIPO">
                         <span class="inline-flex items-center gap-2 font-bold tracking-wider uppercase text-sm">
                             {% if equipo.tipo == 'SPLIT' %}SPLIT
                             {% elif equipo.tipo == 'HELADERA' %}HELADERA
@@ -124,17 +124,17 @@
                             {% else %}{{ equipo.tipo }}{% endif %}
                         </span>
                     </td>
-                    <td class="font-medium">{{ equipo.marca }}</td>
-                    <td class="font-mono text-sm">{{ equipo.modelo }}</td>
-                    <td class="text-[#0066cc]">{{ equipo.cliente.nombre }}</td>
-                    <td class="font-mono text-sm">
+                    <td data-label="MARCA" class="font-medium">{{ equipo.marca }}</td>
+                    <td data-label="MODELO" class="font-mono text-sm">{{ equipo.modelo }}</td>
+                    <td data-label="CLIENTE" class="text-[#0066cc]">{{ equipo.cliente.nombre }}</td>
+                    <td data-label="ULTIMO SERVICE" class="font-mono text-sm">
                         {% if equipo.ultimo_service %}
                             {{ equipo.ultimo_service|date:"d/m/Y" }}
                         {% else %}
                             <span class="text-[#999]">Sin registros</span>
                         {% endif %}
                     </td>
-                    <td class="text-center">
+                    <td data-label="ESTADO" class="text-center">
                         {% if equipo.dias_desde_service <= 90 %}
                             <span class="badge-green">OK</span>
                         {% elif equipo.dias_desde_service <= 180 %}
@@ -143,7 +143,7 @@
                             <span class="badge-red">VENCIDO</span>
                         {% endif %}
                     </td>
-                    <td class="text-center">
+                    <td data-label="ACCIONES" class="text-center">
                         <a href="{% url 'historial_equipo' equipo_id=equipo.id %}"
                            class="btn-outline inline-flex items-center gap-2 text-xs"
                            onclick="event.stopPropagation()">
