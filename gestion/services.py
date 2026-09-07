@@ -121,7 +121,7 @@ class ServicioCalendario:
         fecha_fin = datetime(anio, mes, ultimo_dia, 23, 59, 59)
         
         # 2. Consultar BD (El __range es vital para MSSQL)
-        eventos = EventoCalendario.objects.filter(fecha_hora__range=(fecha_inicio, fecha_fin))
+        eventos = EventoCalendario.objects.select_related('orden__equipo__cliente').filter(fecha_hora__range=(fecha_inicio, fecha_fin))
         ordenes = OrdenReparacion.objects.filter(fecha_ingreso__range=(fecha_inicio, fecha_fin), estado__in=['PENDIENTE', 'DIAGNOSTICO'])
 
         # 3. Agrupar con defaultdict
@@ -132,14 +132,22 @@ class ServicioCalendario:
             dia = ev.fecha_hora.date().day 
             eventos_por_dia[dia][ev.tipo].append({
                 'hora': ev.fecha_hora.strftime('%H:%M'), 
-                'descripcion': ev.titulo
+                'descripcion': ev.titulo,
+                'ev_id': ev.id,
+                'completado': ev.completado,
+                'cliente': ev.orden.equipo.cliente.nombre if ev.orden else '',
+                'equipo': f"{ev.orden.equipo.get_tipo_display()} {ev.orden.equipo.marca}".strip() if ev.orden else '',
             })
             
         for orden in ordenes:
             dia = orden.fecha_ingreso.date().day
             eventos_por_dia[dia]['TURNO'].append({
                 'hora': orden.fecha_ingreso.strftime('%H:%M'), 
-                'descripcion': f"Ingreso: {orden.equipo.cliente.nombre}"
+                'descripcion': f"Ingreso: {orden.equipo.cliente.nombre}",
+                'ev_id': None,
+                'completado': False,
+                'cliente': orden.equipo.cliente.nombre,
+                'equipo': '',
             })
 
         # 4. Construir la grilla

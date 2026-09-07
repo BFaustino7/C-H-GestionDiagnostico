@@ -1,5 +1,6 @@
 import json
 from django.core.paginator import Paginator
+from django.db.models import Q, Count
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
@@ -8,7 +9,7 @@ from django.utils import timezone
 from datetime import datetime
 
 # --- MODELOS Y FORMULARIOS ---
-from .models import OrdenReparacion, Equipo, FichaTecnica, Producto, Cliente, ConfiguracionSistema, Alarma
+from .models import OrdenReparacion, Equipo, FichaTecnica, Producto, Cliente, ConfiguracionSistema, Alarma, EventoCalendario
 from .forms import (ClienteForm, EquipoForm, OrdenIngresoForm, 
                     OrdenTecnicaForm, EspecificacionesForm, EventoCalendarioForm,
                     ConfiguracionSistemaForm, RegistroUsuarioForm)
@@ -84,7 +85,7 @@ def imprimir_remito(request, orden_id):
 @login_required
 def lista_clientes(request):
     query = request.GET.get('q', '')   
-    clientes = sel.buscar_clientes(query)
+    clientes = sel.buscar_clientes(query).annotate(total_equipos=Count('equipo'))
     
     return render(request, 'gestion/lista_clientes.html', {
         'lista_clientes': clientes,
@@ -129,8 +130,66 @@ def calendario_taller(request):
     
     # Le pasamos un formulario vacío para renderizar en el modal
     contexto['form_evento'] = EventoCalendarioForm() 
+
+    # Paneles del sidebar: ALERTAS DE HOY y PRÓXIMAS ENTREGAS
+    ahora = timezone.localtime(timezone.now())
+    hoy_date = ahora.date()
+    contexto['alertas_hoy'] = EventoCalendario.objects.filter(
+        tipo='ALERTA', completado=False, fecha_hora__date=hoy_date
+    ).order_by('fecha_hora')
+    contexto['proximas_entregas'] = EventoCalendario.objects.filter(
+        tipo='ENTREGA', completado=False, fecha_hora__gte=ahora
+    ).select_related('orden__equipo__cliente').order_by('fecha_hora')[:5]
     
     return render(request, 'gestion/calendario.html', contexto)
+
+@login_required
+def historial_eventos(request):
+    """Lista eventos pasados o completados, ordenados de más reciente a más antiguo."""
+    ahora = timezone.now()
+    eventos = EventoCalendario.objects.select_related('orden__equipo__cliente').filter(
+        Q(fecha_hora__lt=ahora) | Q(completado=True)
+    ).order_by('-fecha_hora')
+
+    tipo = request.GET.get('tipo')
+    if tipo in ('TURNO', 'ENTREGA', 'ALERTA'):
+        eventos = eventos.filter(tipo=tipo)
+
+    paginator = Paginator(eventos, 15)
+    eventos_paginados = paginator.get_page(request.GET.get('page'))
+
+    return render(request, 'gestion/historial_eventos.html', {
+        'eventos': eventos_paginados,
+        'tipo_actual': tipo,
+    })
+
+@login_required
+def toggle_evento_api(request, evento_id):
+    """Alterna el estado completado/pendiente de un evento del calendario."""
+    if request.method != 'POST':
+        return api_error(message='Método no permitido', status=405)
+    evento = EventoCalendario.objects.filter(pk=evento_id).first()
+    if not evento:
+        return api_error(message='Evento no encontrado', status=404)
+    evento.completado = not evento.completado
+    evento.save()
+    return api_success({'completado': evento.completado})
+
+@login_required
+def eliminar_cliente(request, cliente_id):
+    """Elimina un cliente SIEMPRE que no tenga equipos vinculados (protege contra borrado en cascada)."""
+    if request.method != 'POST':
+        return api_error(message='Método no permitido', status=405)
+    cliente = Cliente.objects.filter(pk=cliente_id).first()
+    if not cliente:
+        return api_error(message='Cliente no encontrado', status=404)
+    if Equipo.objects.filter(cliente=cliente).exists():
+        return api_error(
+            message='No se puede eliminar el cliente: tiene equipos vinculados. Eliminá o reasigná los equipos primero.',
+            status=400
+        )
+    cliente.delete()
+    return api_success()
 
 @login_required
 def crear_evento_api(request):

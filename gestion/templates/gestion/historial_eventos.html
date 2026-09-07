@@ -1,0 +1,156 @@
+{% extends 'gestion/base.html' %}
+
+{% block title %}Historial de Eventos - C&H Refrigeración{% endblock %}
+{% block page_title %}Historial de Registros{% endblock %}
+{% block nav_calendario %}active{% endblock %}
+
+{% block content %}
+
+<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+<div class="card-industrial overflow-hidden">
+    {# Header del panel #}
+    <div class="px-5 py-4 border-b-2 border-[#00e5ff] bg-[#1a1a1a] flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
+            <h3 class="font-mono text-sm uppercase tracking-widest font-bold m-0 text-white">Historial de Registros</h3>
+        </div>
+
+        {# Filtro por tipo #}
+        <div class="flex items-center border border-[#444] bg-black text-[11px] font-mono">
+            <a href="?tipo=TURNO"
+               class="px-3 py-1.5 uppercase no-underline transition-colors {% if tipo_actual == 'TURNO' %}bg-[#00e5ff] text-[#003344] font-bold{% else %}text-[#888] hover:text-white{% endif %}">
+                Turnos
+            </a>
+            <a href="?tipo=ENTREGA"
+               class="px-3 py-1.5 uppercase no-underline transition-colors {% if tipo_actual == 'ENTREGA' %}bg-[#77ff61] text-[#002200] font-bold{% else %}text-[#888] hover:text-white{% endif %}">
+                Entregas
+            </a>
+            <a href="?tipo=ALERTA"
+               class="px-3 py-1.5 uppercase no-underline transition-colors {% if tipo_actual == 'ALERTA' %}bg-[#ffcc00] text-[#4f3d00] font-bold{% else %}text-[#888] hover:text-white{% endif %}">
+                Alertas
+            </a>
+            <a href="?"
+               class="px-3 py-1.5 uppercase no-underline transition-colors {% if not tipo_actual %}bg-[#ffffff] text-[#1a1a1a] font-bold{% else %}text-[#888] hover:text-white{% endif %}">
+                Todos
+            </a>
+        </div>
+    </div>
+
+    {# Tabla #}
+    <div class="overflow-x-auto">
+        <table class="table-industrial">
+            <thead>
+                <tr>
+                    <th>Fecha / Hora</th>
+                    <th>Tipo</th>
+                    <th>Título / Asunto</th>
+                    <th>Cliente</th>
+                    <th>Tag</th>
+                    <th>Estado</th>
+                    <th class="text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for evento in eventos %}
+                <tr>
+                    <td class="font-mono text-sm">{{ evento.fecha_hora|date:"d/m/Y H:i" }}</td>
+                    <td>
+                        {% if evento.tipo == 'ENTREGA' %}
+                        <span style="background-color:#e8f5e9; color:#1b5e20; border:1px solid #2e7d32; font-family:'JetBrains Mono',monospace; font-size:0.65rem; font-weight:700; padding:2px 8px;">ENTREGA</span>
+                        {% elif evento.tipo == 'TURNO' %}
+                        <span style="background-color:#e3f2fd; color:#0d47a1; border:1px solid #1565c0; font-family:'JetBrains Mono',monospace; font-size:0.65rem; font-weight:700; padding:2px 8px;">TURNO</span>
+                        {% else %}
+                        <span style="background-color:#ffebee; color:#b71c1c; border:1px solid #c62828; font-family:'JetBrains Mono',monospace; font-size:0.65rem; font-weight:700; padding:2px 8px;">ALERTA</span>
+                        {% endif %}
+                    </td>
+                    <td class="font-medium text-[#1a1a1a]">{{ evento.titulo }}</td>
+                    <td>
+                        {% if evento.orden %}{{ evento.orden.equipo.cliente.nombre }}{% else %}<span class="text-[#999]">-</span>{% endif %}
+                    </td>
+                    <td class="font-mono text-sm">{{ evento.tag|default:"-" }}</td>
+                    <td>
+                        {% if evento.completado %}
+                        <span class="badge-status badge-green">Completado</span>
+                        {% else %}
+                        <span class="badge-status badge-amber">Pendiente</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-center">
+                        <button type="button"
+                                class="btn-outline text-xs px-3 py-1 uppercase"
+                                data-url="{% url 'toggle_evento_api' evento.id %}"
+                                onclick="alternarCompletado(this)">
+                            {% if evento.completado %}Marcar Pendiente{% else %}Marcar Completado{% endif %}
+                        </button>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-10">
+                        <span class="font-mono text-sm text-[#999] uppercase tracking-wider">No hay eventos en el historial</span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {# Footer: paginación + volver #}
+    <div class="px-5 py-3 bg-[#f9f9f9] border-t-2 border-[#eee] flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+            <a href="{% url 'calendario' %}" class="btn-industrial btn-green text-[0.7rem] py-1.5 px-3 inline-flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                Volver al Calendario
+            </a>
+            <span class="font-mono text-xs text-[#666]">
+                Página {{ eventos.number }} de {{ eventos.paginator.num_pages }}
+            </span>
+        </div>
+        {% if eventos.has_other_pages %}
+        <div class="flex items-center gap-2">
+            {% if eventos.has_previous %}
+            <a href="?page={{ eventos.previous_page_number }}{% if tipo_actual %}&tipo={{ tipo_actual }}{% endif %}"
+               class="btn-outline text-xs px-3 py-1">Anterior</a>
+            {% endif %}
+            {% if eventos.has_next %}
+            <a href="?page={{ eventos.next_page_number }}{% if tipo_actual %}&tipo={{ tipo_actual }}{% endif %}"
+               class="btn-outline text-xs px-3 py-1">Siguiente</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+window.alternarCompletado = function(btn) {
+    if (!confirm('¿Querés cambiar el estado de este evento?')) return;
+
+    const tokenInput = document.querySelector('[name=csrfmiddlewaretoken]');
+    var token = tokenInput ? tokenInput.value : '';
+    if (!token) {
+        const match = document.cookie.match(/csrftoken=([^;]+)/);
+        if (match) token = match[1];
+    }
+
+    fetch(btn.getAttribute('data-url'), {
+        method: 'POST',
+        headers: { 'X-CSRFToken': token }
+    })
+    .then(function(response) { return response.json(); })
+    .then(function(data) {
+        if (data.status === 'success') {
+            window.location.reload();
+        } else {
+            alert(data.message || 'No se pudo actualizar el evento.');
+        }
+    })
+    .catch(function() {
+        alert('Error de conexión con el servidor.');
+    });
+};
+</script>
+{% endblock %}

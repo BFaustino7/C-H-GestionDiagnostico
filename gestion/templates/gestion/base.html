@@ -176,6 +176,12 @@
                     <path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/>
                 </svg>
                 <span class="max-lg:hidden">Alarmas</span>
+                {% if alarmas_activas_count %}
+                <span class="max-lg:hidden"
+                      style="background-color:#c62828; color:#ffffff; padding:2px 8px; margin-left:8px; font-family:'JetBrains Mono',monospace; font-size:0.7rem; font-weight:700; border:1px solid #000000;">
+                    {{ alarmas_activas_count }}
+                </span>
+                {% endif %}
             </a>
         </div>
 

@@ -6,6 +6,8 @@
 
 {% block content %}
 
+<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
 <!-- Buscador -->
 <div class="card-industrial p-5 mb-6">
     <div class="flex items-center justify-between gap-3 mb-4">
@@ -41,6 +43,7 @@
                     <th>TELEFONO</th>
                     <th>DIRECCION</th>
                     <th>EMAIL</th>
+                    <th class="text-center">EQUIPOS</th>
                     <th class="text-center">ACCIONES</th>
                 </tr>
             </thead>
@@ -52,10 +55,25 @@
                     <td class="text-[#555] text-sm">{{ cliente.direccion|default:"Sin registrar" }}</td>
                     <td class="font-mono text-sm">{{ cliente.email|default:"-" }}</td>
                     <td class="text-center">
-                        <a href="{% url 'editar_cliente' cliente_id=cliente.id %}" class="btn-outline inline-flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
-                            EDITAR
-                        </a>
+                        <span class="font-mono text-sm font-bold {% if cliente.total_equipos %}text-[#1b5e20]{% else %}text-[#999]{% endif %}">
+                            {{ cliente.total_equipos }}
+                        </span>
+                    </td>
+                    <td class="text-center">
+                        <div class="flex items-center justify-center gap-1.5">
+                            <a href="{% url 'editar_cliente' cliente_id=cliente.id %}" class="btn-outline inline-flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+                                EDITAR
+                            </a>
+                            <button type="button"
+                                    class="btn-red btn-industrial text-[0.7rem] py-1.5 px-3 inline-flex items-center gap-1.5"
+                                    data-url="{% url 'eliminar_cliente' cliente.id %}"
+                                    data-nombre="{{ cliente.nombre }}"
+                                    onclick="eliminarCliente(this)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                                ELIMINAR
+                            </button>
+                        </div>
                     </td>
                 </tr>
                 {% endfor %}
@@ -170,6 +188,35 @@
 document.addEventListener('DOMContentLoaded', function() {
     const q = document.querySelector('input[name="q"]');
     if (q && q.value) q.focus();
+
+    function eliminarCliente(btn) {
+        var nombre = btn.getAttribute('data-nombre');
+        if (!confirm('¿Eliminar el cliente "' + nombre + '"? Esta acción no se puede deshacer.')) return;
+
+        const tokenInput = document.querySelector('[name=csrfmiddlewaretoken]');
+        var token = tokenInput ? tokenInput.value : '';
+        if (!token) {
+            const match = document.cookie.match(/csrftoken=([^;]+)/);
+            if (match) token = match[1];
+        }
+
+        fetch(btn.getAttribute('data-url'), {
+            method: 'POST',
+            headers: { 'X-CSRFToken': token }
+        })
+        .then(function(response) { return response.json(); })
+        .then(function(data) {
+            if (data.status === 'success') {
+                window.location.reload();
+            } else {
+                alert(data.message || 'No se pudo eliminar el cliente.');
+            }
+        })
+        .catch(function() {
+            alert('Error de conexión con el servidor.');
+        });
+    }
+    window.eliminarCliente = eliminarCliente;
 
     (function() {
         const modal = document.getElementById('modalNuevoCliente');

@@ -175,6 +175,11 @@
         transform: translateX(2px);
     }
 
+    .cal-event.completado {
+        text-decoration: line-through;
+        opacity: 0.5;
+    }
+
     .cal-event.entrega {
         background-color: #e8f5e9;
         color: #1b5e20;
@@ -649,6 +654,98 @@
         box-shadow: 3px 3px 0px #000000;
     }
 
+    /* Strip inferior (filtros + acciones) */
+    .cal-footer {
+        background-color: #2a2a2a;
+        border-top: 2px solid #000000;
+        padding: 10px 16px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .cal-filters {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .cal-filter {
+        background: transparent;
+        border: 1px solid #555555;
+        color: #aaaaaa;
+        padding: 6px 14px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+
+    .cal-filter:hover {
+        border-color: #ffffff;
+        color: #ffffff;
+    }
+
+    .cal-filter.active {
+        background-color: #ffcc00;
+        border-color: #000000;
+        color: #000000;
+    }
+
+    .cal-filter-count {
+        margin-left: 6px;
+        padding: 1px 6px;
+        background-color: rgba(0, 0, 0, 0.25);
+        font-size: 0.65rem;
+    }
+
+    .cal-footer-actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .cal-footer-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background-color: #1a1a1a;
+        border: 1px solid #000000;
+        color: #ffffff;
+        padding: 8px 16px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+
+    .cal-footer-btn:hover {
+        background-color: #333333;
+        color: #ffcc00;
+        box-shadow: 2px 2px 0px #000000;
+    }
+
+    .cal-footer-btn.green {
+        background-color: #1b5e20;
+        border-color: #0d3d0d;
+    }
+
+    .cal-footer-btn.green:hover {
+        background-color: #2e7d32;
+        color: #ffffff;
+    }
+
     @media (max-width: 1024px) {
         .cal-wrapper {
             flex-direction: column;
@@ -735,19 +832,28 @@
 
                 <div class="cal-events">
                     {% for entrega in dia.entregas %}
-                    <div class="cal-event entrega" title="{{ entrega.cliente }} - {{ entrega.equipo }}">
-                        {{ entrega.cliente|truncatechars:16 }}
+                    <div class="cal-event entrega {% if entrega.completado %}completado{% endif %}"
+                         {% if entrega.ev_id %}data-ev-id="{{ entrega.ev_id }}" data-completado="{{ entrega.completado }}" data-ev-url="{% url 'toggle_evento_api' entrega.ev_id %}"{% endif %}
+                         title="{{ entrega.cliente }} - {{ entrega.equipo }}"
+                         {% if entrega.ev_id %}onclick="toggleEventoCompletado(this)"{% endif %}>
+                        {{ entrega.cliente|default:entrega.descripcion|truncatechars:16 }}
                     </div>
                     {% endfor %}
 
                     {% for turno in dia.turnos %}
-                    <div class="cal-event turno" title="{{ turno.hora }} - {{ turno.descripcion }}">
+                    <div class="cal-event turno {% if turno.completado %}completado{% endif %}"
+                         {% if turno.ev_id %}data-ev-id="{{ turno.ev_id }}" data-completado="{{ turno.completado }}" data-ev-url="{% url 'toggle_evento_api' turno.ev_id %}"{% endif %}
+                         title="{{ turno.hora }} - {{ turno.descripcion }}"
+                         {% if turno.ev_id %}onclick="toggleEventoCompletado(this)"{% endif %}>
                         {{ turno.hora }} {{ turno.descripcion|truncatechars:12 }}
                     </div>
                     {% endfor %}
 
                     {% for alerta in dia.alertas %}
-                    <div class="cal-event alerta" title="{{ alerta.descripcion }}">
+                    <div class="cal-event alerta {% if alerta.completado %}completado{% endif %}"
+                         {% if alerta.ev_id %}data-ev-id="{{ alerta.ev_id }}" data-completado="{{ alerta.completado }}" data-ev-url="{% url 'toggle_evento_api' alerta.ev_id %}"{% endif %}
+                         title="{{ alerta.descripcion }}"
+                         {% if alerta.ev_id %}onclick="toggleEventoCompletado(this)"{% endif %}>
                         {{ alerta.descripcion|truncatechars:18 }}
                     </div>
                     {% endfor %}
@@ -763,6 +869,26 @@
             <div class="cal-cell empty"></div>
             {% endfor %}
 
+        </div>
+
+        {# ===================== STRIP INFERIOR (FILTROS + ACCIONES) ===================== #}
+        <div class="cal-footer">
+            <div class="cal-filters">
+                <button type="button" class="cal-filter active" data-filter="todos" onclick="aplicarFiltroEventos('todos', this)">TODOS</button>
+                <button type="button" class="cal-filter" data-filter="turno" onclick="aplicarFiltroEventos('turno', this)">TURNOS <span class="cal-filter-count">{{ stats_mes.total_turnos|default:"0" }}</span></button>
+                <button type="button" class="cal-filter" data-filter="entrega" onclick="aplicarFiltroEventos('entrega', this)">ENTREGAS <span class="cal-filter-count">{{ stats_mes.total_entregas|default:"0" }}</span></button>
+                <button type="button" class="cal-filter" data-filter="alerta" onclick="aplicarFiltroEventos('alerta', this)">ALERTAS <span class="cal-filter-count">{{ stats_mes.total_alertas|default:"0" }}</span></button>
+            </div>
+            <div class="cal-footer-actions">
+                <a href="{% url 'historial_eventos' %}" class="cal-footer-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
+                    HISTORIAL
+                </a>
+                <button type="button" class="cal-footer-btn green" onclick="abrirModalEvento('TURNO')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                    + NUEVO TURNO
+                </button>
+            </div>
         </div>
     </div>
 
@@ -801,6 +927,57 @@
                     Sin eventos hoy
                 </div>
             {% endif %}
+        </div>
+
+        {# ALERTAS DE HOY #}
+        <div class="agenda-panel">
+            <div class="agenda-header" style="background-color:#c62828; color:#ffffff;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/></svg>
+                ALERTAS DE HOY
+                <span style="margin-left:auto; background-color:#ffcc00; color:#000000; font-family:'JetBrains Mono',monospace; font-size:0.7rem; font-weight:700; padding:1px 6px; border:1px solid #000000;">{{ alertas_hoy|length|stringformat:"02d" }}</span>
+            </div>
+
+            {% for alerta in alertas_hoy %}
+            <div class="agenda-task">
+                <div class="task-dot alerta"></div>
+                <div class="task-time">{{ alerta.fecha_hora|date:"H:i" }}</div>
+                <div class="task-content">
+                    <div class="task-title">{{ alerta.titulo }}</div>
+                    {% if alerta.tag %}
+                    <div class="task-sub">TAG: {{ alerta.tag }}</div>
+                    {% endif %}
+                    <button type="button" class="btn-action" style="width:100%; margin-top:8px; padding:6px 10px; font-size:0.7rem;"
+                            data-ev-url="{% url 'toggle_evento_api' alerta.id %}" onclick="toggleEventoCompletado(this)">
+                        ATENDER
+                    </button>
+                </div>
+            </div>
+            {% empty %}
+            <div class="agenda-empty">Sin alertas para hoy</div>
+            {% endfor %}
+        </div>
+
+        {# PRÓXIMAS ENTREGAS #}
+        <div class="agenda-panel">
+            <div class="agenda-header" style="background-color:#1b5e20; color:#ffffff;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 16h6"/><path d="M19 11v7.2c0 1.2-1 2.2-2.2 2.2H7.2c-1.2 0-2.2-1-2.2-2.2V5c0-1.2 1-2.2 2.2-2.2H12"/><path d="m9 11 2 2 4-4"/></svg>
+                PRÓXIMAS ENTREGAS
+            </div>
+
+            {% for entrega in proximas_entregas %}
+            <div class="agenda-task">
+                <div class="task-dot entrega"></div>
+                <div class="task-time">{{ entrega.fecha_hora|date:"d/m H:i" }}</div>
+                <div class="task-content">
+                    <div class="task-title">{{ entrega.titulo }}</div>
+                    <div class="task-sub">
+                        {% if entrega.orden %}{{ entrega.orden.equipo.cliente.nombre }}{% else %}{{ entrega.tag|default:"" }}{% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="agenda-empty">Sin entregas próximas</div>
+            {% endfor %}
         </div>
 
         {# RESUMEN DEL MES #}
@@ -963,6 +1140,51 @@
 
     window.cerrarModalEvento = function() {
         modal.classList.remove('active');
+    };
+
+    // Alterna completado/pendiente de un evento (click en grid o botón ATENDER)
+    window.toggleEventoCompletado = function(el) {
+        var url = el.getAttribute('data-ev-url');
+        if (!url) return;
+
+        var tokenEl = modal.querySelector('[name=csrfmiddlewaretoken]');
+        var token = tokenEl ? tokenEl.value : '';
+
+        fetch(url, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': token }
+        })
+        .then(function(response) { return response.json(); })
+        .then(function(data) {
+            if (data.status === 'success') {
+                window.location.reload();
+            } else {
+                alert(data.message || 'No se pudo actualizar el evento.');
+            }
+        })
+        .catch(function() {
+            alert('Error de conexión con el servidor.');
+        });
+    };
+
+    // Filtros del strip inferior: TODOS / TURNOS / ENTREGAS / ALERTAS
+    window.aplicarFiltroEventos = function(tipo, btn) {
+        document.querySelectorAll('.cal-filter').forEach(function(b) {
+            b.classList.toggle('active', b === btn);
+        });
+
+        var eventos = document.querySelectorAll('.cal-event');
+        eventos.forEach(function(ev) {
+            var visible = (tipo === 'todos') || ev.classList.contains(tipo);
+            ev.style.display = visible ? '' : 'none';
+        });
+
+        // Si en una celda no queda ningún evento del tipo filtrado, ocultamos el "+N más..."
+        document.querySelectorAll('.cal-events').forEach(function(cont) {
+            var visibles = cont.querySelectorAll('.cal-event:not([style*="display: none"])').length;
+            var more = cont.querySelector('.more-events');
+            if (more) more.style.display = visible ? '' : 'none';
+        });
     };
 
     modal.addEventListener('click', function(e) {
