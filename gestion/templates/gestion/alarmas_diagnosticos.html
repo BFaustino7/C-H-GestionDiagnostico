@@ -8,9 +8,7 @@
 
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-    {# ============================================
-       PANEL IZQUIERDO — Registro de Alarmas (7 cols)
-       ============================================ #}
+    {# ============================================ PANEL IZQUIERDO — Registro de Alarmas (7 cols) ============================================ #}
     <div class="lg:col-span-7 flex flex-col gap-3">
         {# Header del panel #}
         <div class="bg-[#1a1a1a] text-white p-2.5 flex justify-between items-center">
@@ -113,9 +111,7 @@
         </div>
     </div>
 
-    {# ============================================
-       PANEL DERECHO — Calculadora Termodinámica (5 cols)
-       ============================================ #}
+    {# ============================================ PANEL DERECHO — Calculadora Termodinámica (5 cols) ============================================ #}
     <div class="lg:col-span-5 flex flex-col gap-3">
         {# Header #}
         <div class="bg-[#1a1a1a] text-white p-2.5 flex items-center justify-between">
@@ -151,7 +147,7 @@
                     <span id="badge-superheat" class="text-[10px] px-1.5 py-0.5 border">—</span>
                 </span>
 
-                <div class="grid grid-cols-2 gap-2">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <div class="form-group-industrial">
                         <label for="calc-presion-baja" class="!text-[9px]">PRESIÓN BAJA - PSI</label>
                         <input type="number" id="calc-presion-baja" value="45" class="input-industrial !p-1.5 !text-xs !font-bold">
@@ -162,7 +158,7 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-2 pt-1 border-t border-[#eee] text-[11px]">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-[#eee] text-[11px]">
                     <div>Temp. Sat. (SST): <strong id="val-sst">— °C</strong></div>
                     <div>Sobrecalentamiento: <strong id="val-superheat" class="text-[#026d00] text-sm">— K</strong></div>
                 </div>
@@ -175,7 +171,7 @@
                     <span id="badge-subcooling" class="text-[10px] px-1.5 py-0.5 border">—</span>
                 </span>
 
-                <div class="grid grid-cols-2 gap-2">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <div class="form-group-industrial">
                         <label for="calc-presion-alta" class="!text-[9px]">PRESIÓN ALTA - PSI</label>
                         <input type="number" id="calc-presion-alta" value="245" class="input-industrial !p-1.5 !text-xs !font-bold">
@@ -186,7 +182,7 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-2 pt-1 border-t border-[#eee] text-[11px]">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-[#eee] text-[11px]">
                     <div>Temp. Cond. (SDT): <strong id="val-sdt">— °C</strong></div>
                     <div>Subenfriamiento: <strong id="val-subcooling" class="text-[#026d00] text-sm">— K</strong></div>
                 </div>
@@ -205,7 +201,7 @@
             {# Umbrales activos #}
             <div class="border border-[#e5e5e5] bg-[#f9f9f9] p-3 flex flex-col gap-2">
                 <span class="font-bold uppercase text-[10px] text-[#666] tracking-wider">UMBRALES ACTIVOS</span>
-                <div class="grid grid-cols-2 gap-2 text-[11px]">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
                     <div class="flex justify-between">
                         <span class="text-[#666]">Temp. Max Adv:</span>
                         <strong>{{ config.temp_max_adv }}°C</strong>

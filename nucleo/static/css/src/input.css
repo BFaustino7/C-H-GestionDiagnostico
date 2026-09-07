@@ -264,6 +264,7 @@
   border-collapse: separate;
   border-spacing: 0;
   font-size: 0.8125rem;
+  white-space: nowrap;
 }
 
 .table-industrial thead th {

@@ -10,7 +10,7 @@
 
 <!-- Buscador -->
 <div class="card-industrial p-5 mb-6">
-    <div class="flex items-center justify-between gap-3 mb-4">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
         <div class="flex items-center gap-3">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
             <h3 class="text-sm font-bold tracking-widest uppercase text-[#1a1a1a]">BUSQUEDA DE CLIENTES</h3>
@@ -20,7 +20,7 @@
             NUEVO CLIENTE
         </button>
     </div>
-    <form method="GET" action="{% url 'lista_clientes' %}" class="flex gap-3">
+    <form method="GET" action="{% url 'lista_clientes' %}" class="flex flex-col sm:flex-row gap-3">
         <input
             type="text"
             name="q"
@@ -28,7 +28,7 @@
             placeholder="Buscar por nombre, telefono, direccion..."
             class="input-industrial flex-1"
         >
-        <button type="submit" class="btn-green">BUSCAR</button>
+        <button type="submit" class="btn-green sm:shrink-0">BUSCAR</button>
     </form>
 </div>
 
@@ -82,7 +82,7 @@
     </div>
 
     <!-- Footer -->
-    <div class="px-5 py-3 bg-[#f9f9f9] border-t-2 border-[#eee] flex items-center justify-between">
+    <div class="px-5 py-3 bg-[#f9f9f9] border-t-2 border-[#eee] flex flex-wrap items-center justify-between gap-2">
         <span class="text-sm text-[#666]">
             Mostrando <strong class="font-mono">{{ lista_clientes|length }}</strong> de <strong class="font-mono">{{ total_clientes }}</strong> clientes
         </span>
@@ -138,7 +138,7 @@
                 <input type="text" id="cliente-nombre" name="nombre" required placeholder="Ej: Frigoríficos del Plata S.A." class="input-industrial">
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div class="form-group-industrial">
                     <label for="cliente-cuit">CUIT</label>
                     <input type="text" id="cliente-cuit" name="cuit" placeholder="30-12345678-9" class="input-industrial">
@@ -149,7 +149,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div class="form-group-industrial">
                     <label for="cliente-telefono">Teléfono</label>
                     <input type="text" id="cliente-telefono" name="telefono" placeholder="+54 9 11 4455-6677" class="input-industrial">

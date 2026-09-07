@@ -206,12 +206,12 @@
 
         <!-- Top Header Bar -->
         <header class="bg-white px-8 py-4 border-b-2 border-[#ddd]
-                       flex justify-between items-center">
-            <h2 class="text-xl font-semibold text-[#1a1a1a] m-0">
+                       flex flex-wrap items-center justify-between gap-2">
+            <h2 class="text-xl max-lg:text-lg font-semibold text-[#1a1a1a] m-0 min-w-0 truncate">
                 {% block page_title %}Panel de Control{% endblock %}
             </h2>
             <div class="font-mono text-sm text-[#666] bg-[#f0f0f0] px-4 py-2 border border-[#ccc]
-                        flex items-center gap-2">
+                        flex items-center gap-2 shrink-0 max-sm:px-3 max-sm:py-1.5">
                 <!-- Clock icon -->
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
                      fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -222,7 +222,7 @@
         </header>
 
         <!-- Content Area -->
-        <main class="p-6 lg:p-8 flex-grow">
+        <main class="p-4 sm:p-6 lg:p-8 flex-grow">
             {% block content %}{% endblock %}
         </main>
     </div>

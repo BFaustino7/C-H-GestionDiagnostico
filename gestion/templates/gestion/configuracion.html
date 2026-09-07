@@ -177,7 +177,7 @@
                 <div class="flex flex-col gap-3">
                     <span class="block text-[10px] uppercase text-[#666] font-semibold">UMBRALES DE ALERTA CRÍTICA</span>
 
-                    <div class="grid grid-cols-2 gap-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                             <label class="block text-[9px] uppercase text-[#777] mb-0.5">TEMP MÁX ADV</label>
                             <div class="flex">
@@ -194,7 +194,7 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                             <label class="block text-[9px] uppercase text-[#777] mb-0.5">PRES MÁX ADV</label>
                             <div class="flex">
@@ -258,23 +258,23 @@
                 <div class="border border-[#1a1a1a] p-3 bg-[#f9f9f9] flex flex-col gap-3">
                     <span class="block text-[10px] uppercase text-[#666] font-semibold border-b border-[#ddd] pb-1">TARIFAS DE SERVICIO</span>
 
-                    <div class="flex items-center justify-between">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                         <span class="font-bold text-[#1a1a1a]">DIAGNÓSTICO</span>
-                        <div class="flex items-center w-36">
+                        <div class="flex items-center w-full sm:w-36">
                             <span class="bg-[#f0f0f0] border border-[#1a1a1a] border-r-0 px-2 py-1">$</span>
                             {{ form.tarifa_diagnostico_usd }}
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-between">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                         <span class="font-bold text-[#1a1a1a]">MANTENIMIENTO (ESTÁNDAR)</span>
-                        <div class="flex items-center w-36">
+                        <div class="flex items-center w-full sm:w-36">
                             <span class="bg-[#f0f0f0] border border-[#1a1a1a] border-r-0 px-2 py-1">$</span>
                             {{ form.tarifa_mantenimiento_usd }}
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-between pt-2 border-t border-[#ddd]">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between pt-2 border-t border-[#ddd] gap-2">
                         <div class="flex items-center gap-1.5 text-[#ba1a1a]">
                             <!-- AlertTriangle -->
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
@@ -284,7 +284,7 @@
                             </svg>
                             <span class="font-bold">MULTIPLICADOR DE URGENCIA</span>
                         </div>
-                        <div class="flex items-center w-28">
+                        <div class="flex items-center w-full sm:w-28">
                             {{ form.multiplicador_urgencia }}
                             <span class="bg-[#ffdad6] border border-[#ba1a1a] text-[#ba1a1a] px-2 py-1 font-bold">X</span>
                         </div>
