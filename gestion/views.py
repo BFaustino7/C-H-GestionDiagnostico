@@ -4,10 +4,11 @@ from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.contrib.auth import login as auth_login
+from django.utils import timezone
 from datetime import datetime
 
 # --- MODELOS Y FORMULARIOS ---
-from .models import OrdenReparacion, Equipo, FichaTecnica, Producto, Cliente, ConfiguracionSistema
+from .models import OrdenReparacion, Equipo, FichaTecnica, Producto, Cliente, ConfiguracionSistema, Alarma
 from .forms import (ClienteForm, EquipoForm, OrdenIngresoForm, 
                     OrdenTecnicaForm, EspecificacionesForm, EventoCalendarioForm,
                     ConfiguracionSistemaForm, RegistroUsuarioForm)
@@ -203,3 +204,41 @@ def registro_usuario(request):
     else:
         form = RegistroUsuarioForm()
     return render(request, 'gestion/registro.html', {'form': form})
+
+@login_required
+def alarmas_diagnosticos(request):
+    alarmas = Alarma.objects.all()
+    filtro = request.GET.get('filtro', 'pendientes')
+    if filtro == 'pendientes':
+        alarmas = alarmas.exclude(atendida=True)
+    elif filtro == 'criticas':
+        alarmas = alarmas.filter(nivel='CRITICO')
+    config = ConfiguracionSistema.obtener()
+    return render(request, 'gestion/alarmas_diagnosticos.html', {
+        'alarmas': alarmas,
+        'filtro': filtro,
+        'config': config,
+        'total_pendientes': Alarma.objects.exclude(atendida=True).count(),
+        'total_criticas': Alarma.objects.filter(nivel='CRITICO').count(),
+        'total_todas': Alarma.objects.count(),
+    })
+
+@login_required
+def atender_alarma(request, alarma_id):
+    alarma = get_object_or_404(Alarma, pk=alarma_id)
+    alarma.atendida = True
+    alarma.save()
+    return redirect(request.META.get('HTTP_REFERER', 'alarmas_diagnosticos'))
+
+@login_required
+def simular_alarma_api(request):
+    if request.method == 'POST':
+        Alarma.objects.create(
+            tag=f'ALM-{Alarma.objects.count() + 101}',
+            timestamp=timezone.now(),
+            mensaje='Alarma de prueba SCADA - verificar sistema',
+            nivel='ADVERTENCIA',
+            origen='Banco IoT - Simulación manual',
+        )
+        return api_success()
+    return api_error(message='Método no permitido', status=405)

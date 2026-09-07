@@ -206,3 +206,25 @@ class EventoCalendario(models.Model):
 
     def __str__(self):
         return f"{self.get_tipo_display()} - {self.titulo}"
+
+# --- 5. ALARMAS SCADA ---
+class Alarma(models.Model):
+    NIVELES = [
+        ('CRITICO', 'Crítico'),
+        ('ADVERTENCIA', 'Advertencia'),
+        ('INFO', 'Info'),
+    ]
+    tag = models.CharField(max_length=50)
+    timestamp = models.DateTimeField()
+    mensaje = models.CharField(max_length=255)
+    nivel = models.CharField(max_length=20, choices=NIVELES, default='INFO')
+    atendida = models.BooleanField(default=False)
+    origen = models.CharField(max_length=200, blank=True)
+
+    class Meta:
+        verbose_name = 'Alarma'
+        verbose_name_plural = 'Alarmas'
+        ordering = ['-timestamp']
+
+    def __str__(self):
+        return f'{self.tag} [{self.nivel}] {self.mensaje}'

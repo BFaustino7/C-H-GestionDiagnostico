@@ -1,0 +1,336 @@
+{% extends 'gestion/base.html' %}
+
+{% block title %}Alarmas y Diagnóstico - C&H Refrigeración{% endblock %}
+{% block page_title %}ALARMAS Y DIAGNÓSTICO TERMODINÁMICO{% endblock %}
+{% block nav_alarmas %}active{% endblock %}
+
+{% block content %}
+
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    {# ============================================
+       PANEL IZQUIERDO — Registro de Alarmas (7 cols)
+       ============================================ #}
+    <div class="lg:col-span-7 flex flex-col gap-3">
+        {# Header del panel #}
+        <div class="bg-[#1a1a1a] text-white p-2.5 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                     fill="none" stroke="#00f900" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10.268 21a2 2 0 0 0 3.464 0"/>
+                    <path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/>
+                </svg>
+                <h3 class="font-mono text-xs font-bold uppercase tracking-wider">REGISTRO DE ALARMAS</h3>
+            </div>
+
+            {# Tabs de filtro #}
+            <div class="flex border border-[#444] bg-black text-[10px] font-mono">
+                <a href="?filtro=pendientes"
+                   class="px-2 py-0.5 uppercase no-underline transition-colors {% if filtro == 'pendientes' %}bg-[#00f900] text-[#026d00] font-bold{% else %}text-[#888] hover:text-white{% endif %}">
+                    PENDIENTES ({{ total_pendientes }})
+                </a>
+                <a href="?filtro=criticas"
+                   class="px-2 py-0.5 uppercase no-underline transition-colors {% if filtro == 'criticas' %}bg-[#00f900] text-[#026d00] font-bold{% else %}text-[#888] hover:text-white{% endif %}">
+                    CRÍTICAS ({{ total_criticas }})
+                </a>
+                <a href="?filtro=todas"
+                   class="px-2 py-0.5 uppercase no-underline transition-colors {% if filtro == 'todas' %}bg-[#00f900] text-[#026d00] font-bold{% else %}text-[#888] hover:text-white{% endif %}">
+                    TODAS ({{ total_todas }})
+                </a>
+            </div>
+        </div>
+
+        {# Botón simular alarma #}
+        <div class="flex justify-end">
+            <button type="button" id="btn-simular-alarma"
+                    class="btn-amber btn-industrial text-[0.7rem] py-1.5 px-3 gap-1.5">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>
+                </svg>
+                + SIMULAR ALARMA TEST
+            </button>
+        </div>
+        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+        {# Lista de alarmas #}
+        <div class="border border-[#1a1a1a] bg-white flex flex-col divide-y divide-[#eee]">
+            {% for a in alarmas %}
+            <div class="p-3.5 flex flex-col gap-2 font-mono transition-colors
+                        {% if a.atendida %}bg-[#fbfbfb] opacity-70
+                        {% elif a.nivel == 'CRITICO' %}bg-[#fff5f5] border-l-4 border-l-[#ba1a1a]
+                        {% elif a.nivel == 'ADVERTENCIA' %}bg-[#fffdf0] border-l-4 border-l-[#f1c100]
+                        {% else %}bg-white border-l-4 border-l-[#e2e2e2]{% endif %}">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-2">
+                        {% if a.nivel == 'CRITICO' %}
+                            <span class="px-2 py-0.5 text-[10px] font-bold uppercase border bg-[#ba1a1a] text-white border-[#93000a]">CRITICO</span>
+                        {% elif a.nivel == 'ADVERTENCIA' %}
+                            <span class="px-2 py-0.5 text-[10px] font-bold uppercase border bg-[#f1c100] text-black border-black">ADVERTENCIA</span>
+                        {% else %}
+                            <span class="px-2 py-0.5 text-[10px] font-bold uppercase border bg-[#e2e2e2] text-black">INFO</span>
+                        {% endif %}
+                        <span class="font-bold text-xs text-[#1a1a1a]">{{ a.tag }}</span>
+                    </div>
+                    <span class="text-[11px] text-[#666]">{{ a.timestamp|date:"Y-m-d H:i" }}</span>
+                </div>
+
+                <p class="text-xs text-[#222] font-semibold leading-relaxed">{{ a.mensaje }}</p>
+
+                <div class="flex justify-between items-center pt-1 text-[11px] text-[#666]">
+                    <span>ORIGEN: <strong>{{ a.origen }}</strong></span>
+                    {% if not a.atendida %}
+                    <a href="{% url 'atender_alarma' a.id %}"
+                       class="px-3 py-1 bg-[#1a1a1a] text-white text-xs font-bold uppercase hover:bg-[#026e00] transition-colors border border-black inline-flex items-center gap-1 no-underline">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+                             fill="none" stroke="#00ff00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 6 9 17l-5-5"/>
+                        </svg>
+                        RECONOCER
+                    </a>
+                    {% else %}
+                    <span class="text-[#026d00] font-bold flex items-center gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                            <path d="m9 11 3 3L22 4"/>
+                        </svg>
+                        ATENDIDA
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <div class="p-8 text-center text-[#888] font-mono text-xs flex flex-col items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+                     fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10.268 21a2 2 0 0 0 3.464 0"/>
+                    <path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/>
+                </svg>
+                No hay alarmas para este filtro. Todos los parámetros se encuentran en rango seguro.
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    {# ============================================
+       PANEL DERECHO — Calculadora Termodinámica (5 cols)
+       ============================================ #}
+    <div class="lg:col-span-5 flex flex-col gap-3">
+        {# Header #}
+        <div class="bg-[#1a1a1a] text-white p-2.5 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                     fill="none" stroke="#00f900" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect width="16" height="20" x="4" y="2" rx="2"/>
+                    <path d="M8 6h8"/><path d="M8 10h8"/><path d="M8 14h4"/>
+                    <path d="M8 18h4"/>
+                </svg>
+                <h3 class="font-mono text-xs font-bold uppercase tracking-wider">CALCULADORA P-T</h3>
+            </div>
+        </div>
+
+        {# Body #}
+        <div class="border border-[#1a1a1a] bg-white p-4 flex flex-col gap-4 font-mono text-xs">
+
+            {# Refrigerante #}
+            <div class="form-group-industrial">
+                <label for="calc-gas">REFRIGERANTE:</label>
+                <select id="calc-gas" class="select-industrial">
+                    <option value="R-404A">R-404A (Media/Baja Temp)</option>
+                    <option value="R-134a">R-134a (Media Temp/Chillers)</option>
+                    <option value="R-22">R-22 (Climatización/Industrial)</option>
+                    <option value="R-410A">R-410A (Alta Presión)</option>
+                </select>
+            </div>
+
+            {# Superheat section #}
+            <div class="border border-[#1a1a1a] p-3 bg-[#f9f9f9] flex flex-col gap-2.5">
+                <span class="font-bold uppercase text-[#1a1a1a] border-b border-[#ddd] pb-1 flex justify-between items-center">
+                    <span>1. SOBRECALENTAMIENTO (SUPERHEAT)</span>
+                    <span id="badge-superheat" class="text-[10px] px-1.5 py-0.5 border">—</span>
+                </span>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="form-group-industrial">
+                        <label for="calc-presion-baja" class="!text-[9px]">PRESIÓN BAJA - PSI</label>
+                        <input type="number" id="calc-presion-baja" value="45" class="input-industrial !p-1.5 !text-xs !font-bold">
+                    </div>
+                    <div class="form-group-industrial">
+                        <label for="calc-temp-vet" class="!text-[9px]">TEMP BULBO VET - °C</label>
+                        <input type="number" id="calc-temp-vet" value="-12" class="input-industrial !p-1.5 !text-xs !font-bold">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 pt-1 border-t border-[#eee] text-[11px]">
+                    <div>Temp. Sat. (SST): <strong id="val-sst">— °C</strong></div>
+                    <div>Sobrecalentamiento: <strong id="val-superheat" class="text-[#026d00] text-sm">— K</strong></div>
+                </div>
+            </div>
+
+            {# Subcooling section #}
+            <div class="border border-[#1a1a1a] p-3 bg-[#f9f9f9] flex flex-col gap-2.5">
+                <span class="font-bold uppercase text-[#1a1a1a] border-b border-[#ddd] pb-1 flex justify-between items-center">
+                    <span>2. SUBENFRIAMIENTO (SUBCOOLING)</span>
+                    <span id="badge-subcooling" class="text-[10px] px-1.5 py-0.5 border">—</span>
+                </span>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="form-group-industrial">
+                        <label for="calc-presion-alta" class="!text-[9px]">PRESIÓN ALTA - PSI</label>
+                        <input type="number" id="calc-presion-alta" value="245" class="input-industrial !p-1.5 !text-xs !font-bold">
+                    </div>
+                    <div class="form-group-industrial">
+                        <label for="calc-temp-liquido" class="!text-[9px]">TEMP LÍQUIDO SALIDA - °C</label>
+                        <input type="number" id="calc-temp-liquido" value="38" class="input-industrial !p-1.5 !text-xs !font-bold">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 pt-1 border-t border-[#eee] text-[11px]">
+                    <div>Temp. Cond. (SDT): <strong id="val-sdt">— °C</strong></div>
+                    <div>Subenfriamiento: <strong id="val-subcooling" class="text-[#026d00] text-sm">— K</strong></div>
+                </div>
+            </div>
+
+            {# Botón calcular #}
+            <button type="button" id="btn-calcular"
+                    class="btn-green btn-industrial w-full justify-center text-[0.7rem] py-1.5">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>
+                </svg>
+                CALCULAR
+            </button>
+
+            {# Umbrales activos #}
+            <div class="border border-[#e5e5e5] bg-[#f9f9f9] p-3 flex flex-col gap-2">
+                <span class="font-bold uppercase text-[10px] text-[#666] tracking-wider">UMBRALES ACTIVOS</span>
+                <div class="grid grid-cols-2 gap-2 text-[11px]">
+                    <div class="flex justify-between">
+                        <span class="text-[#666]">Temp. Max Adv:</span>
+                        <strong>{{ config.temp_max_adv }}°C</strong>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-[#666]">Temp. Max Crit:</span>
+                        <strong>{{ config.temp_max_crit }}°C</strong>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-[#666]">Pres. Max Adv:</span>
+                        <strong>{{ config.pres_max_adv }} PSI</strong>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-[#666]">Pres. Max Crit:</span>
+                        <strong>{{ config.pres_max_crit }} PSI</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+    // Approximation formulas ported from the TSX prototype.
+    // These are linear approximations of the real P-T curves — good enough
+    // for a quick diagnostic reference but NOT a replacement for proper P-T tables.
+    var formulas = {
+        'R-404A': {
+            getSST: function(psi) { return Math.round(((psi - 14.7) * 0.42 - 32) * 10) / 10; },
+            getSDT: function(psi) { return Math.round((psi * 0.18 + 5) * 10) / 10; }
+        },
+        'R-134a': {
+            getSST: function(psi) { return Math.round(((psi - 14.7) * 0.65 - 20) * 10) / 10; },
+            getSDT: function(psi) { return Math.round((psi * 0.28 + 8) * 10) / 10; }
+        },
+        'R-22': {
+            getSST: function(psi) { return Math.round(((psi - 14.7) * 0.48 - 25) * 10) / 10; },
+            getSDT: function(psi) { return Math.round((psi * 0.21 + 6) * 10) / 10; }
+        },
+        'R-410A': {
+            getSST: function(psi) { return Math.round(((psi - 14.7) * 0.32 - 30) * 10) / 10; },
+            getSDT: function(psi) { return Math.round((psi * 0.14 + 4) * 10) / 10; }
+        }
+    };
+
+    function calcular() {
+        var gas = document.getElementById('calc-gas').value;
+        var presionBaja = parseFloat(document.getElementById('calc-presion-baja').value) || 0;
+        var tempVET = parseFloat(document.getElementById('calc-temp-vet').value) || 0;
+        var presionAlta = parseFloat(document.getElementById('calc-presion-alta').value) || 0;
+        var tempLiquido = parseFloat(document.getElementById('calc-temp-liquido').value) || 0;
+
+        var f = formulas[gas] || formulas['R-404A'];
+
+        var sst = f.getSST(presionBaja);
+        var superheat = Math.round((tempVET - sst) * 10) / 10;
+
+        var sdt = f.getSDT(presionAlta);
+        var subcooling = Math.round((sdt - tempLiquido) * 10) / 10;
+
+        document.getElementById('val-sst').textContent = sst + ' °C';
+        document.getElementById('val-superheat').textContent = superheat + ' K';
+        document.getElementById('val-sdt').textContent = sdt + ' °C';
+        document.getElementById('val-subcooling').textContent = subcooling + ' K';
+
+        // Superheat badge
+        var badgeSH = document.getElementById('badge-superheat');
+        if (superheat >= 5 && superheat <= 9) {
+            badgeSH.textContent = 'RANGO OPTIMO';
+            badgeSH.className = 'text-[10px] px-1.5 py-0.5 border bg-[#77ff61] text-[#002200]';
+        } else {
+            badgeSH.textContent = 'VERIFICAR VET';
+            badgeSH.className = 'text-[10px] px-1.5 py-0.5 border bg-[#ffe08b] text-[#4f3d00]';
+        }
+
+        // Subcooling badge
+        var badgeSC = document.getElementById('badge-subcooling');
+        if (subcooling >= 4 && subcooling <= 8) {
+            badgeSC.textContent = 'RANGO OPTIMO';
+            badgeSC.className = 'text-[10px] px-1.5 py-0.5 border bg-[#77ff61] text-[#002200]';
+        } else {
+            badgeSC.textContent = 'REVISAR CARGA';
+            badgeSC.className = 'text-[10px] px-1.5 py-0.5 border bg-[#ffe08b] text-[#4f3d00]';
+        }
+    }
+
+    // Calculate on button click
+    document.getElementById('btn-calcular').addEventListener('click', calcular);
+
+    // Also recalculate on input change for live feedback
+    var inputs = ['calc-gas', 'calc-presion-baja', 'calc-temp-vet', 'calc-presion-alta', 'calc-temp-liquido'];
+    inputs.forEach(function(id) {
+        document.getElementById(id).addEventListener('input', calcular);
+    });
+
+    // Initial calculation
+    calcular();
+
+    // Simular alarma
+    document.getElementById('btn-simular-alarma').addEventListener('click', function() {
+        var tokenInput = document.querySelector('[name=csrfmiddlewaretoken]');
+        // Prefer the rendered token; cookie fallback only if not present
+        var token = tokenInput ? tokenInput.value : '';
+        if (!token) {
+            var match = document.cookie.match(/csrftoken=([^;]+)/);
+            if (match) token = match[1];
+        }
+
+        fetch("{% url 'simular_alarma_api' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': token
+            }
+        })
+        .then(function(response) {
+            if (response.ok) {
+                window.location.reload();
+            }
+        });
+    });
+})();
+</script>
+{% endblock %}

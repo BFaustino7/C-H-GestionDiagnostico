@@ -22,5 +22,8 @@ urlpatterns = [
     path('equipo/historial/<int:equipo_id>/', views.historial_equipo, name='historial_equipo'),
     path('cliente/editar/<int:cliente_id>/', views.editar_cliente, name='editar_cliente'),
     path('api/eventos/crear/', views.crear_evento_api, name='crear_evento_api'),
-    path('api/clientes/crear/', views.crear_cliente_api, name='crear_cliente_api')
+    path('api/clientes/crear/', views.crear_cliente_api, name='crear_cliente_api'),
+    path('alarmas/', views.alarmas_diagnosticos, name='alarmas_diagnosticos'),
+    path('alarmas/atender/<int:alarma_id>/', views.atender_alarma, name='atender_alarma'),
+    path('api/alarmas/simular/', views.simular_alarma_api, name='simular_alarma_api')
 ]
