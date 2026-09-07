@@ -14,6 +14,9 @@ __pycache__/
 # Archivos de entorno
 .env
 
+# Node (Tailwind build tooling — compiled CSS is committed)
+node_modules/
+
 # Archivos de VS Code
 .vscode/
 

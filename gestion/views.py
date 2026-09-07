@@ -66,7 +66,8 @@ def detalle_orden(request, orden_id):
         'form_orden': OrdenTecnicaForm(instance=orden),
         'form_ficha': EspecificacionesForm(instance=ficha),
         'form_equipo': EquipoForm(instance=equipo),
-        'total_general': orden.total_calculado
+        'total_general': orden.total_calculado,
+        'total_repuestos': sum(item.precio_congelado * item.cantidad for item in orden.detalleinsumo_set.all())
     })
 
 def imprimir_remito(request, orden_id):

@@ -1,61 +1,78 @@
 {% extends 'gestion/base.html' %}
 
-{% block title %}Editar Cliente - SCADA System{% endblock %}
-
-{% block page_title %}MODIFICACIÓN DE REGISTRO: CLIENTE{% endblock %}
+{% block title %}Editar Cliente | C&H REFRIGERACION{% endblock %}
+{% block page_title %}EDITAR CLIENTE &mdash; {{ cliente.nombre }}{% endblock %}
+{% block nav_clientes %}active{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            
-            <div class="card" style="border: 3px solid #000; border-radius: 0; box-shadow: 8px 8px 0px rgba(0,0,0,0.2);">
-                <div class="card-header bg-dark text-white d-flex align-items-center justify-content-between" style="border-bottom: 3px solid #ffcc00; border-radius: 0;">
-                    <span style="font-family: 'Courier New', monospace; font-weight: bold; letter-spacing: 2px;">
-                        <i class="bi bi-person-lines-fill me-2"></i>ID_CLIENTE: #{{ cliente.id|stringformat:"04d" }}
-                    </span>
-                    <span class="badge bg-warning text-dark" style="border-radius: 0;">MODO EDICIÓN</span>
-                </div>
 
-                <div class="card-body p-4" style="background-color: #f8f9fa;">
-                    <form method="POST">
-                        {% csrf_token %}
-                        
-                        <div class="row g-4">
-                            {% for field in form %}
-                            <div class="col-md-6 mb-3">
-                                <label class="fw-bold text-uppercase mb-2" style="font-size: 0.8rem; letter-spacing: 1px;">
-                                    {{ field.label }}
-                                </label>
-                                {{ field }}
-                                {% if field.errors %}
-                                    <div class="text-danger small mt-1" style="font-family: 'Courier New', monospace;">
-                                        {{ field.errors.0 }}
-                                    </div>
-                                {% endif %}
-                            </div>
-                            {% endfor %}
-                        </div>
+<div class="max-w-3xl mx-auto">
 
-                        <hr style="border-top: 2px solid #000; opacity: 1;" class="my-4">
-
-                        <div class="d-flex justify-content-between align-items-center">
-                            <a href="{% url 'lista_clientes' %}" class="btn btn-outline-dark" style="border-radius: 0; border: 2px solid #000; font-weight: bold;">
-                                <i class="bi bi-arrow-left"></i> CANCELAR
-                            </a>
-                            <button type="submit" class="btn btn-dark" style="border-radius: 0; padding: 10px 30px; font-weight: bold; letter-spacing: 2px; border: 2px solid #000; box-shadow: 4px 4px 0px #ffcc00;">
-                                <i class="bi bi-save"></i> ACTUALIZAR REGISTRO
-                            </button>
-                        </div>
-                    </form>
-                </div>
-                
-                <div class="card-footer bg-light text-muted" style="border-top: 1px solid #ddd; font-family: 'Courier New', monospace; font-size: 0.75rem;">
-                    SYSTEM_STATUS: Conexión estable con MSSQL-Server | {{ now|date:"H:i:s" }}
-                </div>
+    <!-- Header card -->
+    <div class="card-industrial mb-6">
+        <div class="bg-[#1a1a1a] text-white px-6 py-4 flex items-center justify-between border-b-4 border-[#00f900]">
+            <div class="flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                <span class="font-mono text-sm tracking-widest">ID: #{{ cliente.id|stringformat:"05d" }}</span>
             </div>
-
+            <span class="crt-text-amber text-xs">MODO EDICION</span>
         </div>
     </div>
+
+    <!-- Form card -->
+    <div class="card-industrial">
+        <div class="p-6">
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div class="form-group-industrial">
+                        <label class="text-xs font-bold tracking-widest uppercase text-[#666] mb-1.5 block">Nombre</label>
+                        {{ form.nombre }}
+                        {% if form.nombre.errors %}
+                        <span class="text-red-600 text-xs font-mono mt-1 block">{{ form.nombre.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group-industrial">
+                        <label class="text-xs font-bold tracking-widest uppercase text-[#666] mb-1.5 block">Telefono</label>
+                        {{ form.telefono }}
+                        {% if form.telefono.errors %}
+                        <span class="text-red-600 text-xs font-mono mt-1 block">{{ form.telefono.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group-industrial">
+                        <label class="text-xs font-bold tracking-widest uppercase text-[#666] mb-1.5 block">Direccion</label>
+                        {{ form.direccion }}
+                        {% if form.direccion.errors %}
+                        <span class="text-red-600 text-xs font-mono mt-1 block">{{ form.direccion.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group-industrial">
+                        <label class="text-xs font-bold tracking-widest uppercase text-[#666] mb-1.5 block">Email</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                        <span class="text-red-600 text-xs font-mono mt-1 block">{{ form.email.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="border-t-2 border-[#ddd] mt-8 pt-6 flex items-center justify-between">
+                    <a href="{% url 'lista_clientes' %}" class="btn-outline inline-flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+                        CANCELAR
+                    </a>
+                    <button type="submit" class="btn-green inline-flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                        GUARDAR CAMBIOS
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
 </div>
+
 {% endblock %}

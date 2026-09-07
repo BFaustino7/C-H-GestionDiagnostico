@@ -1,266 +1,355 @@
 {% extends 'gestion/base.html' %}
 
-{% block title %}Orden #{{ orden.id }} - C&H Refrigeración{% endblock %}
-
-{% block page_title %}FICHA TÉCNICA - ORDEN DE REPARACIÓN{% endblock %}
+{% block title %}Orden #{{ orden.id }} - C&H Refrigeraci&oacute;n{% endblock %}
+{% block page_title %}FICHA T&Eacute;CNICA - ORDEN DE REPARACI&Oacute;N{% endblock %}
 
 {% block extra_css %}
 <style>
-    /* Estilos base intactos */
-    .order-header {
-        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-        border: 3px solid #000000;
-        padding: 25px 30px;
-        margin-bottom: 25px;
-        box-shadow: 5px 5px 0px rgba(0,0,0,0.3);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 15px;
+    .cost-prefix {
+        background-color: #ffcc00; color: #1a1a1a;
+        padding: 12px 14px; font-family: "JetBrains Mono", monospace;
+        font-size: 1rem; font-weight: 700; display: flex; align-items: center;
+        border: 2px solid #1a1a1a; border-right: none;
     }
-    
-    .order-id-block { display: flex; align-items: center; gap: 20px; }
-    
-    .order-number {
-        font-family: 'Courier New', Courier, monospace;
-        font-size: 2.2rem;
-        font-weight: 700;
-        color: #ffffff;
-        letter-spacing: 2px;
+    .cost-prefix + .input-industrial,
+    .cost-prefix ~ .input-industrial {
+        border-left: none;
     }
-    
-    .order-number span { color: #ffcc00; }
-    
-    .order-date {
-        font-family: 'Courier New', Courier, monospace;
-        font-size: 0.85rem;
-        color: #888888;
-        padding: 8px 15px;
-        background-color: #0d0d0d;
-        border: 1px solid #333333;
+    .cost-input-wrapper {
+        display: flex; align-items: stretch;
+        border: 2px solid #1a1a1a;
     }
-    
-    .status-badge-large {
-        padding: 12px 30px;
-        font-size: 1rem;
-        font-weight: 700;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        font-family: 'Courier New', Courier, monospace;
-        border: 3px solid;
-        box-shadow: 3px 3px 0px rgba(0,0,0,0.5);
+    .cost-input-wrapper .input-industrial {
+        border: none; flex-grow: 1;
     }
-    
-    .status-PENDIENTE { background-color: #dc3545; color: #ffffff; border-color: #a71d2a; }
-    .status-DIAGNOSTICO { background-color: #ffc107; color: #000000; border-color: #d39e00; }
-    .status-REPARACION { background-color: #0d6efd; color: #ffffff; border-color: #0a58ca; }
-    .status-COMPLETADO { background-color: #198754; color: #ffffff; border-color: #146c43; }
-    .status-ENTREGADO { background-color: #6c757d; color: #ffffff; border-color: #565e64; }
-    
-    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 25px; }
-    @media (max-width: 992px) { .info-grid { grid-template-columns: 1fr; } }
-    
-    .info-panel { background-color: #ffffff; border: 2px solid #1a1a1a; box-shadow: 4px 4px 0px rgba(0,0,0,0.15); }
-    .info-panel-header { background-color: #1a1a1a; color: #ffffff; padding: 12px 20px; display: flex; align-items: center; gap: 12px; border-bottom: 3px solid #ffcc00; }
-    .info-panel-header i { font-size: 1.3rem; color: #ffcc00; }
-    .info-panel-header h3 { margin: 0; font-size: 0.95rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; }
-    .info-panel-body { padding: 20px; }
-    .info-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed #cccccc; }
-    .info-row:last-child { border-bottom: none; }
-    .info-label { font-size: 0.8rem; font-weight: 600; color: #666666; text-transform: uppercase; letter-spacing: 1px; }
-    .info-value { font-family: 'Courier New', Courier, monospace; font-size: 1rem; font-weight: 600; color: #1a1a1a; text-align: right; }
-    .info-value.highlight { color: #0d6efd; }
-    
-    .terminal-section { background-color: #ffffff; border: 2px solid #1a1a1a; margin-bottom: 25px; box-shadow: 4px 4px 0px rgba(0,0,0,0.15); }
-    .terminal-header { background-color: #1a1a1a; color: #ffffff; padding: 12px 20px; display: flex; align-items: center; gap: 12px; border-bottom: 3px solid #00ff00; }
-    .terminal-header i { font-size: 1.3rem; color: #00ff00; }
-    .terminal-header h3 { margin: 0; font-size: 0.95rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; }
-    .terminal-body { background-color: #0d0d0d; padding: 20px; min-height: 120px; }
-    .terminal-content { font-family: 'Courier New', Courier, monospace; font-size: 0.95rem; color: #00ff00; line-height: 1.8; white-space: pre-wrap; }
-    .terminal-prompt { color: #ffcc00; }
-    
-    .edit-form-section { background-color: #ffffff; border: 2px solid #1a1a1a; margin-bottom: 25px; box-shadow: 4px 4px 0px rgba(0,0,0,0.15); }
-    .edit-form-header { background-color: #2a2a2a; color: #ffffff; padding: 12px 20px; display: flex; align-items: center; gap: 12px; border-bottom: 3px solid #0dcaf0; }
-    .edit-form-header i { font-size: 1.3rem; color: #0dcaf0; }
-    .edit-form-header h3 { margin: 0; font-size: 0.95rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; }
-    .edit-form-body { padding: 25px; }
-    
-    .form-group-industrial { margin-bottom: 20px; }
-    .form-group-industrial label { display: block; font-size: 0.8rem; font-weight: 700; color: #1a1a1a; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; padding-left: 2px; }
-    .form-group-industrial label i { margin-right: 8px; color: #666666; }
-    
-    .cost-input-wrapper { display: flex; align-items: center; background-color: #1a1a1a; border: 2px solid #000000; padding: 5px; }
-    .cost-prefix { background-color: #ffcc00; color: #000000; padding: 12px 20px; font-family: 'Courier New', Courier, monospace; font-size: 1.2rem; font-weight: 700; }
-    .cost-input-wrapper .input-industrial { border: none; background-color: #ffffff; flex-grow: 1; }
-    
-    .actions-section { display: flex; gap: 15px; flex-wrap: wrap; padding: 20px 0; }
-    .btn-action { padding: 16px 35px; font-size: 0.95rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; border: 3px solid; border-radius: 0; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
-    .btn-actualizar { background-color: #1a1a1a; color: #ffffff; border-color: #000000; }
-    .btn-actualizar:hover { background-color: #333333; transform: translate(-3px, -3px); box-shadow: 6px 6px 0px rgba(0,0,0,0.3); }
-    .btn-remito { background-color: #198754; color: #ffffff; border-color: #146c43; }
-    .btn-remito:hover { background-color: #20c997; transform: translate(-3px, -3px); box-shadow: 6px 6px 0px rgba(0,0,0,0.3); }
-    .btn-volver { background-color: transparent; color: #666666; border-color: #999999; }
-    
-    .last-modified { font-family: 'Courier New', Courier, monospace; font-size: 0.75rem; color: #888888; padding: 10px 15px; background-color: #f5f5f5; border-left: 3px solid #cccccc; margin-top: 15px; }
-    
-    .input-industrial {
-        width: 100%; padding: 14px 18px; font-size: 1rem; border: 2px solid #999; border-radius: 0 !important; background-color: #fafafa;
+    .cost-input-wrapper:focus-within {
+        box-shadow: 0 0 0 3px rgba(0, 249, 0, 0.15);
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="order-header">
-    <div class="order-id-block">
-        <div class="order-number">ORDEN <span>#{{ orden.id|stringformat:"05d" }}</span></div>
-        <div class="order-date"><i class="bi bi-calendar3 me-2"></i>INGRESO: {{ orden.fecha_ingreso|date:"d/m/Y H:i" }}</div>
+
+<!-- Breadcrumb -->
+<div class="flex items-center gap-2 mb-6 text-xs font-mono text-[#888]">
+    <a href="{% url 'tablero' %}" class="text-[#888] no-underline hover:text-[#1a1a1a]">TABLERO</a>
+    <span>/</span>
+    <span class="text-[#1a1a1a] font-bold">ORDEN #{{ orden.id|stringformat:"05d" }}</span>
+</div>
+
+<!-- Order Header -->
+<div class="bg-[#1a1a1a] text-white px-6 lg:px-8 py-5 border-2 border-[#000] shadow-[5px_5px_0px_rgba(0,0,0,0.3)] mb-6 flex flex-wrap justify-between items-center gap-4">
+    <div class="flex items-center gap-5">
+        <div class="font-mono text-3xl font-bold tracking-wider">
+            ORDEN <span class="text-[#00f900]">#{{ orden.id|stringformat:"05d" }}</span>
+        </div>
+        <div class="font-mono text-xs text-[#888] px-3 py-2 bg-[#0d0d0d] border border-[#333]">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block mr-1 align-middle"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
+            INGRESO: {{ orden.fecha_ingreso|date:"d/m/Y H:i" }}
+        </div>
     </div>
-    <div class="status-badge-large status-{{ orden.estado }}">
-        <i class="bi bi-gear-wide-connected me-2"></i>{{ orden.get_estado_display|upper }}
+    <div>
+        {% if orden.estado == 'PENDIENTE' %}
+        <span class="inline-flex items-center gap-2 px-5 py-3 text-sm font-bold tracking-[2px] uppercase font-mono bg-[#ff3333] text-white border-2 border-[#cc0000] shadow-[3px_3px_0px_rgba(0,0,0,0.5)]">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/></svg>
+            {{ orden.get_estado_display|upper }}
+        </span>
+        {% elif orden.estado == 'DIAGNOSTICO' %}
+        <span class="inline-flex items-center gap-2 px-5 py-3 text-sm font-bold tracking-[2px] uppercase font-mono bg-[#ffcc00] text-[#1a1a1a] border-2 border-[#d39e00] shadow-[3px_3px_0px_rgba(0,0,0,0.5)]">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/></svg>
+            {{ orden.get_estado_display|upper }}
+        </span>
+        {% elif orden.estado == 'REPARACION' %}
+        <span class="inline-flex items-center gap-2 px-5 py-3 text-sm font-bold tracking-[2px] uppercase font-mono bg-[#0d6efd] text-white border-2 border-[#0a58ca] shadow-[3px_3px_0px_rgba(0,0,0,0.5)]">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/></svg>
+            {{ orden.get_estado_display|upper }}
+        </span>
+        {% elif orden.estado == 'COMPLETADO' %}
+        <span class="inline-flex items-center gap-2 px-5 py-3 text-sm font-bold tracking-[2px] uppercase font-mono bg-[#198754] text-white border-2 border-[#146c43] shadow-[3px_3px_0px_rgba(0,0,0,0.5)]">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/></svg>
+            {{ orden.get_estado_display|upper }}
+        </span>
+        {% elif orden.estado == 'ENTREGADO' %}
+        <span class="inline-flex items-center gap-2 px-5 py-3 text-sm font-bold tracking-[2px] uppercase font-mono bg-[#6c757d] text-white border-2 border-[#565e64] shadow-[3px_3px_0px_rgba(0,0,0,0.5)]">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/></svg>
+            {{ orden.get_estado_display|upper }}
+        </span>
+        {% endif %}
     </div>
 </div>
 
-<div class="info-grid">
-    <div class="info-panel">
-        <div class="info-panel-header"><i class="bi bi-person-badge"></i><h3>Datos del Cliente</h3></div>
-        <div class="info-panel-body">
-            <div class="info-row"><span class="info-label">Nombre</span><span class="info-value">{{ orden.equipo.cliente.nombre }}</span></div>
-            <div class="info-row"><span class="info-label">Teléfono</span><span class="info-value">{{ orden.equipo.cliente.telefono }}</span></div>
-        </div>
-    </div>
-    <div class="info-panel">
-        <div class="info-panel-header"><i class="bi bi-cpu"></i><h3>Datos del Equipo</h3></div>
-        <div class="info-panel-body">
-            <div class="info-row"><span class="info-label">Marca/Modelo</span><span class="info-value">{{ orden.equipo.marca }} {{ orden.equipo.modelo }}</span></div>
-            <div class="info-row"><span class="info-label">Gas actual</span><span class="info-value highlight">{{ orden.equipo.tipo_gas|default:"—" }}</span></div>
-        </div>
-    </div>
-</div>
+<!-- Two-Column Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
 
-<form id="form-orden-tecnica">
-    {% csrf_token %}
-    
-    <div class="edit-form-section">
-        <div class="edit-form-header"><i class="bi bi-pencil-square"></i><h3>Edición Técnica</h3></div>
-        <div class="edit-form-body">
-            
-            <div class="row">
-                <div class="col-md-3">
-                    <div class="form-group-industrial">
-                        <label><i class="bi bi-fuel-pump"></i> Gas (Equipo)</label>
-                        {{ form_equipo.tipo_gas }}
-                    </div>
+    <!-- LEFT COLUMN (60%) -->
+    <div class="lg:col-span-3 space-y-6">
+
+        <!-- Client Info Panel -->
+        <div class="card-industrial">
+            <div class="bg-[#1a1a1a] text-white px-5 py-3 flex items-center gap-3 border-b-[3px] border-[#ffcc00]">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffcc00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <h3 class="text-sm font-bold tracking-[1.5px] uppercase m-0">Datos del Cliente</h3>
+            </div>
+            <div class="p-5">
+                <div class="flex justify-between items-center py-2.5 border-b border-dashed border-[#ddd]">
+                    <span class="text-xs font-semibold text-[#888] uppercase tracking-[1px]">Nombre</span>
+                    <span class="font-mono text-base font-semibold text-[#1a1a1a]">{{ orden.equipo.cliente.nombre }}</span>
                 </div>
-                <div class="col-md-3">
-                    <div class="form-group-industrial">
-                        <label><i class="bi bi-box"></i> Capacidad</label>
-                        {{ form_equipo.capacidad }}
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="form-group-industrial">
-                        <label><i class="bi bi-fuel-pump"></i> Carga (Gr)</label>
-                        {{ form_ficha.gas_cantidad }}
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group-industrial">
-                        <label><i class="bi bi-moisture"></i> Datos Eléctricos</label>
-                        {{ form_ficha.datos_electricos }}
-                    </div>
+                <div class="flex justify-between items-center py-2.5">
+                    <span class="text-xs font-semibold text-[#888] uppercase tracking-[1px]">Tel&eacute;fono</span>
+                    <span class="font-mono text-base font-semibold text-[#1a1a1a]">{{ orden.equipo.cliente.telefono }}</span>
                 </div>
             </div>
+        </div>
 
-            <hr class="my-4" style="border-top: 2px dashed #333;">
-
-            <div class="form-group-industrial">
-                <label><i class="bi bi-clipboard-pulse"></i> Diagnóstico Técnico</label>
-                {{ form_orden.diagnostico_tecnico }}
+        <!-- Equipment Info Panel -->
+        <div class="card-industrial">
+            <div class="bg-[#1a1a1a] text-white px-5 py-3 flex items-center gap-3 border-b-[3px] border-[#ffcc00]">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffcc00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 7h.01"/><path d="M17 7h.01"/><path d="M7 17h.01"/><path d="M17 17h.01"/></svg>
+                <h3 class="text-sm font-bold tracking-[1.5px] uppercase m-0">Datos del Equipo</h3>
             </div>
-
-            <hr class="my-4" style="border-top: 2px dashed #333;">
-
-            <div class="form-group-industrial">
-                <label><i class="bi bi-box-seam"></i> Insumos Utilizados</label>
-                {% if orden.detalleinsumo_set.all %}
-                <div class="mb-3 p-3" style="background: #f8f9fa; border: 2px solid #ddd;">
-                    {% for detalle in orden.detalleinsumo_set.all %}
-                    <div class="d-flex justify-content-between border-bottom border-secondary border-opacity-25 py-2">
-                        <span><strong>{{ detalle.producto.nombre }}</strong></span>
-                        <span style="color: #198754; font-weight: bold;">$ {{ detalle.precio_congelado }}</span>
-                    </div>
-                    {% endfor %}
+            <div class="p-5">
+                <div class="flex justify-between items-center py-2.5 border-b border-dashed border-[#ddd]">
+                    <span class="text-xs font-semibold text-[#888] uppercase tracking-[1px]">Marca/Modelo</span>
+                    <span class="font-mono text-base font-semibold text-[#1a1a1a]">{{ orden.equipo.marca }} {{ orden.equipo.modelo }}</span>
                 </div>
-                {% endif %}
+                <div class="flex justify-between items-center py-2.5">
+                    <span class="text-xs font-semibold text-[#888] uppercase tracking-[1px]">Gas actual</span>
+                    <span class="font-mono text-base font-semibold text-[#0d6efd]">{{ orden.equipo.tipo_gas|default:"&mdash;" }}</span>
+                </div>
+            </div>
+        </div>
 
-                <div id="insumos-grid">
-                    <div class="insumo-row d-flex gap-2 mb-2">
-                        <input type="text" class="input-industrial insumo-nombre" placeholder="Nuevo repuesto...">
-                        <div class="cost-input-wrapper" style="width: 180px;">
-                            <span class="cost-prefix">$</span>
-                            <input type="number" class="input-industrial insumo-precio" step="0.01" placeholder="0.00">
+        <!-- Technical Edit Form -->
+        <form id="form-orden-tecnica">
+            {% csrf_token %}
+
+            <div class="card-industrial">
+                <div class="bg-[#2a2a2a] text-white px-5 py-3 flex items-center gap-3 border-b-[3px] border-[#00e5ff]">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+                    <h3 class="text-sm font-bold tracking-[1.5px] uppercase m-0">Edici&oacute;n T&eacute;cnica</h3>
+                </div>
+                <div class="p-6">
+
+                    <!-- Equipment specs row -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-5">
+                        <div class="form-group-industrial">
+                            <label>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block mr-1 align-middle"><path d="M3 3h18v18H3z"/><path d="M7 7h.01"/><path d="M17 7h.01"/><path d="M7 17h.01"/><path d="M17 17h.01"/></svg>
+                                Gas (Equipo)
+                            </label>
+                            {{ form_equipo.tipo_gas }}
+                        </div>
+                        <div class="form-group-industrial">
+                            <label>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block mr-1 align-middle"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/></svg>
+                                Capacidad
+                            </label>
+                            {{ form_equipo.capacidad }}
+                        </div>
+                        <div class="form-group-industrial">
+                            <label>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block mr-1 align-middle"><path d="M3 3h18v18H3z"/><path d="M7 7h.01"/><path d="M17 7h.01"/><path d="M7 17h.01"/><path d="M17 17h.01"/></svg>
+                                Carga (Gr)
+                            </label>
+                            {{ form_ficha.gas_cantidad }}
+                        </div>
+                        <div class="form-group-industrial">
+                            <label>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block mr-1 align-middle"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></svg>
+                                El&eacute;ctricos
+                            </label>
+                            {{ form_ficha.datos_electricos }}
                         </div>
                     </div>
-                </div>
-                <button type="button" id="btn-add-insumo" class="btn btn-sm btn-outline-dark" style="border-radius: 0;">+ AGREGAR FILA</button>
-            </div>
 
-            <hr class="my-4" style="border-top: 2px dashed #333;">
+                    <hr class="border-t-2 border-dashed border-[#333] my-5">
 
-            <div class="form-group-industrial">
-                <label><i class="bi bi-wrench-adjustable"></i> Trabajo Realizado y Mano de Obra</label>
-                <div class="d-flex gap-2">
-                    <div style="flex-grow: 1;">{{ form_orden.reparacion_realizada }}</div>
-                    <div class="cost-input-wrapper" style="width: 200px;">
-                        <span class="cost-prefix">$</span>
-                        {{ form_orden.costo_mano_obra }}
+                    <!-- Diagnostico -->
+                    <div class="form-group-industrial mb-5">
+                        <label class="text-xs font-bold tracking-[1.5px] uppercase text-[#555]">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block mr-1 align-middle"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+                            Diagn&oacute;stico T&eacute;cnico
+                        </label>
+                        {{ form_orden.diagnostico_tecnico }}
                     </div>
+
+                    <hr class="border-t-2 border-dashed border-[#333] my-5">
+
+                    <!-- Insumos -->
+                    <div class="form-group-industrial mb-5">
+                        <label class="text-xs font-bold tracking-[1.5px] uppercase text-[#555]">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block mr-1 align-middle"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+                            Insumos Utilizados
+                        </label>
+
+                        {% if orden.detalleinsumo_set.all %}
+                        <div class="mb-3 bg-[#f8f9fa] border-2 border-[#ddd] p-3">
+                            {% for detalle in orden.detalleinsumo_set.all %}
+                            <div class="flex justify-between items-center border-b border-[#eee] border-opacity-25 py-2 {% if forloop.last %}border-b-0{% endif %}">
+                                <span class="font-semibold">{{ detalle.producto.nombre }}</span>
+                                <span class="font-mono text-sm font-bold text-[#198754]">$ {{ detalle.precio_congelado }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <div id="insumos-grid" class="space-y-2">
+                            <div class="insumo-row flex gap-2 items-center">
+                                <input type="text" class="input-industrial insumo-nombre flex-grow" placeholder="Nuevo repuesto...">
+                                <div class="cost-input-wrapper" style="width: 180px;">
+                                    <span class="cost-prefix">$</span>
+                                    <input type="number" class="input-industrial insumo-precio" step="0.01" placeholder="0.00">
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" id="btn-add-insumo" class="btn-industrial btn-outline mt-3 text-xs">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                            AGREGAR FILA
+                        </button>
+                    </div>
+
+                    <hr class="border-t-2 border-dashed border-[#333] my-5">
+
+                    <!-- Reparacion + Mano de Obra -->
+                    <div class="form-group-industrial mb-5">
+                        <label class="text-xs font-bold tracking-[1.5px] uppercase text-[#555]">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block mr-1 align-middle"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                            Trabajo Realizado y Mano de Obra
+                        </label>
+                        <div class="flex gap-3">
+                            <div class="flex-grow">{{ form_orden.reparacion_realizada }}</div>
+                            <div class="cost-input-wrapper" style="width: 200px; flex-shrink: 0;">
+                                <span class="cost-prefix">$</span>
+                                {{ form_orden.costo_mano_obra }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Estado -->
+                    <div class="form-group-industrial mb-5">
+                        <label class="text-xs font-bold tracking-[1.5px] uppercase text-[#555]">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block mr-1 align-middle"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" x2="4" y1="22" y2="15"/></svg>
+                            Estado de la Orden
+                        </label>
+                        {{ form_orden.estado }}
+                    </div>
+
+                    <!-- Total Display -->
+                    <div class="bg-[#1a1a1a] border-2 border-[#000] p-4 text-right">
+                        <span class="text-[#ffcc00] font-mono text-xs tracking-[2px]">TOTAL ACTUALIZADO:</span>
+                        <h2 class="text-white font-mono text-2xl font-bold m-0 mt-1">$ {{ total_general|stringformat:".2f" }}</h2>
+                    </div>
+
                 </div>
             </div>
-            
-            <div class="form-group-industrial">
-                <label><i class="bi bi-flag"></i> Estado de la Orden</label>
-                {{ form_orden.estado }}
+
+            <!-- Action Buttons -->
+            <div class="flex flex-wrap gap-3 mt-5">
+                <button type="submit" class="btn-industrial btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                    Guardar Cambios
+                </button>
+                <a href="{% url 'imprimir_remito' orden.id %}" class="btn-industrial btn-green">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+                    Imprimir Remito
+                </a>
+                <a href="{% url 'tablero' %}" class="btn-industrial btn-outline">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+                    Volver
+                </a>
             </div>
 
-            <div class="mt-4 p-4 text-end" style="background: #1a1a1a; border: 2px solid #000;">
-                <span style="color: #ffcc00; font-family: 'Courier New', monospace; letter-spacing: 2px;">TOTAL ACTUALIZADO:</span>
-                <h2 style="color: #fff; font-family: 'Courier New', monospace; margin: 0;">$ {{ total_general|stringformat:".2f" }}</h2>
-            </div>
+        </form>
+    </div>
 
+    <!-- RIGHT COLUMN (40%) -->
+    <div class="lg:col-span-2 space-y-6">
+
+        <!-- Parts/Insumos Summary Card -->
+        <div class="card-industrial">
+            <div class="bg-[#1a1a1a] text-white px-5 py-3 flex items-center gap-3 border-b-[3px] border-[#ffcc00]">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffcc00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+                <h3 class="text-sm font-bold tracking-[1.5px] uppercase m-0">Repuestos</h3>
+            </div>
+            <div class="p-5">
+                {% if orden.detalleinsumo_set.all %}
+                <table class="table-industrial">
+                    <thead>
+                        <tr>
+                            <th>Repuesto</th>
+                            <th class="text-right">Precio</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for detalle in orden.detalleinsumo_set.all %}
+                        <tr>
+                            <td class="text-sm">{{ detalle.producto.nombre }}</td>
+                            <td class="text-right font-bold text-[#198754]">$ {{ detalle.precio_congelado }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p class="text-sm text-[#999] font-mono text-center py-4">Sin repuestos registrados.</p>
+                {% endif %}
+            </div>
         </div>
+
+        <!-- Totals Card -->
+        <div class="card-industrial">
+            <div class="bg-[#1a1a1a] text-white px-5 py-3 flex items-center gap-3 border-b-[3px] border-[#00f900]">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00f900" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                <h3 class="text-sm font-bold tracking-[1.5px] uppercase m-0">Resumen</h3>
+            </div>
+            <div class="p-5 space-y-3">
+                <div class="flex justify-between items-center py-2 border-b border-dashed border-[#ddd]">
+                    <span class="text-xs font-semibold text-[#888] uppercase tracking-[1px]">Mano de Obra</span>
+                    <span class="font-mono text-sm font-bold text-[#1a1a1a]">$ {{ orden.costo_mano_obra|stringformat:".2f" }}</span>
+                </div>
+                <div class="flex justify-between items-center py-2 border-b border-dashed border-[#ddd]">
+                    <span class="text-xs font-semibold text-[#888] uppercase tracking-[1px]">Repuestos</span>
+                    <span class="font-mono text-sm font-bold text-[#1a1a1a]">$ {{ total_repuestos|stringformat:".2f"|default:"0.00" }}</span>
+                </div>
+                <div class="flex justify-between items-center py-3 bg-[#1a1a1a] px-4">
+                    <span class="text-xs font-bold text-[#ffcc00] uppercase tracking-[2px]">Total</span>
+                    <span class="font-mono text-xl font-bold text-[#00f900]">$ {{ total_general|stringformat:".2f" }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Last Modified -->
+        <div class="bg-[#f5f5f5] border-l-[3px] border-[#ccc] p-3 font-mono text-xs text-[#888]">
+            &Uacute;ltima modificaci&oacute;n: {{ orden.fecha_ingreso|date:"d/m/Y H:i" }}
+        </div>
+
     </div>
-    
-    <div class="actions-section">
-        <button type="submit" class="btn-action btn-actualizar"><i class="bi bi-save"></i> GUARDAR CAMBIOS</button>
-        <a href="{% url 'imprimir_remito' orden.id %}" class="btn-action btn-remito"><i class="bi bi-file-earmark-text"></i> IMPRIMIR REMITO</a>
-        <a href="{% url 'tablero' %}" class="btn-action btn-volver"><i class="bi bi-arrow-left"></i> VOLVER</a>
-    </div>
-</form>
+</div>
+
 {% endblock %}
 
 {% block extra_js %}
 <script>
-    // Agregar filas de insumos
     document.getElementById('btn-add-insumo').addEventListener('click', function() {
         const grid = document.getElementById('insumos-grid');
         const row = document.createElement('div');
-        row.className = 'insumo-row d-flex gap-2 mb-2';
+        row.className = 'insumo-row flex gap-2 items-center';
         row.innerHTML = `
-            <input type="text" class="input-industrial insumo-nombre" placeholder="Repuesto...">
+            <input type="text" class="input-industrial insumo-nombre flex-grow" placeholder="Repuesto...">
             <div class="cost-input-wrapper" style="width: 180px;">
                 <span class="cost-prefix">$</span>
                 <input type="number" class="input-industrial insumo-precio" step="0.01" placeholder="0.00">
             </div>
-            <button type="button" class="btn btn-danger btn-sm" style="border-radius:0" onclick="this.parentElement.remove()">X</button>
+            <button type="button" class="btn-industrial btn-red p-2" onclick="this.parentElement.remove()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+            </button>
         `;
         grid.appendChild(row);
     });
 
     document.getElementById('form-orden-tecnica').addEventListener('submit', function(e) {
         e.preventDefault();
-        
+
         const insumos = [];
         document.querySelectorAll('.insumo-row').forEach(row => {
             const nombre = row.querySelector('.insumo-nombre').value.trim();
@@ -270,7 +359,6 @@
             }
         });
 
-        // Captura segura de campos (usando || '' por si alguno no existe en el DOM)
         const getVal = (name) => {
             const el = document.querySelector(`[name="${name}"]`);
             return el ? el.value : '';
@@ -300,12 +388,12 @@
         .then(data => {
             if(data.status === 'success') {
                 window.onbeforeunload = null;
-                window.location.reload(); 
+                window.location.reload();
             } else {
-                alert('Error de validación: ' + JSON.stringify(data.errors));
+                alert('Error de validaci\u00f3n: ' + JSON.stringify(data.errors));
             }
         })
-        .catch(error => alert('Error crítico en el servidor'));
+        .catch(error => alert('Error cr\u00edtico en el servidor'));
     });
 </script>
 {% endblock %}

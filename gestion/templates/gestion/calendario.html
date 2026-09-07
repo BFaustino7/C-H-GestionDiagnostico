@@ -16,9 +16,6 @@
         align-items: flex-start;
     }
 
-    /* ------------------------------------------
-       BLOQUE PRINCIPAL DEL CALENDARIO
-    ------------------------------------------ */
     .cal-main {
         flex-grow: 1;
         background: #ffffff;
@@ -26,7 +23,6 @@
         box-shadow: 5px 5px 0px #1a1a1a;
     }
 
-    /* Cabecera de navegación de mes */
     .cal-header {
         background-color: #1a1a1a;
         color: #ffffff;
@@ -42,11 +38,10 @@
         font-weight: 700;
         letter-spacing: 3px;
         text-transform: uppercase;
-        font-family: 'Segoe UI', sans-serif;
     }
 
     .cal-header .year-badge {
-        font-family: 'Courier New', monospace;
+        font-family: 'JetBrains Mono', monospace;
         color: #ffcc00;
         font-size: 1rem;
         letter-spacing: 2px;
@@ -75,7 +70,6 @@
         box-shadow: 2px 2px 0px #000000;
     }
 
-    /* Fila de nombres de día */
     .cal-days-header {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
@@ -97,7 +91,6 @@
         color: #ff6666;
     }
 
-    /* Grilla de días */
     .cal-grid {
         display: grid;
         grid-template-columns: repeat(7, 1fr);
@@ -108,7 +101,6 @@
         border-right: 1px solid #cccccc;
         border-bottom: 1px solid #cccccc;
         padding: 8px;
-        vertical-align: top;
         background-color: #ffffff;
         position: relative;
         transition: background-color 0.15s;
@@ -122,12 +114,10 @@
         background-color: #f5f5f5;
     }
 
-    /* Dia vacio (mes anterior/siguiente) */
     .cal-cell.empty {
         background-color: #f9f9f9;
     }
 
-    /* Dia de hoy - cian neon */
     .cal-cell.today {
         background-color: #e0fffe;
         border: 2px solid #00e5ff;
@@ -140,14 +130,13 @@
         box-shadow: 0 0 8px rgba(0, 229, 255, 0.8);
     }
 
-    /* Numero del dia */
     .day-number {
         display: inline-flex;
         align-items: center;
         justify-content: center;
         width: 28px;
         height: 28px;
-        font-family: 'Courier New', monospace;
+        font-family: 'JetBrains Mono', monospace;
         font-size: 0.85rem;
         font-weight: 700;
         color: #1a1a1a;
@@ -158,7 +147,6 @@
         color: #cc4444;
     }
 
-    /* Eventos dentro del dia */
     .cal-events {
         display: flex;
         flex-direction: column;
@@ -187,7 +175,6 @@
         transform: translateX(2px);
     }
 
-    /* Entrega - verde */
     .cal-event.entrega {
         background-color: #e8f5e9;
         color: #1b5e20;
@@ -204,7 +191,6 @@
         flex-shrink: 0;
     }
 
-    /* Turno - azul */
     .cal-event.turno {
         background-color: #e3f2fd;
         color: #0d47a1;
@@ -221,7 +207,6 @@
         flex-shrink: 0;
     }
 
-    /* Alerta / Vencimiento - rojo */
     .cal-event.alerta {
         background-color: #ffebee;
         color: #b71c1c;
@@ -238,11 +223,10 @@
         flex-shrink: 0;
     }
 
-    /* Mas eventos */
     .more-events {
         font-size: 0.65rem;
         color: #888888;
-        font-family: 'Courier New', monospace;
+        font-family: 'JetBrains Mono', monospace;
         padding: 1px 6px;
         margin-top: 2px;
         cursor: pointer;
@@ -253,9 +237,6 @@
         text-decoration: underline;
     }
 
-    /* ------------------------------------------
-       SIDEBAR AGENDA DEL DIA
-    ------------------------------------------ */
     .cal-sidebar {
         width: 270px;
         flex-shrink: 0;
@@ -264,7 +245,6 @@
         gap: 16px;
     }
 
-    /* Panel Hoy */
     .agenda-panel {
         background: #ffffff;
         border: 2px solid #1a1a1a;
@@ -285,11 +265,6 @@
         gap: 8px;
     }
 
-    .agenda-panel .agenda-body {
-        padding: 0;
-    }
-
-    /* Fecha grande */
     .today-date-block {
         padding: 14px 16px;
         background-color: #1a1a1a;
@@ -300,7 +275,7 @@
     }
 
     .today-date-block .day-big {
-        font-family: 'Courier New', monospace;
+        font-family: 'JetBrains Mono', monospace;
         font-size: 2.5rem;
         font-weight: 700;
         color: #00e5ff;
@@ -323,11 +298,10 @@
     .today-date-block .month-year {
         color: #888888;
         font-size: 0.75rem;
-        font-family: 'Courier New', monospace;
+        font-family: 'JetBrains Mono', monospace;
         letter-spacing: 1px;
     }
 
-    /* Tareas del dia */
     .agenda-task {
         padding: 12px 16px;
         border-bottom: 1px solid #eeeeee;
@@ -347,7 +321,7 @@
     }
 
     .task-time {
-        font-family: 'Courier New', monospace;
+        font-family: 'JetBrains Mono', monospace;
         font-size: 0.75rem;
         color: #888888;
         min-width: 42px;
@@ -384,7 +358,6 @@
     .task-dot.turno    { background-color: #1565c0; }
     .task-dot.alerta   { background-color: #c62828; }
 
-    /* Estado vacio agenda */
     .agenda-empty {
         padding: 20px 16px;
         text-align: center;
@@ -394,9 +367,6 @@
         text-transform: uppercase;
     }
 
-    /* ------------------------------------------
-       PANEL LEYENDA
-    ------------------------------------------ */
     .legend-panel {
         background: #ffffff;
         border: 2px solid #1a1a1a;
@@ -436,9 +406,6 @@
         flex-shrink: 0;
     }
 
-    /* ------------------------------------------
-       PANEL STATS DEL MES
-    ------------------------------------------ */
     .stats-panel {
         background: #1a1a1a;
         border: 2px solid #000000;
@@ -476,7 +443,7 @@
     }
 
     .stat-value {
-        font-family: 'Courier New', monospace;
+        font-family: 'JetBrains Mono', monospace;
         font-size: 1.1rem;
         font-weight: 700;
     }
@@ -485,21 +452,17 @@
     .stat-value.blue   { color: #00e5ff; }
     .stat-value.yellow { color: #ffcc00; }
 
-    /* ------------------------------------------
-       BOTONES AGREGAR EVENTO
-    ------------------------------------------ */
-    .btn-add-event {
+    .btn-action {
         background-color: #1a1a1a;
         color: #ffffff;
         border: 2px solid #000000;
         border-radius: 0;
-        width: 100%;
-        padding: 10px;
+        padding: 10px 18px;
         font-size: 0.82rem;
         font-weight: 700;
         letter-spacing: 1px;
         text-transform: uppercase;
-        display: flex;
+        display: inline-flex;
         align-items: center;
         justify-content: center;
         gap: 8px;
@@ -508,84 +471,245 @@
         text-decoration: none;
     }
 
-    .btn-add-event:hover {
+    .btn-action:hover {
         background-color: #333333;
         color: #ffcc00;
         transform: translate(-2px, -2px);
         box-shadow: 4px 4px 0px #000000;
     }
 
-    .btn-add-event.green-variant {
+    .btn-action.green {
         background-color: #1b5e20;
         border-color: #0d3d0d;
         color: #ffffff;
     }
 
-    .btn-add-event.green-variant:hover {
+    .btn-action.green:hover {
         background-color: #2e7d32;
         color: #ffffff;
     }
 
-    .btn-add-event.blue-variant {
+    .btn-action.blue {
         background-color: #0d47a1;
         border-color: #082b64;
         color: #ffffff;
     }
 
-    .btn-add-event.blue-variant:hover {
+    .btn-action.blue:hover {
         background-color: #1565c0;
         color: #ffffff;
+    }
+
+    /* SCADA Modal */
+    .scada-modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .scada-modal-overlay.active {
+        display: flex;
+    }
+
+    .scada-modal {
+        background: #ffffff;
+        border: 3px solid #1a1a1a;
+        box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.3);
+        width: 100%;
+        max-width: 500px;
+        border-radius: 0;
+    }
+
+    .scada-modal-header {
+        background-color: #1a1a1a;
+        border-bottom: 3px solid #00e5ff;
+        padding: 16px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .scada-modal-header h5 {
+        color: #ffffff;
+        font-family: 'JetBrains Mono', monospace;
+        font-weight: 700;
+        letter-spacing: 1px;
+        margin: 0;
+        font-size: 0.95rem;
+    }
+
+    .scada-modal-close {
+        background: none;
+        border: none;
+        color: #888;
+        cursor: pointer;
+        padding: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: color 0.15s;
+    }
+
+    .scada-modal-close:hover {
+        color: #ffffff;
+    }
+
+    .scada-modal-body {
+        padding: 24px;
+    }
+
+    .scada-modal-footer {
+        padding: 16px 24px;
+        border-top: 2px dashed #cccccc;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+
+    .form-group-scada {
+        margin-bottom: 16px;
+    }
+
+    .form-group-scada:last-child {
+        margin-bottom: 0;
+    }
+
+    .form-group-scada label {
+        display: block;
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #1a1a1a;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+    }
+
+    .form-group-scada select,
+    .form-group-scada input,
+    .form-group-scada textarea {
+        width: 100%;
+        padding: 10px 12px;
+        border: 2px solid #cccccc;
+        border-radius: 0;
+        font-size: 0.9rem;
+        font-family: 'Inter', sans-serif;
+        background-color: #ffffff;
+        color: #1a1a1a;
+        transition: border-color 0.15s;
+        box-sizing: border-box;
+    }
+
+    .form-group-scada select:focus,
+    .form-group-scada input:focus,
+    .form-group-scada textarea:focus {
+        outline: none;
+        border-color: #00e5ff;
+    }
+
+    .btn-modal-cancel {
+        background: transparent;
+        border: 2px solid #1a1a1a;
+        color: #1a1a1a;
+        padding: 10px 20px;
+        font-size: 0.82rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        border-radius: 0;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-modal-cancel:hover {
+        background-color: #f0f0f0;
+    }
+
+    .btn-modal-save {
+        background-color: #1a1a1a;
+        border: 2px solid #000000;
+        color: #ffffff;
+        padding: 10px 20px;
+        font-size: 0.82rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        border-radius: 0;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-modal-save:hover {
+        background-color: #333333;
+        color: #ffcc00;
+        transform: translate(-2px, -2px);
+        box-shadow: 3px 3px 0px #000000;
+    }
+
+    @media (max-width: 1024px) {
+        .cal-wrapper {
+            flex-direction: column;
+        }
+        .cal-sidebar {
+            width: 100%;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+        .cal-sidebar > * {
+            flex: 1 1 250px;
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- Barra superior: navegacion de mes + botones agregar -->
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <div class="d-flex align-items-center gap-2">
-        <!-- Mes anterior -->
+
+{# ===================== TOP BAR ===================== #}
+<div class="flex justify-between items-center mb-4">
+    <div class="flex items-center gap-2">
         <a href="?mes={{ mes_anterior }}&anio={{ anio_anterior }}" class="cal-nav-btn" title="Mes anterior">
-            <i class="bi bi-chevron-left"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
         </a>
-        <div style="font-size:1.1rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#1a1a1a; min-width:200px; text-align:center;">
-            {{ nombre_mes|upper }} <span style="font-family:'Courier New',monospace; color:#888888;">{{ anio_actual }}</span>
+        <div class="text-lg font-bold tracking-widest uppercase text-[#1a1a1a] min-w-[200px] text-center">
+            {{ nombre_mes|upper }} <span class="font-mono text-[#888888]">{{ anio_actual }}</span>
         </div>
-        <!-- Mes siguiente -->
         <a href="?mes={{ mes_siguiente }}&anio={{ anio_siguiente }}" class="cal-nav-btn" title="Mes siguiente">
-            <i class="bi bi-chevron-right"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
         </a>
-        <!-- Volver a hoy -->
-        <a href="?" class="cal-nav-btn ms-2" title="Ir a hoy" style="border-color:#00e5ff; color:#00e5ff;">
-            <i class="bi bi-calendar-check"></i>
+        <a href="?" class="cal-nav-btn ml-2" title="Ir a hoy" style="border-color:#00e5ff; color:#00e5ff;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="m9 16 2 2 4-4"/></svg>
         </a>
     </div>
 
-    <div class="d-flex gap-2">
-        <button type="button" class="btn-add-event blue-variant" onclick="abrirModalEvento('TURNO')" style="width:auto; padding:8px 18px;">
-            <i class="bi bi-clock"></i> Nuevo Turno
+    <div class="flex gap-2">
+        <button type="button" class="btn-action blue" onclick="abrirModalEvento('TURNO')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Nuevo Turno
         </button>
-        <button type="button" class="btn-add-event green-variant" onclick="abrirModalEvento('ENTREGA')" style="width:auto; padding:8px 18px;">
-            <i class="bi bi-box-arrow-up"></i> Nueva Entrega
+        <button type="button" class="btn-action green" onclick="abrirModalEvento('ENTREGA')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 16h6"/><path d="M19 11v7.2c0 1.2-1 2.2-2.2 2.2H7.2c-1.2 0-2.2-1-2.2-2.2V5c0-1.2 1-2.2 2.2-2.2H12"/><path d="m9 11 2 2 4-4"/></svg>
+            Nueva Entrega
         </button>
     </div>
 </div>
 
-<!-- Layout principal: calendario + sidebar -->
+{# ===================== MAIN LAYOUT ===================== #}
 <div class="cal-wrapper">
 
-    <!-- ===================== CALENDARIO MENSUAL ===================== -->
+    {# ===================== CALENDARIO MENSUAL ===================== #}
     <div class="cal-main">
 
-        <!-- Cabecera del mes (usada en pantallas medianas como referencia) -->
         <div class="cal-header">
             <span class="month-title">{{ nombre_mes }}</span>
-            <span class="year-badge">[ AÑO {{ anio_actual }} ]</span>
-            <span style="font-size:0.75rem; color:#888888; font-family:'Courier New',monospace;">
+            <span class="year-badge">[ {{ anio_actual }} ]</span>
+            <span class="text-xs text-[#888888] font-mono">
                 {{ total_eventos_mes }} EVENTOS
             </span>
         </div>
 
-        <!-- Nombres de los días -->
         <div class="cal-days-header">
             <div class="cal-day-name">LUN</div>
             <div class="cal-day-name">MAR</div>
@@ -596,15 +720,12 @@
             <div class="cal-day-name weekend">DOM</div>
         </div>
 
-        <!-- Grilla de días -->
         <div class="cal-grid">
 
-            {# Celdas vacías al inicio (días del mes anterior) #}
             {% for vacio in dias_vacios_inicio %}
             <div class="cal-cell empty"></div>
             {% endfor %}
 
-            {# Dias del mes actual #}
             {% for dia in dias_del_mes %}
             <div class="cal-cell
                 {% if dia.es_hoy %}today{% endif %}
@@ -613,28 +734,24 @@
                 <div class="day-number">{{ dia.numero }}</div>
 
                 <div class="cal-events">
-                    {# Entregas del dia #}
                     {% for entrega in dia.entregas %}
                     <div class="cal-event entrega" title="{{ entrega.cliente }} - {{ entrega.equipo }}">
                         {{ entrega.cliente|truncatechars:16 }}
                     </div>
                     {% endfor %}
 
-                    {# Turnos del dia #}
                     {% for turno in dia.turnos %}
                     <div class="cal-event turno" title="{{ turno.hora }} - {{ turno.descripcion }}">
                         {{ turno.hora }} {{ turno.descripcion|truncatechars:12 }}
                     </div>
                     {% endfor %}
 
-                    {# Alertas del dia #}
                     {% for alerta in dia.alertas %}
                     <div class="cal-event alerta" title="{{ alerta.descripcion }}">
                         {{ alerta.descripcion|truncatechars:18 }}
                     </div>
                     {% endfor %}
 
-                    {# Si hay muchos eventos, indicar cuantos mas #}
                     {% if dia.mas_eventos %}
                     <div class="more-events">+{{ dia.mas_eventos }} más...</div>
                     {% endif %}
@@ -642,57 +759,51 @@
             </div>
             {% endfor %}
 
-            {# Celdas vacías al final (días del mes siguiente) #}
             {% for vacio in dias_vacios_fin %}
             <div class="cal-cell empty"></div>
             {% endfor %}
 
-        </div>{# /cal-grid #}
-    </div>{# /cal-main #}
+        </div>
+    </div>
 
-    <!-- ===================== SIDEBAR LATERAL ===================== -->
+    {# ===================== SIDEBAR ===================== #}
     <div class="cal-sidebar">
 
-        <!-- AGENDA DEL DIA -->
+        {# AGENDA DEL DÍA #}
         <div class="agenda-panel">
             <div class="agenda-header">
-                <i class="bi bi-lightning-charge-fill"></i>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg>
                 AGENDA DEL DÍA
             </div>
-            <div class="agenda-body">
 
-                <!-- Fecha grande en negro -->
-                <div class="today-date-block">
-                    <div class="day-big">{{ hoy_numero }}</div>
-                    <div class="day-info">
-                        <span class="day-name">{{ hoy_nombre_dia }}</span>
-                        <span class="month-year">{{ hoy_mes_anio }}</span>
+            <div class="today-date-block">
+                <div class="day-big">{{ hoy_numero }}</div>
+                <div class="day-info">
+                    <span class="day-name">{{ hoy_nombre_dia }}</span>
+                    <span class="month-year">{{ hoy_mes_anio }}</span>
+                </div>
+            </div>
+
+            {% if agenda_hoy %}
+                {% for tarea in agenda_hoy %}
+                <div class="agenda-task">
+                    <div class="task-dot {{ tarea.tipo }}"></div>
+                    <div class="task-time">{{ tarea.hora }}</div>
+                    <div class="task-content">
+                        <div class="task-title">{{ tarea.titulo }}</div>
+                        <div class="task-sub">{{ tarea.subtitulo }}</div>
                     </div>
                 </div>
-
-                <!-- Lista de tareas/eventos del dia -->
-                {% if agenda_hoy %}
-                    {% for tarea in agenda_hoy %}
-                    <div class="agenda-task">
-                        <div class="task-dot {{ tarea.tipo }}"></div>
-                        <div class="task-time">{{ tarea.hora }}</div>
-                        <div class="task-content">
-                            <div class="task-title">{{ tarea.titulo }}</div>
-                            <div class="task-sub">{{ tarea.subtitulo }}</div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                {% else %}
-                    <div class="agenda-empty">
-                        <i class="bi bi-calendar-x" style="font-size:1.5rem; color:#dddddd; display:block; margin-bottom:6px;"></i>
-                        Sin eventos hoy
-                    </div>
-                {% endif %}
-
-            </div>
+                {% endfor %}
+            {% else %}
+                <div class="agenda-empty">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#dddddd" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:block; margin:0 auto 6px;"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="m9 16 2 2 4-4"/></svg>
+                    Sin eventos hoy
+                </div>
+            {% endif %}
         </div>
 
-        <!-- ESTADISTICAS DEL MES -->
+        {# RESUMEN DEL MES #}
         <div class="stats-panel">
             <div class="stats-header">Resumen del Mes</div>
             <div class="stats-body">
@@ -715,13 +826,13 @@
             </div>
         </div>
 
-        <!-- LEYENDA -->
+        {# LEYENDA #}
         <div class="legend-panel">
             <div class="legend-header">Leyenda</div>
             <div class="legend-body">
                 <div class="legend-item">
                     <div class="legend-dot" style="background-color:#00e5ff; box-shadow:0 0 6px rgba(0,229,255,0.7);"></div>
-                    <span>Dia de Hoy</span>
+                    <span>Día de Hoy</span>
                 </div>
                 <div class="legend-item">
                     <div class="legend-dot" style="background-color:#2e7d32;"></div>
@@ -737,56 +848,59 @@
                 </div>
                 <div class="legend-item">
                     <div class="legend-dot" style="background-color:#f9f9f9; border:1px solid #cccccc;"></div>
-                    <span>Dia Inactivo</span>
+                    <span>Día Inactivo</span>
                 </div>
             </div>
         </div>
 
-        <!-- ACCIONES RAPIDAS -->
-        <div style="display:flex; flex-direction:column; gap:8px;">
-            <a href="{% url 'ingreso_equipo' %}" class="btn-add-event">
-                <i class="bi bi-plus-circle"></i> Nuevo Ingreso
+        {# ACCIONES RÁPIDAS #}
+        <div class="flex flex-col gap-2">
+            <a href="{% url 'ingreso_equipo' %}" class="btn-action w-full">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+                Nuevo Ingreso
             </a>
-            <a href="{% url 'tablero' %}" class="btn-add-event" style="background-color:#444444;">
-                <i class="bi bi-speedometer2"></i> Ir al Tablero
+            <a href="{% url 'tablero' %}" class="btn-action w-full" style="background-color:#444444;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+                Ir al Tablero
             </a>
         </div>
 
-    </div>{# /cal-sidebar #}
+    </div>
+</div>
 
-</div>{# /cal-wrapper #}
-
-<div class="modal fade" id="modalEvento" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" style="border: 3px solid #1a1a1a; border-radius: 0; box-shadow: 8px 8px 0px rgba(0,0,0,0.3);">
-            <div class="modal-header" style="background-color: #1a1a1a; color: white; border-bottom: 3px solid #00e5ff; border-radius: 0;">
-                <h5 class="modal-title" style="font-family: 'Courier New', monospace; font-weight: bold; letter-spacing: 1px;">NUEVO EVENTO</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-            </div>
-            <div class="modal-body p-4">
-                <form id="form-nuevo-evento">
-                    {% csrf_token %} <div class="form-group-industrial">
-                        <label>Tipo de Evento</label>
-                        {{ form_evento.tipo }}
-                    </div>
-                    <div class="form-group-industrial">
-                        <label>Fecha y Hora</label>
-                        {{ form_evento.fecha_hora }}
-                    </div>
-                    <div class="form-group-industrial">
-                        <label>Título (Cliente/Equipo)</label>
-                        {{ form_evento.titulo }}
-                    </div>
-                    <div class="form-group-industrial">
-                        <label>Descripción / Detalles</label>
-                        {{ form_evento.descripcion }}
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer" style="border-top: 2px dashed #ccc;">
-                <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal" style="border-radius: 0; font-weight: bold;">CANCELAR</button>
-                <button type="button" class="btn btn-dark" id="btn-guardar-evento" style="border-radius: 0; font-weight: bold;">GUARDAR</button>
-            </div>
+{# ===================== MODAL NUEVO EVENTO ===================== #}
+<div class="scada-modal-overlay" id="modalEvento">
+    <div class="scada-modal">
+        <div class="scada-modal-header">
+            <h5>NUEVO EVENTO</h5>
+            <button type="button" class="scada-modal-close" onclick="cerrarModalEvento()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+        </div>
+        <div class="scada-modal-body">
+            <form id="form-nuevo-evento">
+                {% csrf_token %}
+                <div class="form-group-scada">
+                    <label>Tipo de Evento</label>
+                    {{ form_evento.tipo }}
+                </div>
+                <div class="form-group-scada">
+                    <label>Fecha y Hora</label>
+                    {{ form_evento.fecha_hora }}
+                </div>
+                <div class="form-group-scada">
+                    <label>Título (Cliente/Equipo)</label>
+                    {{ form_evento.titulo }}
+                </div>
+                <div class="form-group-scada">
+                    <label>Descripción / Detalles</label>
+                    {{ form_evento.descripcion }}
+                </div>
+            </form>
+        </div>
+        <div class="scada-modal-footer">
+            <button type="button" class="btn-modal-cancel" onclick="cerrarModalEvento()">Cancelar</button>
+            <button type="button" class="btn-modal-save" id="btn-guardar-evento">Guardar</button>
         </div>
     </div>
 </div>
@@ -795,63 +909,68 @@
 
 {% block extra_js %}
 <script>
-let modalEventoInstancia;
+(function() {
+    const modal = document.getElementById('modalEvento');
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Inicializar el modal de Bootstrap
-    modalEventoInstancia = new bootstrap.Modal(document.getElementById('modalEvento'));
-});
+    window.abrirModalEvento = function(tipo) {
+        document.getElementById('form-nuevo-evento').reset();
 
-function abrirModalEvento(tipo) {
-    // 1. Limpiar formulario anterior
-    document.getElementById('form-nuevo-evento').reset();
-    
-    // 2. Seleccionar el tipo automáticamente y bloquearlo si es necesario
-    const tipoSelect = document.querySelector('#form-nuevo-evento [name="tipo"]');
-    if(tipoSelect) tipoSelect.value = tipo;
+        const tipoSelect = document.querySelector('#form-nuevo-evento [name="tipo"]');
+        if (tipoSelect) tipoSelect.value = tipo;
 
-    // 3. Cambiar color del encabezado según tipo
-    const header = document.querySelector('#modalEvento .modal-header');
-    header.style.borderBottomColor = tipo === 'TURNO' ? '#1565c0' : '#2e7d32';
+        const header = modal.querySelector('.scada-modal-header');
+        header.style.borderBottomColor = tipo === 'TURNO' ? '#1565c0' : '#2e7d32';
 
-    // 4. Mostrar
-    modalEventoInstancia.show();
-}
-
-document.getElementById('btn-guardar-evento').addEventListener('click', function() {
-    const form = document.getElementById('form-nuevo-evento');
-    
-    const payload = {
-        tipo: form.querySelector('[name="tipo"]').value,
-        fecha_hora: form.querySelector('[name="fecha_hora"]').value,
-        titulo: form.querySelector('[name="titulo"]').value,
-        descripcion: form.querySelector('[name="descripcion"]').value
+        modal.classList.add('active');
     };
 
-    fetch("{% url 'crear_evento_api' %}", {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-        },
-        body: JSON.stringify(payload)
-    })
-    .then(response => response.json())
-    .then(data => {
-        if(data.status === 'success') {
-            modalEventoInstancia.hide();
-            // Recargamos la página silenciosamente para que el evento aparezca en la grilla
-            window.location.reload(); 
-        } else {
-            let errorMsg = "Revise los campos:\n";
-            for (let field in data.errors) {
-                errorMsg += `- ${field}: ${data.errors[field]}\n`;
-            }
-            alert(errorMsg);
-        }
-    })
-    .catch(error => alert('Error de conexión con el servidor.'));
-});
-</script>
+    window.cerrarModalEvento = function() {
+        modal.classList.remove('active');
+    };
 
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) cerrarModalEvento();
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modal.classList.contains('active')) {
+            cerrarModalEvento();
+        }
+    });
+
+    document.getElementById('btn-guardar-evento').addEventListener('click', function() {
+        const form = document.getElementById('form-nuevo-evento');
+
+        const payload = {
+            tipo: form.querySelector('[name="tipo"]').value,
+            fecha_hora: form.querySelector('[name="fecha_hora"]').value,
+            titulo: form.querySelector('[name="titulo"]').value,
+            descripcion: form.querySelector('[name="descripcion"]').value
+        };
+
+        fetch("{% url 'crear_evento_api' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(function(response) { return response.json(); })
+        .then(function(data) {
+            if (data.status === 'success') {
+                cerrarModalEvento();
+                window.location.reload();
+            } else {
+                var errorMsg = "Revise los campos:\n";
+                for (var field in data.errors) {
+                    errorMsg += "- " + field + ": " + data.errors[field] + "\n";
+                }
+                alert(errorMsg);
+            }
+        })
+        .catch(function() { alert('Error de conexión con el servidor.'); });
+    });
+})();
+</script>
 {% endblock %}

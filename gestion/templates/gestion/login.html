@@ -4,43 +4,61 @@
 {% block page_title %}INICIO DE SESIÓN{% endblock %}
 
 {% block content %}
+<div class="max-w-md mx-auto mt-24">
+    <!-- Login Card -->
+    <div class="card-industrial">
+        <!-- Header -->
+        <div class="bg-[#1a1a1a] text-white px-6 py-5 border-b-3 border-[#00f900]">
+            <h3 class="text-base font-bold tracking-widest uppercase m-0 font-sans
+                       flex items-center gap-3">
+                <!-- DoorOpen icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                     fill="none" stroke="#00f900" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M13 4h3a2 2 0 0 1 2 2v14"/>
+                    <path d="M2 20h3"/><path d="M13 20h9"/>
+                    <path d="M10 12v.5"/><path d="M13 4.5 19 10l-6 5.5v-3z"/>
+                </svg>
+                INICIAR SESIÓN
+            </h3>
+        </div>
 
-<!-- Page breadcrumb -->
-<div class="d-flex align-items-center mb-4" style="gap: 8px; font-size: 0.8rem; font-family: 'Courier New', Courier, monospace; color: #888;">
-    <a href="{% url 'tablero' %}" style="color: #888; text-decoration: none;">
-        <i class="bi bi-speedometer2"></i> TABLERO
-    </a>
-</div>
+        <!-- Body -->
+        <div class="p-6">
+            <form method="post" novalidate>
+                {% csrf_token %}
 
-<!-- Tarjeta de login -->
-<div class="card border-dark shadow-lg" style="border: 1px solid #000; width: 350px; margin: 100px auto; padding: 40px;">
-    <div class="card-header bg-dark text-white fw-bold" style="border: 1px solid #333; padding: 20px;">
-        <h3 class="mb-0">INICIAR SESIÓN</h3>
+                <div class="form-group-industrial mb-4">
+                    <label for="id_username">Usuario</label>
+                    <input type="text" name="username" id="id_username"
+                           class="input-industrial" required
+                           placeholder="Ingrese su usuario">
+                </div>
+
+                <div class="form-group-industrial mb-5">
+                    <label for="id_password">Contraseña</label>
+                    <input type="password" name="password" id="id_password"
+                           class="input-industrial" required
+                           placeholder="Ingrese su contraseña">
+                </div>
+
+                <button type="submit"
+                        class="btn-green w-full justify-center text-sm">
+                    <!-- LogIn icon -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                        <polyline points="10 17 15 12 10 7"/>
+                        <line x1="15" y1="12" x2="3" y2="12"/>
+                    </svg>
+                    Acceder
+                </button>
+
+                <div class="text-center mt-4 text-xs text-[#666]">
+                    ¿No tienes cuenta?
+                    <a href="#" class="text-[#888] hover:text-[#00f900] transition-colors">Crear usuario</a>
+                </div>
+            </form>
+        </div>
     </div>
-    
-    <div class="card-body">
-        <form method="post" novalidate>
-            {% csrf_token %}
-            
-            <div class="mb-3">
-                <label class="form-label fw-bold small" style="color: #fff;">Usuario</label>
-                <input type="text" name="username" class="form-control form-control-industrial" required style="background-color: #333; color: #fff;">
-            </div>
-            
-            <div class="mb-3">
-                <label class="form-label fw-bold small" style="color: #fff;">Contraseña</label>
-                <input type="password" name="password" class="form-control form-control-industrial" required style="background-color: #333; color: #fff;">
-            </div>
-            
-            <button type="submit" class="btn-guardar w-100">
-                <i class="bi bi-door-open me-1"></i> Acceder
-            </button>
-            
-            <div class="text-center mt-3 small" style="color: #666;">
-                ¿No tienes cuenta? <a href="#" style="color: #888;">Crear usuario</a>
-            </div>
-        </form>
-    </div>
 </div>
-
 {% endblock %}

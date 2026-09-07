@@ -1,378 +1,262 @@
 {% extends 'gestion/base.html' %}
-
-{% block title %}Tablero - Sistema de Gestión de Taller{% endblock %}
-
-{% block page_title %}TABLERO DIAGNÓSTICO{% endblock %}
+{% block title %}Tablero - C&H Refrigeración{% endblock %}
+{% block page_title %}Panel de Control{% endblock %}
+{% block nav_tablero %}active{% endblock %}
 
 {% block content %}
-<div class="container-fluid px-4 py-4">
 
-  <!-- SECCIÓN 1: DIAGNÓSTICO ACTIVO -->
-  <section class="mb-5">
-    <h2 class="fw-bold mb-4"
-      style="color: #1a1a1a; font-family: 'Segoe UI', sans-serif; border-bottom: 2px solid #000; padding-bottom: 12px;">
-      📊 DIAGNÓSTICO ACTIVO (Bucle IoT)
-    </h2>
+{# ============================================================
+   1. SYSTEM METRICS ROW — 4 KPI cards
+   ============================================================ #}
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
 
-    {% for item in banco_pruebas %}
-    <div class="row mb-5 align-items-stretch">
-      <!-- GRÁFICA IZQUIERDA: CICLO (Unidad Interior/Frío) -->
-      <div class="col-lg-6 mb-3 mb-lg-0">
-        <div class="card border-dark shadow-lg"
-          style="border: 1px solid #000; box-shadow: 5px 5px 0px rgba(0,0,0,0.1); border-radius: 0;">
-          <div class="card-header bg-dark text-white fw-bold" style="border: 1px solid #000;">
-            🧊 CICLO - Unidad Interior/Frío #{{ item.id }}
-          </div>
-          <div class="card-body" style="background: #f4f4f4; padding: 20px;">
-            <!-- Valores PLC en tiempo real -->
-            <div class="row mb-4 text-center">
-              <div class="col-md-4">
-                <div class="plc-display"
-                  style="background: #222; border: 1px solid #666; padding: 12px; border-radius: 0;">
-                  <small class="d-block" style="color: #999; font-size: 11px; letter-spacing: 1px;">BAJA PRESIÓN</small>
-                  <div
-                    style="color: #00ff00; font-family: 'Courier New', monospace; font-size: 18px; font-weight: bold; margin-top: 6px;">
-                    {{ item.baja_presion }}
-                  </div>
-                  <small style="color: #00ff00; font-size: 10px;">PSI</small>
-                </div>
-              </div>
-              <div class="col-md-4">
-                <div class="plc-display"
-                  style="background: #222; border: 1px solid #666; padding: 12px; border-radius: 0;">
-                  <small class="d-block" style="color: #999; font-size: 11px; letter-spacing: 1px;">TEMPERATURA</small>
-                  <div
-                    style="color: #0dcaf0; font-family: 'Courier New', monospace; font-size: 18px; font-weight: bold; margin-top: 6px;">
-                    {{ item.temperatura }}
-                  </div>
-                  <small style="color: #0dcaf0; font-size: 10px;">°C</small>
-                </div>
-              </div>
-              <div class="col-md-4">
-                <div class="plc-display"
-                  style="background: #222; border: 1px solid #666; padding: 12px; border-radius: 0;">
-                  <small class="d-block" style="color: #999; font-size: 11px; letter-spacing: 1px;">SUPERHEAT
-                    (SH)</small>
-                  <div
-                    style="color: #d63384; font-family: 'Courier New', monospace; font-size: 18px; font-weight: bold; margin-top: 6px;">
-                    {{ item.superheat }}
-                  </div>
-                  <small style="color: #d63384; font-size: 10px;">K</small>
-                </div>
-              </div>
+    {# --- Card 1: Órdenes Activas --- #}
+    <div class="card-industrial p-5">
+        <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 flex items-center justify-center bg-[#e8ffe8] border border-[#00cc00]">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                     fill="none" stroke="#00f900" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect width="8" height="4" x="8" y="2" rx="1" ry="1"/>
+                    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                    <path d="M12 11h4"/><path d="M12 16h4"/>
+                    <path d="M8 11h.01"/><path d="M8 16h.01"/>
+                </svg>
             </div>
-
-            <!-- Gráfica Chart.js -->
-            <div style="position: relative; height: 300px; margin-top: 20px;">
-              <canvas id="chart-left-{{ item.id }}"></canvas>
-            </div>
-          </div>
+            <span class="text-[0.65rem] font-mono uppercase tracking-widest text-[#666] leading-tight">
+                Órdenes<br>Activas
+            </span>
         </div>
-      </div>
-
-      <!-- GRÁFICA DERECHA: RENDIMIENTO (Unidad Exterior/Trabajo) -->
-      <div class="col-lg-6">
-        <div class="card border-dark shadow-lg"
-          style="border: 1px solid #000; box-shadow: 5px 5px 0px rgba(0,0,0,0.1); border-radius: 0;">
-          <div class="card-header bg-dark text-white fw-bold" style="border: 1px solid #000;">
-            ⚙️ RENDIMIENTO - Unidad Exterior/Trabajo #{{ item.id }}
-          </div>
-          <div class="card-body" style="background: #f4f4f4; padding: 20px;">
-            <!-- Valores PLC en tiempo real -->
-            <div class="row mb-4 text-center">
-              <div class="col-md-6">
-                <div class="plc-display"
-                  style="background: #222; border: 1px solid #666; padding: 12px; border-radius: 0;">
-                  <small class="d-block" style="color: #999; font-size: 11px; letter-spacing: 1px;">ALTA PRESIÓN</small>
-                  <div
-                    style="color: #dc3545; font-family: 'Courier New', monospace; font-size: 18px; font-weight: bold; margin-top: 6px;">
-                    {{ item.alta_presion }}
-                  </div>
-                  <small style="color: #dc3545; font-size: 10px;">PSI</small>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="plc-display"
-                  style="background: #222; border: 1px solid #666; padding: 12px; border-radius: 0;">
-                  <small class="d-block" style="color: #999; font-size: 11px; letter-spacing: 1px;">POTENCIA</small>
-                  <div
-                    style="color: #ffc107; font-family: 'Courier New', monospace; font-size: 18px; font-weight: bold; margin-top: 6px;">
-                    {{ item.potencia }}
-                  </div>
-                  <small style="color: #ffc107; font-size: 10px;">W</small>
-                </div>
-              </div>
-            </div>
-
-            <!-- Gráfica Chart.js -->
-            <div style="position: relative; height: 300px; margin-top: 20px;">
-              <canvas id="chart-right-{{ item.id }}"></canvas>
-            </div>
-          </div>
-        </div>
-      </div>
+        <div class="crt-text text-4xl font-mono font-bold">{{ ordenes_en_proceso|length }}</div>
+        <div class="text-[0.7rem] text-[#999] font-mono mt-1">EN PROCESO</div>
     </div>
-    {% endfor %}
-  </section>
 
-  <!-- SECCIÓN 2: TABLAS DE GESTIÓN -->
-  <section class="mb-5">
-    <h2 class="fw-bold mb-4"
-      style="color: #1a1a1a; font-family: 'Segoe UI', sans-serif; border-bottom: 2px solid #000; padding-bottom: 12px;">
-      📋 GESTIÓN DE ÓRDENES
-    </h2>
-
-    <div class="row">
-      <!-- TABLA: EN PROCESO -->
-      <div class="col-lg-6 mb-4">
-        <div class="card border-dark shadow-lg"
-          style="border: 1px solid #000; box-shadow: 5px 5px 0px rgba(0,0,0,0.1); border-radius: 0;">
-          <div class="card-header bg-dark text-white fw-bold" style="border: 1px solid #000;">
-            ⏳ EN PROCESO
-          </div>
-          <div class="table-responsive">
-            <table class="table table-dark table-bordered table-hover mb-0" style="border: 1px solid #000;">
-              <thead style="background: #000;">
-                <tr>
-                  <th style="border: 1px solid #333;">ID</th>
-                  <th style="border: 1px solid #333;">Cliente</th>
-                  <th style="border: 1px solid #333;">Estado</th>
-                  <th style="border: 1px solid #333;">Acción</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for orden in ordenes_en_proceso %}
-                <tr>
-                  <td style="border: 1px solid #333; font-family: 'Courier New', monospace;">#{{ orden.id }}</td>
-                  <td style="border: 1px solid #333;">{{ orden.equipo.cliente }}</td>
-                  <td style="border: 1px solid #333;">
-                    {% if orden.estado == 'PENDIENTE' %}
-                    <span class="badge"
-                      style="background: #dc3545; border-radius: 0; padding: 6px 10px; font-size: 11px; font-weight: bold;">PENDIENTE</span>
-                    {% elif orden.estado == 'DIAGNOSTICO' %}
-                    <span class="badge"
-                      style="background: #ffc107; color: #000; border-radius: 0; padding: 6px 10px; font-size: 11px; font-weight: bold;">DIAGNÓSTICO</span>
-                    {% elif orden.estado == 'REPARACION' %}
-                    <span class="badge"
-                      style="background: #0d6efd; border-radius: 0; padding: 6px 10px; font-size: 11px; font-weight: bold;">REPARACIÓN</span>
-                    {% endif %}
-                  </td>
-                  <td style="border: 1px solid #333;">
-                    <a href="{% url 'detalle_orden' orden.id %}" class="btn btn-sm btn-outline-light"
-                      style="border: 1px solid #666; border-radius: 0; padding: 4px 8px; font-size: 11px;">
-                      📄 Ficha
-                    </a>
-                  </td>
-                </tr>
-                {% empty %}
-                <tr>
-                  <td colspan="4" class="text-center text-muted py-3">Sin órdenes en proceso</td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
+    {# --- Card 2: Pendientes Entrega --- #}
+    <div class="card-industrial p-5">
+        <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 flex items-center justify-center bg-[#e0f7fa] border border-[#00e5ff]">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                     fill="none" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 16h6"/><path d="M19 11v7.2c0 1.2-1 2.2-2.2 2.2H7.2c-1.2 0-2.2-1-2.2-2.2V5c0-1.2 1-2.2 2.2-2.2H12"/>
+                    <path d="m9 11 2 2 4-4"/>
+                </svg>
+            </div>
+            <span class="text-[0.65rem] font-mono uppercase tracking-widest text-[#666] leading-tight">
+                Pendientes<br>Entrega
+            </span>
         </div>
-      </div>
-
-      <!-- TABLA: PARA ENTREGAR -->
-      <div class="col-lg-6 mb-4">
-        <div class="card border-dark shadow-lg"
-          style="border: 1px solid #000; box-shadow: 5px 5px 0px rgba(0,0,0,0.1); border-radius: 0;">
-          <div class="card-header bg-dark text-white fw-bold" style="border: 1px solid #000;">
-            ✅ PARA ENTREGAR
-          </div>
-          <div class="table-responsive">
-            <table class="table table-dark table-bordered table-hover mb-0" style="border: 1px solid #000;">
-              <thead style="background: #000;">
-                <tr>
-                  <th style="border: 1px solid #333;">Cliente</th>
-                  <th style="border: 1px solid #333;">Equipo</th>
-                  <th style="border: 1px solid #333;">cobro</th>
-                  <th style="border: 1px solid #333;">Acción</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for entrega in ordenes_para_entregar %}
-                <tr>
-                  <td style="border: 1px solid #333;">{{ entrega.equipo.cliente.nombre }}</td>
-                  <td style="border: 1px solid #333;">{{ entrega.equipo.get_tipo_display }}</td>
-                  <td style="border: 1px solid #333; font-family: 'Courier New', monospace; color: #ffc107;">$
-                    <entrega class="total_calculado"></entrega></td>
-                  <td style="border: 1px solid #333;">
-                    <a href="{% url 'detalle_orden' entrega.id %}" class="btn btn-sm btn-success"
-                      style="border-radius: 0; padding: 4px 8px; font-size: 11px; background: #28a745; border: 1px solid #28a745;">
-                      👁️ Ficha
-                    </a>
-                  </td>
-                </tr>
-                {% empty %}
-                <tr>
-                  <td colspan="4" class="text-center text-muted py-3">Sin órdenes para entregar</td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
+        <div class="crt-text text-4xl font-mono font-bold" style="color:#00e5ff; text-shadow:0 0 8px rgba(0,229,255,0.6);">
+            {{ ordenes_para_entregar|length }}
         </div>
-      </div>
+        <div class="text-[0.7rem] text-[#999] font-mono mt-1">COMPLETADAS</div>
     </div>
-  </section>
+
+    {# --- Card 3: Entregadas Recientes --- #}
+    <div class="card-industrial p-5">
+        <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 flex items-center justify-center bg-[#fff8e0] border border-[#ffcc00]">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                     fill="none" stroke="#ffcc00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
+                    <polyline points="16 7 22 7 22 13"/>
+                </svg>
+            </div>
+            <span class="text-[0.65rem] font-mono uppercase tracking-widest text-[#666] leading-tight">
+                Entregadas<br>Recientes
+            </span>
+        </div>
+        <div class="crt-text-amber text-4xl font-mono font-bold">{{ ordenes_entregadas|length }}</div>
+        <div class="text-[0.7rem] text-[#999] font-mono mt-1">ÚLTIMAS 5</div>
+    </div>
+
+    {# --- Card 4: Banco de Pruebas (Monitoreo Activo) --- #}
+    <div class="card-industrial p-5">
+        <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 flex items-center justify-center bg-[#e8ffe8] border border-[#00cc00]">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                     fill="none" stroke="#00f900" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+                </svg>
+            </div>
+            <span class="text-[0.65rem] font-mono uppercase tracking-widest text-[#666] leading-tight">
+                Monitoreo<br>Activo
+            </span>
+        </div>
+        <div class="crt-text text-4xl font-mono font-bold">{{ banco_pruebas|length }}</div>
+        <div class="text-[0.7rem] text-[#999] font-mono mt-1">EN BANCO</div>
+    </div>
 
 </div>
 
-<!-- BOTÓN FLOTANTE (FAB) CON ICONO DE ROBOT -->
-<button class="btn btn-dark fab-button" id="fab-button" style="
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  border: 2px solid #000;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  cursor: pointer;
-  z-index: 1000;
-  transition: transform 0.3s ease;
-">
-  🤖
-</button>
 
-{% endblock %}
+{# ============================================================
+   2. ACTIVE WORK ORDERS TABLE
+   ============================================================ #}
+<div class="card-industrial mb-8">
+    <div class="px-5 py-4 border-b-2 border-[#00f900] flex items-center justify-between">
+        <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-[#00f900] animate-pulse"></span>
+            <h3 class="font-mono text-sm uppercase tracking-widest font-bold m-0">Órdenes Activas</h3>
+        </div>
+        <span class="font-mono text-xs text-[#666]">{{ ordenes_en_proceso|length }} registro{{ ordenes_en_proceso|length|pluralize }}</span>
+    </div>
 
-{% block extra_js %}
-<script>
-  // Gráficas Chart.js para cada equipo
-  {% for item in banco_pruebas %}
-  // GRÁFICA IZQUIERDA: CICLO
-  const ctxLeft{{ item.id }} = document.getElementById('chart-left-{{ item.id }}').getContext('2d');
-  const chartLeft{{ item.id }} = new Chart(ctxLeft{{ item.id }}, {
-    type: 'line',
-    data: {
-      labels: {{ item.labels | safe }},
-    datasets: [
-    {
-      label: 'Baja Presión (PSI)',
-      data: {{ item.baja_presion_data | safe }},
-    borderColor: '#00ff00',
-    backgroundColor: 'rgba(0, 255, 0, 0.1)',
-    borderWidth: 2,
-    tension: 0.4,
-    fill: true
-          },
-    {
-      label: 'Temperatura (°C)',
-      data: {{ item.temperatura_data | safe }},
-    borderColor: '#0dcaf0',
-    backgroundColor: 'rgba(13, 202, 240, 0.1)',
-    borderWidth: 2,
-    tension: 0.4,
-    fill: false
-          },
-    {
-      label: 'Superheat (K)',
-      data: {{ item.superheat_data | safe }},
-    borderColor: '#d63384',
-    backgroundColor: 'rgba(214, 51, 132, 0.1)',
-    borderWidth: 2,
-    tension: 0.4,
-    fill: false
-          }
-  ]
-      },
-    options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        labels: {
-          color: '#1a1a1a',
-          font: { family: "'Segoe UI', sans-serif", size: 11 }
-        }
-      }
-    },
-    scales: {
-      x: {
-        grid: { color: '#ddd' },
-        ticks: { color: '#666', font: { family: "'Segoe UI', sans-serif" } }
-      },
-      y: {
-        grid: { color: '#ddd' },
-        ticks: { color: '#666', font: { family: "'Segoe UI', sans-serif" } }
-      }
-    }
-  }
-    });
+    <div class="overflow-x-auto">
+        <table class="table-industrial">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Cliente</th>
+                    <th>Equipo</th>
+                    <th>Estado</th>
+                    <th>Ingreso</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for orden in ordenes_en_proceso %}
+                <tr>
+                    <td class="font-bold">#{{ orden.id }}</td>
+                    <td>{{ orden.equipo.cliente.nombre }}</td>
+                    <td>
+                        <span class="text-[#1a1a1a]">{{ orden.equipo.get_tipo_display }}</span>
+                        <span class="text-[#666]">{{ orden.equipo.marca }} {{ orden.equipo.modelo }}</span>
+                    </td>
+                    <td>
+                        {% if orden.estado == 'PENDIENTE' %}
+                            <span class="badge-status badge-amber">Pendiente</span>
+                        {% elif orden.estado == 'DIAGNOSTICO' %}
+                            <span class="badge-status badge-amber">Diagnóstico</span>
+                        {% elif orden.estado == 'REPARACION' %}
+                            <span class="badge-status badge-green">Reparación</span>
+                        {% else %}
+                            <span class="badge-status badge-cyan">{{ orden.get_estado_display }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-[#666]">{{ orden.fecha_ingreso|date:"d/m/Y" }}</td>
+                    <td>
+                        <a href="{% url 'detalle_orden' orden_id=orden.id %}"
+                           class="btn-industrial btn-green text-[0.7rem] py-1.5 px-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                            Ver
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center py-10">
+                        <div class="flex flex-col items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+                                 fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M8 15h8"/><path d="M9 9h.01"/><path d="M15 9h.01"/>
+                            </svg>
+                            <span class="font-mono text-sm text-[#999] uppercase tracking-wider">
+                                No hay órdenes activas
+                            </span>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 
-  // GRÁFICA DERECHA: RENDIMIENTO
-  const ctxRight{{ item.id }} = document.getElementById('chart-right-{{ item.id }}').getContext('2d');
-  const chartRight{{ item.id }} = new Chart(ctxRight{{ item.id }}, {
-    type: 'line',
-    data: {
-      labels: {{ item.labels | safe }},
-    datasets: [
-    {
-      label: 'Alta Presión (PSI)',
-      data: {{ item.alta_presion_data | safe }},
-    borderColor: '#dc3545',
-    backgroundColor: 'rgba(220, 53, 69, 0.1)',
-    borderWidth: 2,
-    tension: 0.4,
-    fill: true
-          },
-    {
-      label: 'Potencia (W)',
-      data: {{ item.potencia_data | safe }},
-    borderColor: '#ffc107',
-    backgroundColor: 'rgba(255, 193, 7, 0.1)',
-    borderWidth: 2,
-    tension: 0.4,
-    fill: false
-          }
-  ]
-      },
-    options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        labels: {
-          color: '#1a1a1a',
-          font: { family: "'Segoe UI', sans-serif", size: 11 }
-        }
-      }
-    },
-    scales: {
-      x: {
-        grid: { color: '#ddd' },
-        ticks: { color: '#666', font: { family: "'Segoe UI', sans-serif" } }
-      },
-      y: {
-        grid: { color: '#ddd' },
-        ticks: { color: '#666', font: { family: "'Segoe UI', sans-serif" } }
-      }
-    }
-  }
-    });
-  {% endfor %}
 
-  // Efecto hover en botón FAB
-  const fabButton = document.getElementById('fab-button');
-  fabButton.addEventListener('mouseover', function () {
-    this.style.transform = 'scale(1.1)';
-  });
-  fabButton.addEventListener('mouseout', function () {
-    this.style.transform = 'scale(1)';
-  });
+{# ============================================================
+   3. BOTTOM ROW — Últimas Entregas + Resumen Rápido
+   ============================================================ #}
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-  // Ejemplo de acción al clickear FAB
-  fabButton.addEventListener('click', function () {
-    console.log('FAB Clicked - Robot asistente activado');
-    alert('🤖 Asistente de diagnóstico listo para ayudarte');
-  });
-</script>
+    {# --- Left Panel: Últimas Entregas --- #}
+    <div class="card-industrial">
+        <div class="px-5 py-4 border-b border-[#e5e5e5] flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                 fill="none" stroke="#00f900" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+                <path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>
+            </svg>
+            <h3 class="font-mono text-xs uppercase tracking-widest font-bold m-0">Últimas Entregas</h3>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="table-industrial">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Cliente</th>
+                        <th>Equipo</th>
+                        <th>Fecha</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for orden in ordenes_entregadas %}
+                    <tr>
+                        <td class="font-bold">#{{ orden.id }}</td>
+                        <td>{{ orden.equipo.cliente.nombre }}</td>
+                        <td>
+                            <span class="text-[#1a1a1a]">{{ orden.equipo.get_tipo_display }}</span>
+                            <span class="text-[#666]">{{ orden.equipo.marca }}</span>
+                        </td>
+                        <td class="text-[#666]">{{ orden.fecha_ingreso|date:"d/m/Y" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center py-8">
+                            <span class="font-mono text-sm text-[#999] uppercase tracking-wider">
+                                Sin entregas recientes
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {# --- Right Panel: Resumen Rápido --- #}
+    <div class="card-industrial">
+        <div class="px-5 py-4 border-b border-[#e5e5e5] flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                 fill="none" stroke="#00f900" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+            </svg>
+            <h3 class="font-mono text-xs uppercase tracking-widest font-bold m-0">Resumen Rápido</h3>
+        </div>
+
+        <div class="p-5 flex flex-col gap-4">
+            {# Row: Órdenes en Proceso #}
+            <div class="flex items-center justify-between py-2 border-b border-[#f0f0f0]">
+                <span class="text-xs font-mono uppercase tracking-wider text-[#666]">Órdenes en Proceso</span>
+                <span class="crt-text text-lg font-mono font-bold">{{ ordenes_en_proceso|length }}</span>
+            </div>
+
+            {# Row: Pendientes de Entrega #}
+            <div class="flex items-center justify-between py-2 border-b border-[#f0f0f0]">
+                <span class="text-xs font-mono uppercase tracking-wider text-[#666]">Pendientes de Entrega</span>
+                <span class="crt-text text-lg font-mono font-bold" style="color:#00e5ff; text-shadow:0 0 8px rgba(0,229,255,0.6);">
+                    {{ ordenes_para_entregar|length }}
+                </span>
+            </div>
+
+            {# Row: Equipo en Banco de Pruebas #}
+            <div class="flex items-center justify-between py-2 border-b border-[#f0f0f0]">
+                <span class="text-xs font-mono uppercase tracking-wider text-[#666]">Equipo en Banco</span>
+                <span class="crt-text text-lg font-mono font-bold">{{ banco_pruebas|length }}</span>
+            </div>
+
+            {# Row: Entregadas Recientes #}
+            <div class="flex items-center justify-between py-2">
+                <span class="text-xs font-mono uppercase tracking-wider text-[#666]">Entregadas Recientes</span>
+                <span class="crt-text-amber text-lg font-mono font-bold">{{ ordenes_entregadas|length }}</span>
+            </div>
+        </div>
+    </div>
+
+</div>
+
 {% endblock %}

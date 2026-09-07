@@ -1,463 +1,204 @@
-{% load static %}
-<!DOCTYPE html>
+{% load static %}<!DOCTYPE html>
 <html lang="es">
 <head>
     <link rel="icon" type="image/png" href="{% static 'icono.png' %}">
     <link rel="apple-touch-icon" href="{% static 'icono.png' %}">
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}C&H Refrigeración - Sistema de Gestión{% endblock %}</title>
-    
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-    
-    <!-- Chart.js -->
+    <title>{% block title %}C&H Refrigeración - SCADA{% endblock %}</title>
+
+    <!-- Google Fonts: Inter + JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+
+    <!-- Compiled Tailwind CSS + SCADA Design System -->
+    <link rel="stylesheet" href="{% static 'css/app.css' %}">
+
+    <!-- Chart.js (used by tablero) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    
-    <style>
-        /* ========================================
-           SCADA/INDUSTRIAL THEME - C&H REFRIGERACIÓN
-           ======================================== */
-        
-        :root {
-            --sidebar-bg: #1a1a1a;
-            --sidebar-border: #000000;
-            --main-bg: #f4f4f4;
-            --accent-green: #00ff00;
-            --accent-red: #ff3333;
-            --accent-yellow: #ffcc00;
-            --text-primary: #ffffff;
-            --text-secondary: #888888;
-            --panel-bg: #2a2a2a;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--main-bg);
-            min-height: 100vh;
-            display: flex;
-        }
-        
-        /* Numeric values use Courier New */
-        .numeric-value,
-        .data-value,
-        input[type="number"],
-        .counter,
-        .metric-value {
-            font-family: 'Courier New', Courier, monospace;
-            letter-spacing: 1px;
-        }
-        
-        /* ========================================
-           SIDEBAR - Panel de Control Industrial
-           ======================================== */
-        
-        #sidebar-wrapper {
-            width: 260px;
-            min-height: 100vh;
-            background-color: var(--sidebar-bg);
-            border-right: 4px solid var(--sidebar-border);
-            position: fixed;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        /* Logo Block */
-        .sidebar-logo {
-            background-color: #000000;
-            padding: 20px 15px;
-            text-align: center;
-            border-bottom: 2px solid #333333;
-        }
-        
-        .sidebar-logo h1 {
-            color: var(--text-primary);
-            font-size: 1.1rem;
-            font-weight: 700;
-            letter-spacing: 2px;
-            margin: 0;
-            text-transform: uppercase;
-        }
-        
-        .sidebar-logo .logo-subtitle {
-            color: var(--accent-green);
-            font-size: 0.7rem;
-            letter-spacing: 3px;
-            margin-top: 5px;
-            font-family: 'Courier New', Courier, monospace;
-        }
-        
-        /* Navigation Links */
-        .sidebar-nav {
-            padding: 20px 0;
-            flex-grow: 1;
-        }
-        
-        .sidebar-nav .nav-link {
-            display: flex;
-            align-items: center;
-            padding: 14px 20px;
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 0.95rem;
-            font-weight: 500;
-            letter-spacing: 0.5px;
-            border-left: 3px solid transparent;
-            transition: all 0.2s ease;
-        }
-        
-        .sidebar-nav .nav-link:hover {
-            background-color: var(--panel-bg);
-            color: var(--text-primary);
-            border-left-color: var(--accent-yellow);
-        }
-        
-        .sidebar-nav .nav-link.active {
-            background-color: var(--panel-bg);
-            color: var(--accent-green);
-            border-left-color: var(--accent-green);
-        }
-        
-        .sidebar-nav .nav-link i {
-            font-size: 1.2rem;
-            margin-right: 12px;
-            width: 24px;
-            text-align: center;
-        }
-        
-        /* Status Indicator */
-        .sidebar-status {
-            padding: 15px 20px;
-            background-color: #0d0d0d;
-            border-top: 1px solid #333333;
-        }
-        
-        .status-indicator {
-            display: flex;
-            align-items: center;
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            font-family: 'Courier New', Courier, monospace;
-        }
-        
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            background-color: var(--accent-green);
-            border-radius: 50%;
-            margin-right: 8px;
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        
-        /* ========================================
-           MAIN CONTENT AREA
-           ======================================== */
-        
-        #page-content-wrapper {
-            flex-grow: 1;
-            margin-left: 260px;
-            min-height: 100vh;
-            background-color: var(--main-bg);
-            display: flex;
-            flex-direction: column;
-        }
-        
-        /* Top Header Bar */
-        .top-header {
-            background-color: #ffffff;
-            padding: 15px 30px;
-            border-bottom: 2px solid #dddddd;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .page-title {
-            font-size: 1.4rem;
-            font-weight: 600;
-            color: #1a1a1a;
-            margin: 0;
-        }
-        
-        .header-datetime {
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 0.85rem;
-            color: #666666;
-            background-color: #f0f0f0;
-            padding: 8px 15px;
-            border: 1px solid #cccccc;
-        }
-        
-        /* Main Content */
-        .main-content {
-            padding: 25px 30px;
-            flex-grow: 1;
-        }
-        
-        /* ========================================
-           INDUSTRIAL UI COMPONENTS
-           ======================================== */
-        
-        /* Panel Style */
-        .industrial-panel {
-            background-color: #ffffff;
-            border: 2px solid #cccccc;
-            border-radius: 0;
-            box-shadow: 3px 3px 0px #999999;
-            margin-bottom: 20px;
-        }
-        
-        .industrial-panel .panel-header {
-            background-color: #2a2a2a;
-            color: #ffffff;
-            padding: 12px 20px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            border-bottom: 3px solid #000000;
-        }
-        
-        .industrial-panel .panel-body {
-            padding: 20px;
-        }
-        
-        /* Buttons */
-        .btn-industrial {
-            background-color: #2a2a2a;
-            color: #ffffff;
-            border: 2px solid #000000;
-            border-radius: 0;
-            padding: 10px 25px;
-            font-weight: 600;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-            transition: all 0.2s ease;
-        }
-        
-        .btn-industrial:hover {
-            background-color: #444444;
-            color: #ffffff;
-            transform: translate(-2px, -2px);
-            box-shadow: 4px 4px 0px #000000;
-        }
-        
-        .btn-industrial-success {
-            background-color: #1a5c1a;
-            border-color: #0d3d0d;
-        }
-        
-        .btn-industrial-success:hover {
-            background-color: #228b22;
-        }
-        
-        .btn-industrial-danger {
-            background-color: #8b0000;
-            border-color: #5c0000;
-        }
-        
-        .btn-industrial-danger:hover {
-            background-color: #b22222;
-        }
-        
-        /* Form Controls */
-        .form-control-industrial {
-            border: 2px solid #999999;
-            border-radius: 0;
-            padding: 10px 15px;
-            font-size: 0.95rem;
-            background-color: #ffffff;
-        }
-        
-        .form-control-industrial:focus {
-            border-color: #1a1a1a;
-            box-shadow: 3px 3px 0px #cccccc;
-            outline: none;
-        }
-        
-        /* Tables */
-        .table-industrial {
-            border: 2px solid #1a1a1a;
-        }
-        
-        .table-industrial thead {
-            background-color: #1a1a1a;
-            color: #ffffff;
-        }
-        
-        .table-industrial thead th {
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            font-size: 0.8rem;
-            padding: 12px 15px;
-            border: none;
-        }
-        
-        .table-industrial tbody td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #dddddd;
-            vertical-align: middle;
-        }
-        
-        .table-industrial tbody tr:hover {
-            background-color: #f0f0f0;
-        }
-        
-        /* Status Badges */
-        .badge-status {
-            padding: 5px 12px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            border-radius: 0;
-            font-family: 'Courier New', Courier, monospace;
-        }
-        
-        .badge-operational { background-color: #00aa00; color: #ffffff; }
-        .badge-warning { background-color: #ffaa00; color: #000000; }
-        .badge-critical { background-color: #cc0000; color: #ffffff; }
-        .badge-offline { background-color: #666666; color: #ffffff; }
-        
-        /* Responsive */
-        @media (max-width: 992px) {
-            #sidebar-wrapper {
-                width: 70px;
-            }
-            
-            #sidebar-wrapper .sidebar-logo h1,
-            #sidebar-wrapper .sidebar-logo .logo-subtitle,
-            #sidebar-wrapper .nav-link span,
-            #sidebar-wrapper .status-indicator span {
-                display: none;
-            }
-            
-            #sidebar-wrapper .nav-link {
-                justify-content: center;
-                padding: 15px;
-            }
-            
-            #sidebar-wrapper .nav-link i {
-                margin-right: 0;
-                font-size: 1.4rem;
-            }
-            
-            #page-content-wrapper {
-                margin-left: 70px;
-            }
-        }
-    </style>
-    
+
     {% block extra_css %}{% endblock %}
 </head>
-<body>
-    <!-- Sidebar -->
-    <nav id="sidebar-wrapper">
+<body class="bg-[#f4f4f4] text-[#1a1c1c] antialiased selection:bg-[#00f900] selection:text-[#026d00] min-h-screen flex">
+
+    <!-- ============================================
+         SIDEBAR — Panel de Control Industrial
+         ============================================ -->
+    <nav id="sidebar-wrapper"
+         class="fixed left-0 top-0 bottom-0 w-[260px] bg-[#1a1a1a] border-r-4 border-black z-50 flex flex-col transition-all duration-200 max-lg:w-[70px]"
+         aria-label="Navegación principal">
+
         <!-- Logo Block -->
-        <div class="sidebar-logo">
-            <h1><i class="bi bi-snow me-2"></i>C&H</h1>
-            <h1>REFRIGERACIÓN</h1>
-            <div class="logo-subtitle">SISTEMA DE GESTIÓN</div>
+        <div class="bg-black px-4 py-5 text-center border-b-2 border-[#333]">
+            <div class="flex items-center justify-center gap-2">
+                <!-- Snowflake icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
+                     fill="none" stroke="#00f900" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="2" y1="12" x2="22" y2="12"/>
+                    <line x1="12" y1="2" x2="12" y2="22"/>
+                    <path d="m20 16-4-4 4-4"/>
+                    <path d="m4 8 4 4-4 4"/>
+                    <path d="m16 4-4 4-4-4"/>
+                    <path d="m8 20 4-4 4 4"/>
+                </svg>
+                <h1 class="text-white text-base font-bold tracking-widest uppercase m-0
+                           max-lg:hidden">C&H</h1>
+            </div>
+            <h1 class="text-white text-sm font-bold tracking-widest uppercase m-0
+                       max-lg:hidden">REFRIGERACIÓN</h1>
+            <div class="text-[#00f900] text-[0.65rem] tracking-[3px] mt-1 font-mono
+                        max-lg:hidden">SISTEMA DE GESTIÓN</div>
         </div>
-        
-        <!-- Navigation -->
-        <div class="sidebar-nav">
-            <a href="{% url 'tablero' %}" class="nav-link {% block nav_tablero %}{% endblock %}">
-                <i class="bi bi-speedometer2"></i>
-                <span>Tablero</span>
+
+        <!-- Navigation Links -->
+        <div class="py-5 flex-grow">
+            <!-- Tablero -->
+            <a href="{% url 'tablero' %}"
+               class="flex items-center px-5 py-3.5 text-[#888] no-underline text-[0.95rem] font-medium
+                      border-l-[3px] border-transparent transition-all duration-200
+                      hover:bg-[#2a2a2a] hover:text-white hover:border-[#ffcc00]
+                      max-lg:justify-center max-lg:px-0 max-lg:py-4
+                      {% block nav_tablero %}{% endblock %}">
+                <!-- LayoutDashboard -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                     class="shrink-0 max-lg:mr-0 mr-3 max-lg:text-[1.4rem]">
+                    <rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/>
+                    <rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/>
+                </svg>
+                <span class="max-lg:hidden">Tablero</span>
             </a>
-            <a href="{% url 'ingreso_equipo' %}" class="nav-link {% block nav_nuevo_ingreso %}{% endblock %}">
-                <i class="bi bi-plus-square"></i>
-                <span>Nuevo Ingreso</span>
+
+            <!-- Nuevo Ingreso -->
+            <a href="{% url 'ingreso_equipo' %}"
+               class="flex items-center px-5 py-3.5 text-[#888] no-underline text-[0.95rem] font-medium
+                      border-l-[3px] border-transparent transition-all duration-200
+                      hover:bg-[#2a2a2a] hover:text-white hover:border-[#ffcc00]
+                      max-lg:justify-center max-lg:px-0 max-lg:py-4
+                      {% block nav_nuevo_ingreso %}{% endblock %}">
+                <!-- PlusSquare -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                     class="shrink-0 max-lg:mr-0 mr-3 max-lg:text-[1.4rem]">
+                    <rect width="18" height="18" x="3" y="3" rx="2"/>
+                    <path d="M12 8v8"/><path d="M8 12h8"/>
+                </svg>
+                <span class="max-lg:hidden">Nuevo Ingreso</span>
             </a>
-            <a href="{% url 'lista_clientes' %}" class="nav-link {% block nav_clientes %}{% endblock %}">
-                <i class="bi bi-people"></i>
-                <span>Clientes</span>
+
+            <!-- Clientes -->
+            <a href="{% url 'lista_clientes' %}"
+               class="flex items-center px-5 py-3.5 text-[#888] no-underline text-[0.95rem] font-medium
+                      border-l-[3px] border-transparent transition-all duration-200
+                      hover:bg-[#2a2a2a] hover:text-white hover:border-[#ffcc00]
+                      max-lg:justify-center max-lg:px-0 max-lg:py-4
+                      {% block nav_clientes %}{% endblock %}">
+                <!-- Users -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                     class="shrink-0 max-lg:mr-0 mr-3 max-lg:text-[1.4rem]">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+                <span class="max-lg:hidden">Clientes</span>
             </a>
-            <a href="{% url 'lista_equipos' %}" class="nav-link {% block nav_equipos %}{% endblock %}">
-                <i class="bi bi-box-seam"></i>
-                <span>Equipos</span>
+
+            <!-- Equipos -->
+            <a href="{% url 'lista_equipos' %}"
+               class="flex items-center px-5 py-3.5 text-[#888] no-underline text-[0.95rem] font-medium
+                      border-l-[3px] border-transparent transition-all duration-200
+                      hover:bg-[#2a2a2a] hover:text-white hover:border-[#ffcc00]
+                      max-lg:justify-center max-lg:px-0 max-lg:py-4
+                      {% block nav_equipos %}{% endblock %}">
+                <!-- Package -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                     class="shrink-0 max-lg:mr-0 mr-3 max-lg:text-[1.4rem]">
+                    <path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/>
+                    <path d="M12 22V12"/><path d="m3.3 7 7.703 4.734a2 2 0 0 0 1.994 0L20.7 7"/>
+                    <path d="m7.5 4.27 9 5.15"/>
+                </svg>
+                <span class="max-lg:hidden">Equipos</span>
             </a>
-            <a href="{% url 'calendario' %}" class="nav-link {% block nav_calendario %}{% endblock %}">
-                <i class="bi bi-calendar3"></i>
-                <span>Calendario</span>
+
+            <!-- Calendario -->
+            <a href="{% url 'calendario' %}"
+               class="flex items-center px-5 py-3.5 text-[#888] no-underline text-[0.95rem] font-medium
+                      border-l-[3px] border-transparent transition-all duration-200
+                      hover:bg-[#2a2a2a] hover:text-white hover:border-[#ffcc00]
+                      max-lg:justify-center max-lg:px-0 max-lg:py-4
+                      {% block nav_calendario %}{% endblock %}">
+                <!-- Calendar -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                     class="shrink-0 max-lg:mr-0 mr-3 max-lg:text-[1.4rem]">
+                    <path d="M8 2v4"/><path d="M16 2v4"/>
+                    <rect width="18" height="18" x="3" y="4" rx="2"/>
+                    <path d="M3 10h18"/>
+                </svg>
+                <span class="max-lg:hidden">Calendario</span>
             </a>
         </div>
-        
-        <!-- Status Indicator -->
-        <div class="sidebar-status">
-            <div class="status-indicator">
-                <div class="status-dot"></div>
-                <span>SISTEMA ACTIVO</span>
+
+        <!-- System Status Footer -->
+        <div class="px-5 py-3.5 bg-[#0d0d0d] border-t border-[#333]">
+            <div class="flex items-center text-xs text-[#888] font-mono
+                        max-lg:justify-center max-lg:text-[0]">
+                <span class="w-2 h-2 bg-[#00f900] rounded-full mr-2 shrink-0
+                             animate-[pulse_2s_infinite]
+                             max-lg:mr-0 max-lg:w-3 max-lg:h-3"></span>
+                <span class="max-lg:hidden">SISTEMA ACTIVO</span>
             </div>
         </div>
     </nav>
-    
-    <!-- Main Content -->
-    <div id="page-content-wrapper">
-        <!-- Top Header -->
-        <header class="top-header">
-            <h2 class="page-title">{% block page_title %}Panel de Control{% endblock %}</h2>
-            <div class="header-datetime" id="datetime-display">
-                <i class="bi bi-clock me-2"></i>
+
+    <!-- ============================================
+         MAIN CONTENT AREA
+         ============================================ -->
+    <div id="page-content-wrapper"
+         class="flex-grow ml-[260px] min-h-screen bg-[#f4f4f4] flex flex-col
+                max-lg:ml-[70px]">
+
+        <!-- Top Header Bar -->
+        <header class="bg-white px-8 py-4 border-b-2 border-[#ddd]
+                       flex justify-between items-center">
+            <h2 class="text-xl font-semibold text-[#1a1a1a] m-0">
+                {% block page_title %}Panel de Control{% endblock %}
+            </h2>
+            <div class="font-mono text-sm text-[#666] bg-[#f0f0f0] px-4 py-2 border border-[#ccc]
+                        flex items-center gap-2">
+                <!-- Clock icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                </svg>
                 <span id="current-datetime"></span>
             </div>
         </header>
-        
+
         <!-- Content Area -->
-        <main class="main-content">
-            {% block content %}
-            <!-- Child template content goes here -->
-            {% endblock %}
+        <main class="p-6 lg:p-8 flex-grow">
+            {% block content %}{% endblock %}
         </main>
     </div>
-    
-    <!-- Bootstrap 5 JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     <!-- DateTime Display Script -->
     <script>
         function updateDateTime() {
             const now = new Date();
-            const options = { 
-                weekday: 'short', 
-                year: 'numeric', 
-                month: 'short', 
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: false
+            const options = {
+                weekday: 'short', year: 'numeric', month: 'short', day: '2-digit',
+                hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
             };
-            document.getElementById('current-datetime').textContent = 
-                now.toLocaleDateString('es-ES', options).toUpperCase();
+            document.getElementById('current-datetime').textContent =
+                now.toLocaleDateString('es-AR', options).toUpperCase();
         }
-        
         updateDateTime();
         setInterval(updateDateTime, 1000);
     </script>
-    
+
     {% block extra_js %}{% endblock %}
 </body>
 </html>

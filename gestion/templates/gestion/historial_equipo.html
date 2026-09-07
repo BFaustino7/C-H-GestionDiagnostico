@@ -1,113 +1,127 @@
 {% extends 'gestion/base.html' %}
 
-{% block title %}Historial: {{ equipo.marca }} - SR Taller{% endblock %}
+{% block title %}Historial: {{ equipo.marca }} {{ equipo.modelo }} | C&H REFRIGERACION{% endblock %}
+{% block page_title %}HISTORIAL DE SERVICIOS{% endblock %}
+{% block nav_equipos %}active{% endblock %}
 
 {% block content %}
-<div class="container-fluid px-4 py-4">
-    
-    <div class="d-flex justify-content-between align-items-center mb-4 bg-dark text-white p-3 border border-black shadow">
+
+<!-- Equipment info header -->
+<div class="card-industrial mb-6">
+    <div class="bg-[#1a1a1a] text-white px-6 py-5 flex items-center justify-between border-b-4 border-[#00f900]">
         <div>
-            <h2 class="m-0 fw-bold text-uppercase">
-                <i class="bi bi-tools me-2"></i> {{ equipo.marca }} {{ equipo.modelo }}
-            </h2>
-            <small class="text-secondary">PROPIETARIO: <strong style="color: #ffcc00;">{{ equipo.cliente.nombre }}</strong></small>
+            <h3 class="text-lg font-bold tracking-widest uppercase m-0">
+                {{ equipo.marca }} {{ equipo.modelo }}
+            </h3>
+            <span class="text-sm text-[#aaa]">Propietario: <strong class="text-[#ffcc00]">{{ equipo.cliente.nombre }}</strong></span>
         </div>
-
-        <div class="text-end">
-            <span class="badge" style="background-color: #333; font-family: 'Courier New', monospace; font-size: 0.9rem; border: 1px solid #666;">
-                ID EQUIPO: EQ-{{ equipo.id|stringformat:"05d" }}
-            </span>
-        </div>
+        <span class="font-mono text-sm tracking-widest text-[#00f900]">EQ-{{ equipo.id|stringformat:"05d" }}</span>
     </div>
 
-    <div class="row">
-        <div class="col-lg-12">
-            <h5 class="section-header text-uppercase fw-bold mb-3" style="border-left: 5px solid #ffcc00; padding-left: 15px; color: #1a1a1a;">
-                📜 Línea de Tiempo de Intervenciones
-            </h5>
-
-            {% if ordenes %}
-                <div class="timeline-wrapper">
-                    {% for orden in ordenes %}
-                    <div class="card mb-4" style="border: 2px solid #1a1a1a; border-radius: 0; box-shadow: 4px 4px 0px rgba(0,0,0,0.15);">
-                        
-                        <div class="d-flex justify-content-between align-items-center p-2 px-3" style="background-color: #1a1a1a; color: #fff; border-bottom: 3px solid #ffcc00;">
-                            <span class="fw-bold" style="font-family: 'Courier New', monospace; font-size: 1.1rem;">ORDEN #{{ orden.id|stringformat:"05d" }}</span>
-                            <span style="font-size: 0.85rem; color: #aaa;"><i class="bi bi-calendar3"></i> {{ orden.fecha_ingreso|date:"d/m/Y H:i" }}</span>
-                        </div>
-                        
-                        <div class="card-body p-0">
-                            <div class="row g-0">
-                                
-                                <div class="col-md-8 p-3">
-                                    <div class="p-3 mb-3" style="background: #0d0d0d; color: #00ff00; font-family: 'Courier New', monospace; border: 1px solid #333;">
-                                        <div style="font-size: 0.75rem; color: #888; margin-bottom: 5px; text-transform: uppercase;">> DIAGNÓSTICO_TÉCNICO:</div>
-                                        <div style="white-space: pre-wrap; font-size: 0.9rem;">{{ orden.diagnostico_tecnico|default:"Sin diagnóstico cargado aún." }}</div>
-                                    </div>
-                                    
-                                    <div class="mb-3">
-                                        <strong style="font-size: 0.8rem; text-transform: uppercase; color: #666;">TRABAJO REALIZADO:</strong>
-                                        <div style="font-size: 0.95rem; color: #1a1a1a; margin-top: 4px; white-space: pre-wrap;">{{ orden.reparacion_realizada|default:"En proceso..." }}</div>
-                                    </div>
-                                    
-                                    <div>
-                                        <strong style="font-size: 0.8rem; text-transform: uppercase; color: #666;">REPUESTOS Y MATERIALES:</strong>
-                                        {% if orden.detalleinsumo_set.all %}
-                                            <ul style="list-style-type: none; padding-left: 0; margin-top: 5px; margin-bottom: 0; border-left: 3px solid #cccccc; padding-left: 10px;">
-                                            {% for item in orden.detalleinsumo_set.all %}
-                                                <li style="display: flex; justify-content: space-between; font-size: 0.9rem; padding: 3px 0; border-bottom: 1px dashed #eee;">
-                                                    <span>• {{ item.producto.nombre }} (x{{ item.cantidad }})</span>
-                                                    <strong style="color: #198754;">${{ item.precio_congelado }}</strong>
-                                                </li>
-                                            {% endfor %}
-                                            </ul>
-                                        {% else %}
-                                            <div style="font-size: 0.85rem; color: #888; font-style: italic; margin-top: 5px;">No se registraron repuestos adicionales en esta orden.</div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-4 p-3 d-flex flex-column justify-content-center align-items-center" style="background-color: #f8f9fa; border-left: 2px dashed #ccc;">
-                                    
-                                    <div class="mb-3 w-100 text-center">
-                                        <span style="display: block; padding: 8px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; font-size: 0.85rem; color: #fff;
-                                            {% if orden.estado == 'PENDIENTE' %}background-color: #dc3545;
-                                            {% elif orden.estado == 'DIAGNOSTICO' %}background-color: #ffc107; color: #000;
-                                            {% elif orden.estado == 'ESPERA' %}background-color: #6c757d;
-                                            {% elif orden.estado == 'REPARACION' %}background-color: #0d6efd;
-                                            {% else %}background-color: #198754;{% endif %}">
-                                            {{ orden.get_estado_display }}
-                                        </span>
-                                    </div>
-                                    
-                                    <div class="w-100 text-center mb-3" style="background-color: #1a1a1a; padding: 15px 10px; border: 2px solid #000;">
-                                        <div style="font-size: 0.7rem; color: #ffcc00; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 5px;">COSTO TOTAL</div>
-                                        <div style="font-size: 1.8rem; font-weight: 700; color: #fff; font-family: 'Courier New', monospace;">
-                                            ${{ orden.total_calculado|stringformat:".2f" }}
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="w-100">
-                                        <a href="{% url 'detalle_orden' orden.id %}" class="btn w-100" style="background-color: #fff; color: #1a1a1a; border: 2px solid #1a1a1a; font-weight: bold; font-size: 0.85rem; border-radius: 0; transition: all 0.2s;">
-                                            <i class="bi bi-search me-1"></i> VER FICHA COMPLETA
-                                        </a>
-                                    </div>
-                                    
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <div class="p-5 text-center" style="background-color: #fff; border: 2px dashed #ccc;">
-                    <i class="bi bi-clipboard-x display-1 text-muted"></i>
-                    <h4 class="mt-3 text-uppercase fw-bold" style="color: #1a1a1a;">Sin Historial</h4>
-                    <p class="text-muted">Este equipo no registra intervenciones técnicas previas en el sistema.</p>
-                </div>
-            {% endif %}
+    <div class="p-5 grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
+        <div>
+            <span class="block text-xs font-bold tracking-widest uppercase text-[#888] mb-1">Tipo</span>
+            <span class="font-medium">{{ equipo.tipo }}</span>
+        </div>
+        <div>
+            <span class="block text-xs font-bold tracking-widest uppercase text-[#888] mb-1">Marca</span>
+            <span class="font-medium">{{ equipo.marca }}</span>
+        </div>
+        <div>
+            <span class="block text-xs font-bold tracking-widest uppercase text-[#888] mb-1">Modelo</span>
+            <span class="font-mono">{{ equipo.modelo }}</span>
+        </div>
+        <div>
+            <span class="block text-xs font-bold tracking-widest uppercase text-[#888] mb-1">Ubicacion</span>
+            <span class="font-medium">{{ equipo.ubicacion|default:"-" }}</span>
         </div>
     </div>
+</div>
+
+<!-- Back button -->
+<a href="{% url 'lista_equipos' %}" class="btn-outline inline-flex items-center gap-2 mb-5">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+    VOLVER A EQUIPOS
+</a>
+
+<!-- Orders history -->
+<div class="card-industrial overflow-hidden">
+    {% if ordenes %}
+    <div class="overflow-x-auto">
+        <table class="table-industrial">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>FECHA</th>
+                    <th>ESTADO</th>
+                    <th>DIAGNOSTICO</th>
+                    <th>REPUESTOS</th>
+                    <th class="text-right">COSTO</th>
+                    <th class="text-center">DETALLE</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for orden in ordenes %}
+                <tr>
+                    <td class="font-mono text-sm">#{{ orden.id|stringformat:"05d" }}</td>
+                    <td class="font-mono text-sm">{{ orden.fecha_ingreso|date:"d/m/Y" }}</td>
+                    <td>
+                        {% if orden.estado == 'PENDIENTE' %}
+                            <span class="badge-red">{{ orden.get_estado_display }}</span>
+                        {% elif orden.estado == 'DIAGNOSTICO' %}
+                            <span class="badge-amber">{{ orden.get_estado_display }}</span>
+                        {% elif orden.estado == 'ESPERA' %}
+                            <span class="badge-status bg-[#6c757d] text-white">{{ orden.get_estado_display }}</span>
+                        {% elif orden.estado == 'REPARACION' %}
+                            <span class="badge-status bg-[#0d6efd] text-white">{{ orden.get_estado_display }}</span>
+                        {% elif orden.estado == 'COMPLETADO' %}
+                            <span class="badge-green">{{ orden.get_estado_display }}</span>
+                        {% elif orden.estado == 'ENTREGADO' %}
+                            <span class="badge-green">{{ orden.get_estado_display }}</span>
+                        {% else %}
+                            <span class="badge-status">{{ orden.get_estado_display }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="max-w-xs text-sm text-[#555] truncate" title="{{ orden.diagnostico_tecnico }}">
+                        {{ orden.diagnostico_tecnico|default:"Sin diagnostico"|truncatewords:10 }}
+                    </td>
+                    <td class="font-mono text-sm">
+                        {% if orden.detalleinsumo_set.all %}
+                            {{ orden.detalleinsumo_set.all|length }} items
+                        {% else %}
+                            <span class="text-[#999]">-</span>
+                        {% endif %}
+                    </td>
+                    <td class="font-mono text-right font-bold text-[#0066cc]">${{ orden.total_calculado|stringformat:".2f" }}</td>
+                    <td class="text-center">
+                        <a href="{% url 'detalle_orden' orden.id %}" class="btn-outline inline-flex items-center gap-2 text-xs">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                            VER
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Summary footer -->
+    <div class="px-5 py-3 bg-[#f9f9f9] border-t-2 border-[#eee]">
+        <span class="text-sm text-[#666]">
+            <strong class="font-mono">{{ ordenes|length }}</strong> intervenciones registradas
+        </span>
+    </div>
+
+    {% else %}
+    <!-- Empty state -->
+    <div class="p-16 text-center">
+        <div class="mb-5 text-[#bbb]">
+            <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>
+        </div>
+        <h4 class="text-lg font-bold tracking-widest uppercase text-[#1a1a1a] mb-2">Sin historial de servicios</h4>
+        <p class="text-[#888] text-sm mb-6">Este equipo no registra intervenciones tecnicas previas en el sistema.</p>
+    </div>
+    {% endif %}
 </div>
 
 {% endblock %}
