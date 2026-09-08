@@ -18,6 +18,23 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-clave-por-defecto-desarrol
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
+# Modo produccion explicito (tunel Cloudflare / exposicion a internet).
+# Se define desde el script de arranque de produccion, no en .env de desarrollo.
+PRODUCTION = os.getenv('PRODUCTION', 'False') == 'True'
+
+if PRODUCTION:
+    # Django corre detras de Cloudflare Tunnel: Cloudflare termina TLS (https)
+    # y reenvia por HTTP al localhost. Confiar en el header que lo indica.
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000  # 1 año
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = 'DENY'
+
 # Hosts que pueden servir este Django
 allowed_hosts_env = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1')
 ALLOWED_HOSTS = [h.strip() for h in allowed_hosts_env.split(',') if h.strip()]

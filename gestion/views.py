@@ -251,8 +251,10 @@ def editar_cliente(request, cliente_id):
         'cliente': cliente
     })
 
+@login_required
 def registro_usuario(request):
-    if request.user.is_authenticated:
+    # Registro restringido a staff: crear cuentas desde /admin/ (uso interno de 2 personas)
+    if not request.user.is_staff:
         return redirect('tablero')
     if request.method == 'POST':
         form = RegistroUsuarioForm(request.POST)
